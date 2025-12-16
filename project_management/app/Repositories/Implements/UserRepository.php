@@ -27,6 +27,7 @@ class UserRepository implements IUserRepository {
     public function update(int $id, array $data): bool
     {
         $user = User::findOrFail($id);
+        
         return $user->update($data);
     }
 
