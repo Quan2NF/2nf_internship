@@ -1,5 +1,5 @@
 # PHP 8.3 FPM (phù hợp Laravel 11)
-FROM php:8.3-fpm
+FROM php:8.4-fpm
 
 # Cài các package hệ thống cần thiết
 RUN apt-get update && apt-get install -y \
@@ -26,10 +26,10 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy source code vào container
-COPY . .
+#COPY . .
 
 # Cấp quyền cho Laravel
-RUN chmod -R 777 storage bootstrap/cache
+
 
 # Expose port cho PHP-FPM
 EXPOSE 9000

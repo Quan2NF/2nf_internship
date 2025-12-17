@@ -9,7 +9,11 @@ class UserTransformer
         return [
             'id' => $user->id,
             'name' => $user->name, // example computed
-            'email' => $user->email, 
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role' => $user->role,
+            'joined_at' => $user->joined_at,
+            'status' => $user->status
         ];
     }
 }

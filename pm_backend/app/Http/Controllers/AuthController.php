@@ -21,7 +21,11 @@ class AuthController extends Controller
         'name' => 'required|string|max:255',
         'email' => 'required|email|unique:users,email',
         'password' => 'required|string|min:6',
+        'phone' => 'nullable|string|max:20',
+        'role' => 'required|string|in:user,admin',
+        'status' => 'required|integer|in:0,1', // 0 : đã nghỉ, 1 : đang làm
     ]);
+        $validated['joined_at'] = now();
         $user = $this->authService->register($validated);
 
         $token = $user->createToken('api_token')->plainTextToken;
@@ -59,6 +63,6 @@ class AuthController extends Controller
     {
         $this->authService->logout($request->user());
 
-        return response()->json(['message' => 'Logged out successfully']);
+        return response()->json(['message' => 'Đăng xuất thành công']);
     }
 }
