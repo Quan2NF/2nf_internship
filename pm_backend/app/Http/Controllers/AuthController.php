@@ -23,7 +23,7 @@ class AuthController extends Controller
         'password' => 'required|string|min:6',
         'phone' => 'nullable|string|max:20',
         'role' => 'required|string|in:user,admin',
-        'status' => 'required|integer|in:0,1', // 0 : đã nghỉ, 1 : đang làm
+        'status' => 'required|boolean|in:0,1', // 0 : đã nghỉ, 1 : đang làm
     ]);
         $validated['joined_at'] = now();
         $user = $this->authService->register($validated);

@@ -51,7 +51,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'joined_at' => 'datetime'
+            'joined_at' => 'datetime',
+            'status' => 'boolean'
         ];
     }
 }
