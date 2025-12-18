@@ -1,15 +1,18 @@
 <?php
 
+namespace App\Repository\Implementations;
+
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use App\Repository\Interfaces\BaseRepositoryInterface;
 
 abstract class BaseRepository implements BaseRepositoryInterface
 {
     protected Model $model;
 
-    public function __construc(Model $model)
+    public function __construct(Model $model)
     {
         $this->model = $model;
     }
@@ -54,9 +57,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
 
     public function createMany(array $data): Collection
     {
-        return collect($data)->map(
-            fn ($item) => $this->create($item)
-        );
+        return DB::transaction(function () use ($data) {
+            return collect($data)->map(
+                fn ($item) => $this->create($item)
+            );
+        });
     }
 
     public function update(int $id, array $data): Model
