@@ -25,12 +25,10 @@ return new class extends Migration
             $table->string('role_in_project')->nullable();
 
             $table->timestamp('joined_at')->nullable();
-
-            $table->timestamps();
-
             $table->unique(['project_id', 'user_id']);
+            $table->index('user_id');            
             
-            $table->index('user_id');
+            $table->timestamps();
         });
     }
 

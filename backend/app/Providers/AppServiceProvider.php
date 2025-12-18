@@ -20,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Model::preventLazyLoading(! app()->isProduction());
+        /** @var \Illuminate\Foundation\Application $app */
+        $app = $this->app;
+
+        Model::preventLazyLoading(!$app->isProduction());
+        Model::preventSilentlyDiscardingAttributes(!$app->isProduction());
     }
 }
