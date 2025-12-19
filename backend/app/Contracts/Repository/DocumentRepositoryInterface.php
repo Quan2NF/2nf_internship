@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Interfaces;
+namespace App\Contracts\Repository;
 
 interface DocumentRepositoryInterface extends BaseRepositoryInterface
 {

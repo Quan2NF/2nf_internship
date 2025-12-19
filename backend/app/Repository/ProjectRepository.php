@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Implementations;
+namespace App\Repository;
 
 use App\Models\Project;
 use App\Repository\Interfaces\ProjectRepositoryInterface;

@@ -51,7 +51,7 @@ enum ResponseCode : string
     /**
      * Get the human-readable message for the response code.
      */
-    public function message(?string $field = null, ?string $value = null): string
+    public function message(?string $field = null, ?string $value = null): ?string
     {
         return match($this) {
             self::SUCCESS => 'Success',

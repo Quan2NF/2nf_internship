@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repository\Implementations;
+namespace App\Repository;
 
 use App\Models\Issue;
 use App\Repository\Interfaces\IssueRepositoryInterface;

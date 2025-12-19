@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Interfaces;
+namespace App\Contracts\Service;
 
 use App\Data\Project\AssignMembersToProjectData;
 use App\Http\Responses\ApiResponse;
@@ -10,15 +10,12 @@ use App\Data\Project\ProjectListFilterData;
 use App\Data\Project\ProjectScheduleAndInfoData;
 use App\Data\Project\ProjectSettingData;
 
-interface IssueServiceInterface
+/**
+ * @extends BaseServiceInterface<ProjectData>
+ */
+interface ProjectServiceInterface extends BaseServiceInterface
 {
     public function getList(ProjectListFilterData $data): ApiResponse;
-
-    public function create(ProjectData $data): ApiResponse;
-
-    public function edit(ProjectData $data): ApiResponse;
-
-    public function delete(ProjectData $data): ApiResponse;
 
     public function assignPM(ProjectData $data): ApiResponse;
 

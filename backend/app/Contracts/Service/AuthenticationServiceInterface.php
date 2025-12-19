@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Interfaces;
+namespace App\Contracts\Service;
 
 use App\Http\Responses\ApiResponse;
 
