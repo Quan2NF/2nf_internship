@@ -4,18 +4,15 @@ namespace App\Service\Interfaces;
 
 use App\Http\Responses\ApiResponse;
 
-use App\Data\Authentication\LoginRequestData;
-use App\Data\Authentication\ForgotPasswordRequestData;
-use App\Data\Authentication\LogoutRequestData;
-use App\Data\Authentication\ResetPasswordRequestData;
+use App\Data\Authentication\AuthenticationData;
 
 interface AuthenticationServiceInterface
 {
-    public function Login(LoginRequestData $data): ApiResponse;
+    public function login(AuthenticationData $data): ApiResponse;
 
-    public function ForgotPassword(ForgotPasswordRequestData $data): ApiResponse;
+    public function forgotPassword(AuthenticationData $data): ApiResponse;
 
-    public function ResetPassword(ResetPasswordRequestData $data): ApiResponse;
+    public function resetPassword(AuthenticationData $data): ApiResponse;
 
-    public function Logout(LogoutRequestData $data): ApiResponse;
+    public function logout(AuthenticationData $data): ApiResponse;
 }

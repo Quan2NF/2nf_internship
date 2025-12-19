@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Data\User;
+namespace App\Data\Issue;
 
 use Spatie\LaravelData\Data;
 
-class AssignRolesToUserRequestData extends Data
+class PostCommentToIssueData extends Data
 {
     public function __construct(
         //

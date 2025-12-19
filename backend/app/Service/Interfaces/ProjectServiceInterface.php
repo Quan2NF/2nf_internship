@@ -2,38 +2,33 @@
 
 namespace App\Service\Interfaces;
 
+use App\Data\Project\AssignMembersToProjectData;
 use App\Http\Responses\ApiResponse;
 
-use App\Data\Project\GetListProjectRequestData;
-use App\Data\Project\CreateProjectRequestData;
-use App\Data\Project\EditProjectRequestData;
-use App\Data\Project\DeleteProjectRequestData;
-use App\Data\Project\AssignPMToProjectRequestData;
-use App\Data\Project\AssignMembersToProjectRequestData;
-use App\Data\Project\GetSettingProjectRequestData;
-use App\Data\Project\UpdateSettingProjectRequestData;
-use App\Data\Project\GetScheduleInfoProjectRequestData;
-use App\Data\Project\UpdateScheduleInfoProjectRequestData;
+use App\Data\Project\ProjectData;
+use App\Data\Project\ProjectListFilterData;
+use App\Data\Project\ProjectScheduleAndInfoData;
+use App\Data\Project\ProjectSettingData;
 
 interface IssueServiceInterface
 {
-    public function GetList(GetListProjectRequestData $data): ApiResponse;
+    public function getList(ProjectListFilterData $data): ApiResponse;
 
-    public function Create(CreateProjectRequestData $data): ApiResponse;
+    public function create(ProjectData $data): ApiResponse;
 
-    public function Edit(EditProjectRequestData $data): ApiResponse;
+    public function edit(ProjectData $data): ApiResponse;
 
-    public function Delete(DeleteProjectRequestData $data): ApiResponse;
+    public function delete(ProjectData $data): ApiResponse;
 
-    public function AssignPM(AssignPMToProjectRequestData $data): ApiResponse;
+    public function assignPM(ProjectData $data): ApiResponse;
 
-    public function AssignMembers(AssignMembersToProjectRequestData $data): ApiResponse;
+    public function assignMembers(AssignMembersToProjectData $data): ApiResponse;
 
-    public function GetSetting(GetSettingProjectRequestData $data): ApiResponse;
+    public function getSetting(ProjectSettingData $data): ApiResponse;
 
-    public function UpdateSetting(UpdateSettingProjectRequestData $data): ApiResponse;
+    public function updateSetting(ProjectSettingData $data): ApiResponse;
 
-    public function GetScheduleInfo(GetScheduleInfoProjectRequestData $data): ApiResponse;
+    public function getScheduleAndInfo(ProjectScheduleAndInfoData $data): ApiResponse;
 
-    public function UpdateScheduleInfo(UpdateScheduleInfoProjectRequestData $data): ApiResponse;
+    public function updateScheduleAndInfo(ProjectScheduleAndInfoData $data): ApiResponse;
 }

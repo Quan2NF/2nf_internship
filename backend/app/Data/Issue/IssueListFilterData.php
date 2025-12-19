@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Data\Authentication;
+namespace App\Data\Issue;
 
 use Spatie\LaravelData\Data;
 
-class LogoutRequestData extends Data
+class IssueListFilterData extends Data
 {
     public function __construct(
         //

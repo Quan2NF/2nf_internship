@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Data\Role;
+namespace App\Data\Issue;
 
 use Spatie\LaravelData\Data;
 
-class DeleteRoleRequestData extends Data
+class IssueData extends Data
 {
     public function __construct(
         //

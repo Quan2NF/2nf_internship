@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Data\User;
+namespace App\Data\Project;
 
 use Spatie\LaravelData\Data;
 
-class EditUserRequestData extends Data
+class AssignMembersToProjectData extends Data
 {
     public function __construct(
         //

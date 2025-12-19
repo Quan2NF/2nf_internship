@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Data\Role;
+namespace App\Data\Project;
 
 use Spatie\LaravelData\Data;
 
-class CreateRoleRequestData extends Data
+class ProjectData extends Data
 {
     public function __construct(
         //

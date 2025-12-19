@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Data\Project;
+namespace App\Data\User;
 
 use Spatie\LaravelData\Data;
 
-class GetScheduleInfoProjectRequestData extends Data
+class AssignRolesToUserData extends Data
 {
     public function __construct(
         //

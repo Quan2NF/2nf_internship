@@ -4,7 +4,7 @@ namespace App\Data\Project;
 
 use Spatie\LaravelData\Data;
 
-class DeleteProjectRequestData extends Data
+class ProjectListFilterData extends Data
 {
     public function __construct(
         //

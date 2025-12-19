@@ -4,7 +4,7 @@ namespace App\Data\Project;
 
 use Spatie\LaravelData\Data;
 
-class CreateProjectRequestData extends Data
+class ProjectSettingData extends Data
 {
     public function __construct(
         //

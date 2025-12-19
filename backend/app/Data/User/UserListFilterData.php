@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Data\Issue;
+namespace App\Data\User;
 
 use Spatie\LaravelData\Data;
 
-class CreateIssueRequestData extends Data
+class UserListFilterData extends Data
 {
     public function __construct(
         //
