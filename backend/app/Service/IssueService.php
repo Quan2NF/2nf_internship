@@ -2,21 +2,20 @@
 
 namespace App\Service;
 
-use App\Service\Interfaces\IssueServiceInterface;
-use App\Http\Responses\ApiResponse;
+use App\Contracts\Service\IssueServiceInterface;
 
-use App\Data\Issue\IssueData;
 use App\Data\Issue\IssueListFilterData;
 use App\Data\Issue\PostCommentToIssueData;
+use App\Data\Response\ApiResponseData;
 
 class IssueService extends BaseService implements IssueServiceInterface
 {
-    public function getList(IssueListFilterData $data): ApiResponse
+    public function getList(IssueListFilterData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
     
-    public function postComment(PostCommentToIssueData $data): ApiResponse
+    public function postComment(PostCommentToIssueData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }

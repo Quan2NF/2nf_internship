@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Service;
 
-use App\Http\Responses\ApiResponse;
+use App\Data\Response\ApiResponseData;
 use Spatie\LaravelData\Data;
 
 /**
@@ -14,17 +14,17 @@ interface BaseServiceInterface
      * @param T $data
      * @return ApiResponse
      */
-    public function create(Data $data): ApiResponse;
+    public function create(Data $data): ApiResponseData;
 
     /**
      * @param T $data
      * @return ApiResponse
      */
-    public function edit(Data $data): ApiResponse;
+    public function edit(Data $data): ApiResponseData;
 
     /**
      * @param T $data
      * @return ApiResponse
      */
-    public function delete(Data $data): ApiResponse;
+    public function delete(Data $data): ApiResponseData;
 }

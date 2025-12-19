@@ -2,17 +2,16 @@
 
 namespace App\Contracts\Service;
 
-use App\Http\Responses\ApiResponse;
-
 use App\Data\Authentication\AuthenticationData;
+use App\Data\Response\ApiResponseData;
 
 interface AuthenticationServiceInterface
 {
-    public function login(AuthenticationData $data): ApiResponse;
+    public function login(AuthenticationData $data): ApiResponseData;
 
-    public function forgotPassword(AuthenticationData $data): ApiResponse;
+    public function forgotPassword(AuthenticationData $data): ApiResponseData;
 
-    public function resetPassword(AuthenticationData $data): ApiResponse;
+    public function resetPassword(AuthenticationData $data): ApiResponseData;
 
-    public function logout(AuthenticationData $data): ApiResponse;
+    public function logout(AuthenticationData $data): ApiResponseData;
 }

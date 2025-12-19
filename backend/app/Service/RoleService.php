@@ -2,12 +2,12 @@
 
 namespace App\Service;
 
-use App\Service\Interfaces\RoleServiceInterface;
-use App\Http\Responses\ApiResponse;
+use App\Contracts\Service\RoleServiceInterface;
+use App\Data\Response\ApiResponseData;
 
 class RoleService extends BaseService implements RoleServiceInterface
 {
-    public function getList(): ApiResponse
+    public function getList(): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }

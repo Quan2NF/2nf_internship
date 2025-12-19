@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Models\Issue;
-use App\Repository\Interfaces\IssueRepositoryInterface;
+use App\Contracts\Repository\IssueRepositoryInterface;
 
 class IssueRepository extends BaseRepository implements IssueRepositoryInterface
 {

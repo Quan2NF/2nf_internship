@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\IssuePriority;
+use App\Enums\IssueStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,26 +35,8 @@ class Issue extends Model
         'due_date'     => 'date',
         'estimate_time'=> 'decimal:2',
         'actual_time'  => 'decimal:2',
-        'status'       => 'string',
-        'priority'     => 'string',
-    ];
-
-    public const STATUS_OPEN        = 'open';
-    public const STATUS_TODO        = 'todo';
-    public const STATUS_IN_PROGRESS = 'in_progress';
-    public const STATUS_REVIEWING   = 'reviewing';
-    public const STATUS_RE_OPEN     = 're_open';
-    public const STATUS_DONE        = 'done';
-    public const STATUS_CLOSE       = 'close';
-
-    public const STATUSES = [
-        self::STATUS_OPEN,
-        self::STATUS_TODO,
-        self::STATUS_IN_PROGRESS,
-        self::STATUS_REVIEWING,
-        self::STATUS_RE_OPEN,
-        self::STATUS_DONE,
-        self::STATUS_CLOSE,
+        'status'       => IssueStatus::class,
+        'priority'     => IssuePriority::class,
     ];
 
     // RELATIONSHIPS

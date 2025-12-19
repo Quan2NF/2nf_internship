@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ProjectStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -23,19 +24,7 @@ class Project extends Model
     protected $casts = [
         'kickoff_date' => 'date',
         'end_date'     => 'date',
-        'status'       => 'string',
-    ];
-
-    public const STATUS_PLANNED   = 'planned';
-    public const STATUS_ACTIVE    = 'active';
-    public const STATUS_COMPLETED = 'completed';
-    public const STATUS_ARCHIVED  = 'archived';
-
-    public const STATUSES = [
-        self::STATUS_PLANNED,
-        self::STATUS_ACTIVE,
-        self::STATUS_COMPLETED,
-        self::STATUS_ARCHIVED,
+        'status'       => ProjectStatus::class,
     ];
 
     // RELATIONSHIPS

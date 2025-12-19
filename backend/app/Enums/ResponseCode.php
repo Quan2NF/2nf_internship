@@ -47,44 +47,4 @@ enum ResponseCode : string
     // Service unavailable / maintenance
     case SERVICE_UNAVAILABLE = 'R_CMN_503_01';
     case CODE_MAINTENANCE = 'R_CMN_503_02';
-
-    /**
-     * Get the human-readable message for the response code.
-     */
-    public function message(?string $field = null, ?string $value = null): ?string
-    {
-        return match($this) {
-            self::SUCCESS => 'Success',
-            self::INVALID_PARAMETER => 'Invalid parameter',
-            self::INVALID_TENANT => 'Invalid tenant',
-            self::EXPIRED_TOKEN => 'Validity period expired',
-            self::INVALID_CREDENTIALS => 'Username or password incorrect',
-            self::FORBIDDEN => 'You do not have access. Please contact the system administrator',
-            self::SERVICE_UNAVAILABLE_FOR_TENANT => 'This service is unavailable for your tenant. Please contact the system administrator',
-            self::DATA_NOT_FOUND => 'No data found',
-            self::RESOURCE_FORBIDDEN => 'You do not have permission to access this resource. Please contact the system administrator',
-            self::DATA_DOES_NOT_EXIST => 'Data does not exist',
-            self::TENANT_CONFIG_NOT_FOUND => 'Tenant settings file not found',
-            self::ALREADY_DELETED => 'It has already been deleted',
-            self::MALFORMED_DATA => "{$field}: malformed data {$value}",
-            self::DATA_EXCEEDS_LIMIT => "{$field}: data cannot exceed {$value}",
-            self::DATA_BELOW_LIMIT => "{$field}: data cannot be less than {$value}",
-            self::DATA_EXCEEDS_CHAR_LIMIT => "{$field}: data cannot exceed {$value} characters",
-            self::DATA_BELOW_CHAR_LIMIT => "{$field}: data cannot be less than {$value} characters",
-            self::INVALID_TRANSMITTED_DATA => "{$field}: invalid transmitted data",
-            self::EMPTY_DATA => "{$field}: data cannot be empty",
-            self::EMAIL_ALREADY_EXISTS => 'Email already exists',
-            self::FIELD_MUST_BE_LESS_THAN => "The {$field} must be less than the {$value}",
-            self::ACCOUNT_ALREADY_EXISTS => 'This account is already registered',
-            self::SERVER_ERROR => 'Server error. Please contact the system administrator',
-            self::INVALID_FILE_FORMAT => 'The uploaded file is not in the correct format',
-            self::FILE_TOO_LARGE => 'The uploaded file is too large. Image files must be less than or equal to {$value}. Non-image files must be less than or equal to {$value}.',
-            self::FILE_DOWNLOAD_FAILED => 'File download failed. Please contact the system administrator',
-            self::FILE_UPLOAD_FAILED => 'Uploading file failed. Please contact the system administrator',
-            self::FILE_DOWNLOAD_FAILED_AGAIN => 'File download failed. Please contact the system administrator',
-            self::SERVICE_UNAVAILABLE => 'Service unavailable',
-            self::CODE_MAINTENANCE => 'Code maintenance',
-            default => null,
-        };
-    }
 }

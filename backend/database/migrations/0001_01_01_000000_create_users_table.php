@@ -18,10 +18,6 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('password');
             
-            $table->enum('position', [
-                'dev_backend', 'dev_frontend', 'tester', 'comtor', 'BA', 'QA', 'PM', 'PMO', 'Admin'
-            ]);
-            
             $table->date('date_joined')->nullable();
             $table->enum('status', ['active', 'inactive', 'on_leave'])->default('active');
 
@@ -31,7 +27,6 @@ return new class extends Migration
 
             // Index
             $table->index('email');
-            $table->index('position');
             $table->index('status');
         });
 

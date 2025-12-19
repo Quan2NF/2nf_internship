@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Models\Document;
-use App\Repository\Interfaces\DocumentRepositoryInterface;
+use App\Contracts\Repository\DocumentRepositoryInterface;
 
 class DocumentRepository extends BaseRepository implements DocumentRepositoryInterface
 {

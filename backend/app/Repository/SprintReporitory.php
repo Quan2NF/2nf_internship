@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Models\Sprint;
-use App\Repository\Interfaces\SprintRepositoryInterface;
+use App\Contracts\Repository\SprintRepositoryInterface;
 
 class SprintReporitory extends BaseRepository implements SprintRepositoryInterface
 {

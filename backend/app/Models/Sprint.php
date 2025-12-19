@@ -24,18 +24,6 @@ class Sprint extends Model
         'status'     => 'string',
     ];
 
-    // CONSTANTS
-
-    public const STATUS_PLANNED     = 'planned';
-    public const STATUS_ACTIVE      = 'active';
-    public const STATUS_COMPLETED   = 'completed';
-
-    public const STATUSES = [
-        self::STATUS_PLANNED,
-        self::STATUS_ACTIVE,
-        self::STATUS_COMPLETED,
-    ];
-
     // RELATIONSHIPS
 
     public function project()

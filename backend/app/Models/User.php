@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\UserStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -24,7 +26,6 @@ class User extends Authenticatable
         'email',
         'phone',
         'password',
-        'position',
         'date_joined',
         'status',
     ];
@@ -48,46 +49,10 @@ class User extends Authenticatable
     {
         return [
             'date_joined'       => 'date',
-            'status'            => 'string',
+            'status'            => UserStatus::class,
             'password'          => 'hashed', // auto-hash
         ];
     }
-
-    // CONSTANTS
-
-    // Positions
-    public const POSITION_DEV_BACKEND  = 'dev_backend';
-    public const POSITION_DEV_FRONTEND = 'dev_frontend';
-    public const POSITION_TESTER       = 'tester';
-    public const POSITION_COMTOR       = 'comtor';
-    public const POSITION_BA           = 'BA';
-    public const POSITION_QA           = 'QA';
-    public const POSITION_PM           = 'PM';
-    public const POSITION_PMO          = 'PMO';
-    public const POSITION_ADMIN        = 'Admin';
-
-    public const POSITIONS = [
-        self::POSITION_DEV_BACKEND,
-        self::POSITION_DEV_FRONTEND,
-        self::POSITION_TESTER,
-        self::POSITION_COMTOR,
-        self::POSITION_BA,
-        self::POSITION_QA,
-        self::POSITION_PM,
-        self::POSITION_PMO,
-        self::POSITION_ADMIN,
-    ];
-
-    // Statuses
-    public const STATUS_ACTIVE   = 'active';
-    public const STATUS_INACTIVE = 'inactive';
-    public const STATUS_ON_LEAVE = 'on_leave';
-
-    public const STATUSES = [
-        self::STATUS_ACTIVE,
-        self::STATUS_INACTIVE,
-        self::STATUS_ON_LEAVE,
-    ];
 
     // RELATIONSHIPS
 

@@ -2,7 +2,7 @@
 
 namespace App\Contracts\Service;
 
-use App\Http\Responses\ApiResponse;
+use App\Data\Response\ApiResponseData;
 
 use App\Data\Role\RoleData;
 
@@ -11,5 +11,5 @@ use App\Data\Role\RoleData;
  */
 interface RoleServiceInterface extends BaseServiceInterface
 {
-    public function getList(): ApiResponse;
+    public function getList(): ApiResponseData;
 }

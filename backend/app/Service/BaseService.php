@@ -2,23 +2,23 @@
 
 namespace App\Service;
 
-use App\Http\Responses\ApiResponse;
-use App\Service\Interfaces\BaseServiceInterface;
+use App\Contracts\Service\BaseServiceInterface;
+use App\Data\Response\ApiResponseData;
 use Spatie\LaravelData\Data;
 
 abstract class BaseService implements BaseServiceInterface
 {
-    public function create(Data $data): ApiResponse
+    public function create(Data $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
 
-    public function edit(Data $data): ApiResponse
+    public function edit(Data $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
 
-    public function delete(Data $data): ApiResponse
+    public function delete(Data $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }

@@ -2,28 +2,28 @@
 
 namespace App\Service;
 
-use App\Service\Interfaces\AuthenticationServiceInterface;
-use App\Http\Responses\ApiResponse;
+use App\Contracts\Service\AuthenticationServiceInterface;
+use App\Data\Response\ApiResponseData;
 use App\Data\Authentication\AuthenticationData;
 
 class AuthenticationService implements AuthenticationServiceInterface
 {
-    public function login(AuthenticationData $data): ApiResponse
+    public function login(AuthenticationData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
 
-    public function forgotPassword(AuthenticationData $data): ApiResponse
+    public function forgotPassword(AuthenticationData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
 
-    public function resetPassword(AuthenticationData $data): ApiResponse
+    public function resetPassword(AuthenticationData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
 
-    public function logout(AuthenticationData $data): ApiResponse
+    public function logout(AuthenticationData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }

@@ -3,7 +3,7 @@
 namespace App\Repository;
 
 use App\Models\Milestone;
-use App\Repository\Interfaces\MilestoneRepositoryInterface;
+use App\Contracts\Repository\MilestoneRepositoryInterface;
 
 class MilestoneRepository extends BaseRepository implements MilestoneRepositoryInterface
 {

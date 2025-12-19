@@ -2,8 +2,8 @@
 
 namespace App\Contracts\Service;
 
+use App\Data\Response\ApiResponseData;
 use App\Data\User\AssignRolesToUserData;
-use App\Http\Responses\ApiResponse;
 
 use App\Data\User\UserData;
 use App\Data\User\UserListFilterData;
@@ -13,9 +13,9 @@ use App\Data\User\UserListFilterData;
  */
 interface UserServiceInterface extends BaseServiceInterface
 {
-    public function getFilteredList(UserListFilterData $data): ApiResponse;
+    public function getFilteredList(UserListFilterData $data): ApiResponseData;
 
-    public function assignRoles(AssignRolesToUserData $data): ApiResponse;
+    public function assignRoles(AssignRolesToUserData $data): ApiResponseData;
 
-    public function getRoles(UserData $data): ApiResponse;
+    public function getRoles(UserData $data): ApiResponseData;
 }

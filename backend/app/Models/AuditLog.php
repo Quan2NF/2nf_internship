@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\Model\Issue\IssueAuditAction;
 
 class AuditLog extends Model
 {
@@ -16,7 +15,6 @@ class AuditLog extends Model
     ];
 
     protected $casts = [
-        'action' => IssueAuditAction::class,
         'old_values' => 'array',
         'new_values' => 'array',
     ];
