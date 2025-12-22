@@ -5,9 +5,9 @@ namespace App\Http\Responses;
 use App\Enums\ResponseCode;
 use App\Data\Response\ApiResponseData;
 
-trait ApiResponse
+final class ApiResponse
 {
-    protected function apiResponse(
+    public static function apiResponse(
         ResponseCode $code,
         mixed $data = null
     ): ApiResponseData {

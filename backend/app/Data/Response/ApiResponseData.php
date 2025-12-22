@@ -2,8 +2,8 @@
 
 namespace App\Data\Response;
 
-use Spatie\LaravelData\Data;
 use App\Enums\ResponseCode;
+use Spatie\LaravelData\Data;
 
 class ApiResponseData extends Data
 {
@@ -12,4 +12,15 @@ class ApiResponseData extends Data
         public ?ResponseCode $response_code,
         public mixed $data
     ) {}
+
+    public function toResponse($request)
+    {
+        return response()->json(
+            [
+                'response_code' => $this->response_code->value,
+                'data' => $this->data,
+            ],
+            $this->status
+        );
+    }
 }
