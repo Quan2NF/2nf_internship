@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 use App\Services\Interfaces\IUserService;
-use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -20,24 +19,12 @@ class UserController extends Controller {
         $users = $this->userService->getAll();
         return response()->json($users);
     }
-    public function update(Request $request, User $user) {
-        $this->authorize('update', $user);
-        $dto = new UpdateUserDto(
-            $request->input('name'),
-            $request->input('email'),
-            $request->input('password'),
-            $request->input('phone'),
-            $request->input('role')
-        );
-
-        $updatedUser = $this->userService->update($user, $dto);
-        return response()->json(UserTransformer::transform($updatedUser));
-    }
+    
     public function destroy(User $user)
     {
         $this->authorize('delete', $user);
-
-        $this->userService->delete($user);
-        return response()->json(['message' => 'User deleted']);
+        
+        $this->userService->delete($user->id);
+        return response()->json(['message' => 'Xóa người dùng']);
     }
 }

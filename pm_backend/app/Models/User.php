@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,48 +10,42 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens,HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
+        'employee_code',   // Mã nhân viên
         'name',
         'email',
         'password',
-        'phone',
-        'role',
-        'status',
-        'joined_at'
+        'phone_number',
+        'birthday',
+        'gender',          // 1: Male, 2: Female, 3: Other
+        'join_date',
+        'resign_date',
+        'avatar',
+        'is_active',       // 1: Active, 2: Inactive
     ];
 
-   
-
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
+    protected $casts = [
+        'password' => 'hashed',
+        'birthday' => 'date',
+        'join_date' => 'date',
+        'resign_date' => 'date',
+        'is_active' => 'integer',
+    ];
+
+    // Nếu muốn quan hệ với Role
+    public function role()
     {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-            'joined_at' => 'datetime',
-            'status' => 'boolean'
-        ];
+        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
+    }
+    public function hasRole(string|array $roles): bool {
+        $roles = (array) $roles;
+        return $this->roles->pluck('code')->intersect($roles)->isNotEmpty();
     }
 }

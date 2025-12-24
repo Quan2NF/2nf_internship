@@ -10,17 +10,13 @@ class Role extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',        // admin, PMO, PM, member   
-        'description',
-        'status',      // 1: active, 0: inactive
+        'code',  // ví dụ: 'admin', 'pmo', 'pm', 'member'
+        'name',  // tên hiển thị
     ];
 
-    protected $casts = [
-        'status' => 'boolean',
-    ];
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');
     }
 }

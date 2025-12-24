@@ -5,46 +5,33 @@ use App\DTOs\UpdateUserDto;
 use App\Models\User;
 use App\Repositories\Interfaces\IUserRepository;
 use App\Services\Interfaces\IUserService;
+use App\Services\Implements\BaseService;
 
-class UserService implements IUserService {
-    protected IUserRepository $userRepo;
-
-    public function __construct(IUserRepository $userRepo)
+class UserService extends BaseService implements IUserService 
+{
+   public function __construct(protected IUserRepository $userRepo)
     {
-        $this->userRepo = $userRepo;
+        parent::__construct($userRepo); // truyền xuống BaseService
+        
     }
-    public function getAll() : array {
-       $userList = $this->userRepo->all();
-       return $userList;
-    }
-    public function getbyId(int $id) : User {
-       $user = $this->userRepo->find($id);
-       return $user;
-    }
+    public function updateUser(User $user, UpdateUserDto $dto): User
+    {
+        
+        $data = [
+            'name'  => $dto->name ?? $user->name,
+            'email' => $dto->email ?? $user->email,
+            'phone' => $dto->phone ?? $user->phone,
+        ];
 
-    public function update(User $user, UpdateUserDto $dto): User {
-       if ($dto->name !== null) {
-        $user->name = $dto->name;
-       }
+        // Sử dụng BaseService::update
+        $this->update($user->id, $data);
 
-    if ($dto->email !== null) {
-        $user->email = $dto->email;
-       }
-     if ($dto->phone !== null) {
-        $user->phone = $dto->phone;
-       }
-        if ($dto->role !== null) {
-        $user->role = $dto->role;
-       }
-    $data = $dto->toArray();
+        // Sync roles nếu có
+        if (!empty($dto->roles)) {
+            $user->roles()->sync($dto->role); // roles là mảng ID hoặc code
+        }
 
-    $this->userRepo->update($user->id, $data);
-
-    // Reload user để chắc chắn dữ liệu mới
-    return $this->userRepo->find($user->id);
-    }
-
-    public function delete(User $user): void {
-        $this->userRepo->delete($user->id);
+        // Reload user kèm roles
+        return $user->refresh()->load('roles');
     }
 }
