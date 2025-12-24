@@ -12,31 +12,39 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('projects', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('code')->unique();
+            $table->id(); // bigint unsigned auto_increment
 
-            $table->date('kickoff_date')->nullable();
-            $table->date('end_date')->nullable();
-
+            $table->string('code', 100);
+            $table->string('name', 100);
             $table->text('description')->nullable();
 
-            $table->enum('status', ['planned', 'active', 'completed', 'archived'])->default('planned');
+            $table->unsignedTinyInteger('status');
 
-            $table->foreignId('pm_id')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
+            $table->date('planned_start_date')->nullable();
+            $table->date('planned_end_date')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
 
-            // created_at, updated_at, deleted_at
+            $table->unsignedInteger('progress_rate');
+
+            $table->unsignedTinyInteger('is_public')->default(0);
+            $table->unsignedTinyInteger('is_active')->default(1);
+
+            $table->unsignedBigInteger('created_by');
+            $table->unsignedBigInteger('updated_by');
+
             $table->timestamps();
             $table->softDeletes();
+
+            // INDEXES
+            $table->unique('code', 'projects_code_uq');
             
-            // Index
-            $table->index('status');
-            $table->index('kickoff_date');
-            $table->index('pm_id');
-            $table->index('code');
+            // FOREIGN KEYS
+            $table->foreign('created_by', 'projects_created_by_fk')
+                ->references('id')->on('users');
+
+            $table->foreign('updated_by', 'projects_updated_by_fk')
+                ->references('id')->on('users');
         });
     }
 

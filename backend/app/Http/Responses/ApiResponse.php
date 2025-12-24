@@ -7,7 +7,7 @@ use App\Data\Response\ApiResponseData;
 
 final class ApiResponse
 {
-    public static function apiResponse(
+    public static function from(
         ResponseCode $code,
         mixed $data = null
     ): ApiResponseData {

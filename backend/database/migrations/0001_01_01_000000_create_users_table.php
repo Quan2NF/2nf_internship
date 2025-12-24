@@ -12,22 +12,31 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('phone')->nullable();
-            $table->string('password');
+            $table->id(); // bigint unsigned auto_increment
+
+            $table->string('employee_code', 20);
+            $table->string('name', 100);
+            $table->string('email', 100);
+            $table->string('password', 255);
+
+            $table->string('phone_number', 15)->nullable();
+            $table->date('birthday')->nullable();
+            $table->unsignedTinyInteger('gender')->nullable()
+                  ->comment('1: Male, 2: Female, 3: Other');
+
+            $table->date('join_date')->nullable();
+            $table->date('resign_date')->nullable();
+
+            $table->string('avatar', 255)->nullable();
+
+            $table->unsignedTinyInteger('is_active')->default(1);
+
+            $table->timestamps();   // created_at, updated_at
+            $table->softDeletes();  // deleted_at
             
-            $table->date('date_joined')->nullable();
-            $table->enum('status', ['active', 'inactive', 'on_leave'])->default('active');
-
-            // created_at, updated_at, deleted_at
-            $table->timestamps();
-            $table->softDeletes();
-
-            // Index
-            $table->index('email');
-            $table->index('status');
+            // INDEXES
+            $table->unique('employee_code', 'users_employee_code_uq');
+            $table->unique('email', 'users_email_uq');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

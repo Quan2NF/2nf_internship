@@ -18,6 +18,6 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $ex) {
-            return ApiResponse::apiResponse(ResponseCode::SERVER_ERROR);
+            return ApiResponse::from(ResponseCode::SERVER_ERROR);
         });
     })->create();
