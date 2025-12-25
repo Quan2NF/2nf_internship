@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Role extends Model
 {
@@ -15,7 +14,15 @@ class Role extends Model
         'name',
     ];
 
-    public function projectMembers(): BelongsToMany
+    protected function casts(): array
+    {
+        return [
+            'code' => 'string',
+            'name' => 'string',
+        ];
+    }
+
+    public function projectMembers()
     {
         return $this->belongsToMany(
             ProjectMember::class,

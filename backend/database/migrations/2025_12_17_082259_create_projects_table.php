@@ -41,10 +41,12 @@ return new class extends Migration
             
             // FOREIGN KEYS
             $table->foreign('created_by', 'projects_created_by_fk')
-                ->references('id')->on('users');
+                ->references('id')->on('users')
+                ->cascadeOnDelete();
 
             $table->foreign('updated_by', 'projects_updated_by_fk')
-                ->references('id')->on('users');
+                ->references('id')->on('users')
+                ->cascadeOnDelete();
         });
     }
 

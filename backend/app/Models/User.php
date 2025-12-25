@@ -5,12 +5,10 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Enums\User\UserGender;
-use App\Enums\User\UserStatus;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
@@ -38,12 +36,17 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'password'    => 'hashed',
-            'birthday'    => 'date',
-            'gender'      => UserGender::class,
-            'join_date'   => 'date',
-            'resign_date' => 'date',
-            'is_active'   => 'boolean',
+            'employee_code' => 'string',
+            'name'          => 'string',
+            'email'         => 'string',
+            'password'      => 'hashed',
+            'phone_number'  => 'string',
+            'birthday'      => 'date',
+            'gender'        => UserGender::class,
+            'join_date'     => 'date',
+            'resign_date'   => 'date',
+            'avatar'        => 'string',
+            'is_active'     => 'boolean',
         ];
     }
 
@@ -53,14 +56,14 @@ class User extends Authenticatable
     ];
 
     // RELATIONSHIPS
-    public function positions(): BelongsToMany
+    public function positions()
     {
         return $this->belongsToMany(Position::class, 'user_positions')
                     ->withPivot('start_date', 'end_date')
                     ->withTimestamps();
     }
 
-    public function projects(): BelongsToMany
+    public function projects()
     {
         return $this->belongsToMany(Project::class, 'project_members')
                     ->withPivot('id') // needed to get project_member id

@@ -6,7 +6,6 @@ use App\Enums\Position\PositionScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Position extends Model
 {
@@ -21,6 +20,8 @@ class Position extends Model
     protected function casts(): array
     {
         return [
+            'code'  => 'string',
+            'name'  => 'string',
             'scope' => PositionScope::class,
         ];
     }
@@ -29,7 +30,7 @@ class Position extends Model
         'scope' => PositionScope::Project,
     ];
 
-    public function users(): BelongsToMany
+    public function users()
     {
         return $this->belongsToMany(User::class, 'user_positions')
                     ->withPivot('start_date', 'end_date')
