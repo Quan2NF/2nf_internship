@@ -9,23 +9,20 @@ class ProjectPolicy
 {
     /**
      * System-level bypass
-     * ADMIN and PMO have full access
+     * ADMIN and PMO have full access everywhere
      */
     public function before(User $user, string $ability): bool|null
     {
         if (
-            $user->positions->contains('code', 'ADMIN') ||
-            $user->positions->contains('code', 'PMO')
+            $user->positions()->whereIn('code', ['ADMIN', 'PMO'])->exists()
         ) {
             return true;
         }
-
         return null;
     }
 
     /**
-     * Create new project
-     * ADMIN / PMO only (handled by before)
+     * ADMIN and PMO only
      */
     public function create(User $user): bool
     {
@@ -33,16 +30,96 @@ class ProjectPolicy
     }
 
     /**
+     * View project
+     * ADMIN and PMO (before) or project member
+     */
+    public function view(User $user, Project $project): bool
+    {
+        return $this->isProjectMember($user, $project);
+    }
+
+    /**
      * Edit existing project
-     * ADMIN / PMO (before) OR PM of that project
+     * ADMIN and PMO (before) or PM of that project
      */
     public function update(User $user, Project $project): bool
     {
-        return $project->members()
+        return $this->isProjectPM($user, $project);
+    }
+
+    /**
+     * ADMIN and PMO only
+     */
+    public function delete(User $user, Project $project): bool
+    {
+        return false;
+    }
+
+    /**
+     * Assign PM
+     * ADMIN and PMO only
+     */
+    public function assignPM(User $user, Project $project): bool
+    {
+        return false;
+    }
+
+    /**
+     * Assign members
+     * ADMIN and PMO or PM of project
+     */
+    public function assignMembers(User $user, Project $project): bool
+    {
+        return $this->isProjectPM($user, $project);
+    }
+
+    /**
+     * Get and update setting
+     * ADMIN and PMO or PM of project
+     */
+    public function getSetting(User $user, Project $project): bool
+    {
+        return $this->isProjectPM($user, $project);
+    }
+
+    public function updateSetting(User $user, Project $project): bool
+    {
+        return $this->isProjectPM($user, $project);
+    }
+
+    /**
+     * Get and update schedule and status
+     * ADMIN and PMO or PM of project
+     */
+    public function getScheduleAndInfo(User $user, Project $project): bool
+    {
+        return $this->isProjectPM($user, $project);
+    }
+
+    public function updateScheduleAndInfo(User $user, Project $project): bool
+    {
+        return $this->isProjectPM($user, $project);
+    }
+
+    /**
+     * Check if user is member of project
+     */
+    private function isProjectMember(User $user, Project $project): bool
+    {
+        return $project->projectMembers()
             ->where('user_id', $user->id)
-            ->whereHas('roles', fn ($q) =>
-                $q->where('code', 'PM')
-            )
             ->exists();
+    }
+    
+    /**
+     * Check if user is PM of project
+     */
+    private function isProjectPM(User $user, Project $project): bool
+    {
+        $member = $project->projectMembers()
+            ->where('user_id', $user->id)
+            ->first();
+
+        return $member?->roles()->where('code', 'PM')->exists() ?? false;
     }
 }

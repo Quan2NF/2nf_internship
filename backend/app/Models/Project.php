@@ -63,10 +63,15 @@ class Project extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function members()
+    public function users()
     {
         return $this->belongsToMany(User::class, 'project_members')
                     ->withPivot('id')
                     ->withTimestamps();
+    }
+
+    public function projectMembers()
+    {
+        return $this->hasMany(ProjectMember::class, 'project_id');
     }
 }
