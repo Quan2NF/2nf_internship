@@ -2,10 +2,10 @@
 
 namespace App\Service;
 
-use App\Contracts\Service\RoleServiceInterface;
+use App\Contracts\Service\PositionServiceInterface;
 use App\Data\Response\ApiResponseData;
 
-class RoleService extends BaseService implements RoleServiceInterface
+class PositionService extends BaseService implements PositionServiceInterface
 {
     public function getList(): ApiResponseData
     {

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Data\User;
+namespace App\Data\Common;
 
 use Spatie\LaravelData\Data;
 
-class AssignRolesToUserData extends Data
+class KeyOnlyData extends Data
 {
     public function __construct(
-        //
+        public int $id,
     ) {}
 }

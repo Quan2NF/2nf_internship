@@ -2,29 +2,18 @@
 
 namespace App\Contracts\Service;
 
+use App\Data\Common\EntityData;
+use App\Data\Common\EntityWithKeyData;
+use App\Data\Common\KeyOnlyData;
 use App\Data\Response\ApiResponseData;
-use Spatie\LaravelData\Data;
 
-/**
- * @template T of Data
- */
 interface BaseServiceInterface
 {
-    /**
-     * @param T $data
-     * @return ApiResponse
-     */
-    public function create(Data $data): ApiResponseData;
+    public function view(KeyOnlyData $data): ApiResponseData;
 
-    /**
-     * @param T $data
-     * @return ApiResponse
-     */
-    public function edit(Data $data): ApiResponseData;
+    public function create(EntityData $data): ApiResponseData;
 
-    /**
-     * @param T $data
-     * @return ApiResponse
-     */
-    public function delete(Data $data): ApiResponseData;
+    public function edit(EntityWithKeyData $data): ApiResponseData;
+
+    public function delete(KeyOnlyData $data): ApiResponseData;
 }

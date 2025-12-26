@@ -4,14 +4,17 @@ namespace App\Data\Project;
 
 use Spatie\LaravelData\Data;
 
-class AssignMembersToProjectData extends Data
+/**
+ * Data required to assign a Project Manager (PM) to a project.
+ */
+class AssignPMData extends Data
 {
     /**
      * @param int $project_id The ID of the project
-     * @param array<int, array<string>> $user_roles Mapping of user IDs to an array of roles
+     * @param int $pm_id The user ID of the project manager to assign
      */
     public function __construct(
         public int $project_id,
-        public array $user_roles,
+        public int $pm_id,
     ) {}
 }
