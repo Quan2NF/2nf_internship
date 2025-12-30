@@ -9,6 +9,13 @@ use App\Data\Auth\AuthResponseData;
 use App\Data\User\UserData;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Contracts\Auth\Authenticatable;
+use App\Models\User;
+use Laravel\Sanctum\PersonalAccessToken;   
+use App\Data\Auth\ForgotPasswordData; 
+
+use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 class AuthService implements IAuthService
 {
@@ -31,5 +38,46 @@ class AuthService implements IAuthService
             token_type: 'Bearer',
             user: UserData::fromModel($user)
         );
+    }
+
+    public function logout(User $user): void
+    {
+        /** @var PersonalAccessToken|null $token */
+        $token = $user->currentAccessToken();
+
+        $token?->delete();
+    }
+
+    public function forgotPassword(ForgotPasswordData $data): void
+    {
+        $status = Password::sendResetLink([
+            'email' => $data->email,
+        ]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            throw ValidationException::withMessages([
+                'email' => __($status),
+            ]);
+        }
+    }
+
+    public function resetPassword(array $data): void
+    {
+        $status = Password::reset(
+            $data,
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => bcrypt($password),
+                ])->save();
+
+                $user->tokens()->delete(); // logout all devices
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            throw ValidationException::withMessages([
+                'email' => __($status),
+            ]);
+        }
     }
 }

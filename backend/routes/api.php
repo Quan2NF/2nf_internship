@@ -12,7 +12,12 @@ use App\Http\Controllers\Api\AuthController;
 */
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout']);
+    
+    Route::get('/me', [AuthController::class, 'me']); // lấy thông tin user đang đăng nhập 
+
+    Route::post('/logout', [AuthController::class, 'logout']); //revoke token hiện tại
 });
