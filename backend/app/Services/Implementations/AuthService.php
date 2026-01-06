@@ -13,6 +13,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use App\Models\User;
 use Laravel\Sanctum\PersonalAccessToken;   
 use App\Data\Auth\ForgotPasswordData; 
+use App\Exceptions\Domain\BusinessException;
 
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -28,7 +29,7 @@ class AuthService implements IAuthService
         $user = $this->userRepository->findByEmail($data->email);
 
         if (!$user || !Hash::check($data->password, $user->password)) {
-            throw new AuthenticationException('Invalid credentials');
+            throw new BusinessException('Invalid credentials 11111', 401);
         }
 
         $token = $user->createToken('api')->plainTextToken;
@@ -75,9 +76,7 @@ class AuthService implements IAuthService
         );
 
         if ($status !== Password::PASSWORD_RESET) {
-            throw ValidationException::withMessages([
-                'email' => __($status),
-            ]);
+            throw new BusinessException(__($status), 400);
         }
     }
 }
