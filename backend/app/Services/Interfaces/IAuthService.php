@@ -9,7 +9,7 @@ use App\Models\User;
 
 interface IAuthService
 {
-    public function login(LoginData $data): AuthResponseData;
+    public function login(LoginData $data);
     
     public function logout(User $user): void;
 

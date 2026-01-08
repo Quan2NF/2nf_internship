@@ -3,29 +3,20 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Data\Auth\LoginData;
 
 class LoginRequest extends FormRequest
 {
-    public function authorize(): bool
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [
             'email'    => ['required', 'email'],
-            'password' => ['required', 'string', 'min:6'],
+            'password' => ['required', 'string'],
         ];
     }
 
-    public function messages(): array
+    public function toData(): LoginData
     {
-        return [
-            'email.required'    => 'EMAIL_REQUIRED',
-            'email.email'       => 'EMAIL_INVALID',
-            'password.required' => 'PASSWORD_REQUIRED',
-            'password.min'      => 'PASSWORD_TOO_SHORT',
-        ];
+        return LoginData::from($this->validated());
     }
 }

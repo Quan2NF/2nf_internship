@@ -31,34 +31,42 @@ class AuthController extends Controller
 
         $result = $authService->login($data);
 
-        return $this->success('LOGIN_SUCCESS', $result);
+        return $this->success(
+            message: 'LOGIN_SUCCESS',
+            data: $result
+        );
     }
 
     public function logout(Request $request)
     {
         $this->authService->logout($request->user());
 
-        return $this->success('LOGOUT_SUCCESS');
+        return $this->success(
+            message: 'LOGOUT_SUCCESS'
+        );
     }
 
     public function me(Request $request)
     {
-        return response()->json([
-            'user' => $request->user(),
-        ]);
+        return $this->success(
+            data: $request->user(),
+            message: 'GET_ME_SUCCESS'
+        );
     }
 
     public function forgotPassword(Request $request)
     {
-        $data = ForgotPasswordData::from($request->validate([
-            'email' => ['required', 'email'],
-        ]));
+        $data = ForgotPasswordData::from(
+            $request->validate([
+                'email' => ['required', 'email'],
+            ])
+        );
 
         $this->authService->forgotPassword($data);
 
-        return response()->json([
-            'message' => 'Reset password email sent',
-        ]);
+        return $this->success(
+            message: 'RESET_PASSWORD_EMAIL_SENT'
+        );
     }
 
     public function resetPassword(Request $request)
@@ -71,9 +79,9 @@ class AuthController extends Controller
 
         $this->authService->resetPassword($payload);
 
-        return response()->json([
-            'message' => 'Password reset successfully',
-        ]);
+        return $this->success(
+            message: 'PASSWORD_RESET_SUCCESS'
+        );
     }
 
 }

@@ -2,22 +2,14 @@
 
 namespace App\Exceptions\Domain;
 
-use Exception;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class BusinessException extends Exception
+class BusinessException extends HttpException
 {
-    protected int $statusCode;
-
     public function __construct(
         string $message,
         int $statusCode = 400
     ) {
-        parent::__construct($message);
-        $this->statusCode = $statusCode;
-    }
-
-    public function getStatusCode(): int
-    {
-        return $this->statusCode;
+        parent::__construct($statusCode, $message);
     }
 }

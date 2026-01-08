@@ -2,20 +2,23 @@
 
 namespace App\Exceptions;
 
-use Throwable;
+use App\Data\Common\ApiErrorResponseData;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\ValidationException;
-use App\Data\Common\ApiErrorResponseData;
-use App\Exceptions\Domain\BusinessException;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
+    /**
+     * Render an exception into an HTTP response.
+     */
     public function render($request, Throwable $e)
     {
+        // ===== API JSON RESPONSE =====
         if ($request->expectsJson()) {
 
-            // 422 - Validation
+            // 1. Validation error → 422
             if ($e instanceof ValidationException) {
                 return response()->json(
                     new ApiErrorResponseData(
@@ -26,27 +29,17 @@ class Handler extends ExceptionHandler
                 );
             }
 
-            // Business Exception (400, 403, ...)
-            if ($e instanceof BusinessException) {
+            // 2. Business / Domain / Auth / Forbidden / NotFound
+            if ($e instanceof HttpExceptionInterface) {
                 return response()->json(
                     new ApiErrorResponseData(
                         message: $e->getMessage()
                     ),
-                    $e->getStatusCode() // ✅ ĐÚNG
+                    $e->getStatusCode()
                 );
             }
 
-            // 401 - Auth
-            if ($e instanceof UnauthorizedHttpException) {
-                return response()->json(
-                    new ApiErrorResponseData(
-                        message: 'UNAUTHENTICATED'
-                    ),
-                    401
-                );
-            }
-
-            // 500 - Fallback
+            // 3. Fallback system error
             return response()->json(
                 new ApiErrorResponseData(
                     message: 'INTERNAL_SERVER_ERROR'
@@ -55,6 +48,7 @@ class Handler extends ExceptionHandler
             );
         }
 
+        // ===== WEB REQUEST =====
         return parent::render($request, $e);
     }
 }
