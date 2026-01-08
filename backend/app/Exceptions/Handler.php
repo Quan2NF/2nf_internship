@@ -3,11 +3,11 @@
 namespace App\Exceptions;
 
 use Throwable;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Validation\ValidationException;
 use App\Data\Common\ApiErrorResponseData;
 use App\Exceptions\Domain\BusinessException;
-use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
@@ -15,41 +15,41 @@ class Handler extends ExceptionHandler
     {
         if ($request->expectsJson()) {
 
-            // Validation error
+            // 422 - Validation
             if ($e instanceof ValidationException) {
                 return response()->json(
                     new ApiErrorResponseData(
-                        message: 'Validation failed',
+                        message: 'DATA_INVALID',
                         errors: $e->errors()
                     ),
                     422
                 );
             }
 
-            // Business exception
+            // Business Exception (400, 403, ...)
             if ($e instanceof BusinessException) {
                 return response()->json(
                     new ApiErrorResponseData(
                         message: $e->getMessage()
                     ),
-                    $e->status()
+                    $e->getStatusCode() // ✅ ĐÚNG
                 );
             }
 
-            // Auth / Sanctum
+            // 401 - Auth
             if ($e instanceof UnauthorizedHttpException) {
                 return response()->json(
                     new ApiErrorResponseData(
-                        message: 'Unauthenticated'
+                        message: 'UNAUTHENTICATED'
                     ),
                     401
                 );
             }
 
-            // Fallback
+            // 500 - Fallback
             return response()->json(
                 new ApiErrorResponseData(
-                    message: 'Internal server error'
+                    message: 'INTERNAL_SERVER_ERROR'
                 ),
                 500
             );

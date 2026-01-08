@@ -1,14 +1,23 @@
 <?php
+
 namespace App\Exceptions\Domain;
 
 use Exception;
 
 class BusinessException extends Exception
 {
-    protected int $status = 400;
+    protected int $statusCode;
 
-    public function status(): int
+    public function __construct(
+        string $message,
+        int $statusCode = 400
+    ) {
+        parent::__construct($message);
+        $this->statusCode = $statusCode;
+    }
+
+    public function getStatusCode(): int
     {
-        return $this->status;
+        return $this->statusCode;
     }
 }

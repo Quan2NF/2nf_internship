@@ -28,8 +28,12 @@ class AuthService implements IAuthService
     {
         $user = $this->userRepository->findByEmail($data->email);
 
-        if (!$user || !Hash::check($data->password, $user->password)) {
-            throw new BusinessException('Invalid credentials 11111', 401);
+        if (!$user) {
+            throw new BusinessException('DATA_NOT_FOUND', 400);
+        }
+
+        if (!Hash::check($data->password, $user->password)) {
+            throw new BusinessException('PASSWORD_FAIL', 400);
         }
 
         $token = $user->createToken('api')->plainTextToken;

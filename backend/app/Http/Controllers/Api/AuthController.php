@@ -7,6 +7,10 @@ use App\Data\Auth\LoginData;
 use App\Services\Interfaces\IAuthService;
 use Illuminate\Http\Request;
 use App\Data\Auth\ForgotPasswordData;
+use App\Data\Common\ApiSuccessResponseData;
+use App\Http\Controllers\Concerns\ApiResponse;
+use App\Http\Requests\Auth\LoginRequest;
+
 
 
 class AuthController extends Controller
@@ -17,21 +21,24 @@ class AuthController extends Controller
     {
         $this->authService = $authService;
     }
+    //public function __construct(protected IAuthService $authService) {} co the de kieu nay cho gon
 
     public function login(
-        LoginData $data,
+        LoginRequest $request,
         IAuthService $authService
     ) {
-        return $authService->login($data);
+        $data = LoginData::from($request->validated());
+
+        $result = $authService->login($data);
+
+        return $this->success('LOGIN_SUCCESS', $result);
     }
 
     public function logout(Request $request)
     {
         $this->authService->logout($request->user());
 
-        return response()->json([
-            'message' => 'Logged out'
-        ]);
+        return $this->success('LOGOUT_SUCCESS');
     }
 
     public function me(Request $request)

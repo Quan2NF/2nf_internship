@@ -3,11 +3,10 @@ namespace App\Data\Common;
 
 use Spatie\LaravelData\Data;
 
-class ApiErrorResponseData extends Data
+class ApiSuccessResponseData extends Data
 {
     public function __construct(
         public string $message,
-        public mixed $errors = null
+        public mixed $data = null
     ) {}
 }
-
