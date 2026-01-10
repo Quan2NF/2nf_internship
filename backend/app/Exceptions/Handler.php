@@ -29,7 +29,7 @@ class Handler extends ExceptionHandler
                 );
             }
 
-            // 2. Business / Domain / Auth / Forbidden / NotFound
+            // 2. cac loi 400 401 v.v
             if ($e instanceof HttpExceptionInterface) {
                 return response()->json(
                     new ApiErrorResponseData(

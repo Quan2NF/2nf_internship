@@ -10,6 +10,9 @@ use App\Data\Auth\ForgotPasswordData;
 use App\Data\Common\ApiSuccessResponseData;
 use App\Http\Controllers\Concerns\ApiResponse;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\ForgotPasswordRequest;
+use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Data\Auth\ResetPasswordData;
 
 
 
@@ -54,13 +57,9 @@ class AuthController extends Controller
         );
     }
 
-    public function forgotPassword(Request $request)
+    public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $data = ForgotPasswordData::from(
-            $request->validate([
-                'email' => ['required', 'email'],
-            ])
-        );
+        $data = ForgotPasswordData::from($request->validated());
 
         $this->authService->forgotPassword($data);
 
@@ -69,15 +68,11 @@ class AuthController extends Controller
         );
     }
 
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $payload = $request->validate([
-            'token' => ['required'],
-            'email' => ['required', 'email'],
-            'password' => ['required', 'confirmed', 'min:8'],
-        ]);
+        $data = ResetPasswordData::from($request->validated());
 
-        $this->authService->resetPassword($payload);
+        $this->authService->resetPassword($data);
 
         return $this->success(
             message: 'PASSWORD_RESET_SUCCESS'

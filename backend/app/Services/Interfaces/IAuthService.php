@@ -5,6 +5,7 @@ namespace App\Services\Interfaces;
 use App\Data\Auth\LoginData;
 use App\Data\Auth\AuthResponseData;
 use App\Data\Auth\ForgotPasswordData;
+use App\Data\Auth\ResetPasswordData;
 use App\Models\User;
 
 interface IAuthService
@@ -15,5 +16,5 @@ interface IAuthService
 
     public function forgotPassword(ForgotPasswordData $data): void;
 
-    public function resetPassword(array $payload): void;
+    public function resetPassword(ResetPasswordData $data): void;
 }

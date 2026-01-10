@@ -55,14 +55,22 @@ class AuthService implements IAuthService
 
     public function forgotPassword(ForgotPasswordData $data): void
     {
+        $user = User::where('email', $data->email)->first();
+
+        if (!$user) {
+            throw new BusinessException('DATA_NOT_FOUND', 400);
+        }
+
+        if ($user->trashed()) {
+            throw new BusinessException('USER_INACTIVE', 403);
+        }
+
         $status = Password::sendResetLink([
             'email' => $data->email,
         ]);
 
         if ($status !== Password::RESET_LINK_SENT) {
-            throw ValidationException::withMessages([
-                'email' => __($status),
-            ]);
+            throw new BusinessException('MAIL_SEND_FAILED', 500);
         }
     }
 
