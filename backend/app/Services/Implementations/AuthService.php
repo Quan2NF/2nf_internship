@@ -14,6 +14,10 @@ use App\Models\User;
 use Laravel\Sanctum\PersonalAccessToken;   
 use App\Data\Auth\ForgotPasswordData; 
 use App\Exceptions\Domain\BusinessException;
+use App\Data\Auth\ResetPasswordData;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -24,25 +28,26 @@ class AuthService implements IAuthService
         private IUserRepository $userRepository
     ) {}
 
-    public function login(LoginData $data): AuthResponseData
+    public function login(LoginData $data): UserData
     {
-        $user = $this->userRepository->findByEmail($data->email);
+        $credentials = [
+            'email' => $data->email,
+            'password' => $data->password,
+        ];
+
+        if (!Auth::attempt($credentials)) {
+            throw new BusinessException('PASSWORD_FAIL', 400);
+        }
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         if (!$user) {
             throw new BusinessException('DATA_NOT_FOUND', 400);
         }
+        Auth::login($user);
 
-        if (!Hash::check($data->password, $user->password)) {
-            throw new BusinessException('PASSWORD_FAIL', 400);
-        }
-
-        $token = $user->createToken('api')->plainTextToken;
-
-        return new AuthResponseData(
-            token: $token,
-            token_type: 'Bearer',
-            user: UserData::fromModel($user)
-        );
+        return UserData::fromModel($user);
     }
 
     public function logout(User $user): void
@@ -74,21 +79,38 @@ class AuthService implements IAuthService
         }
     }
 
-    public function resetPassword(array $data): void
+    public function resetPassword(ResetPasswordData $data): void
     {
-        $status = Password::reset(
-            $data,
-            function (User $user, string $password) {
-                $user->forceFill([
-                    'password' => bcrypt($password),
-                ])->save();
+        $record = DB::table('password_reset_tokens')
+            ->where('token', Hash::make($data->token))
+            ->first();
 
-                $user->tokens()->delete(); // logout all devices
-            }
-        );
-
-        if ($status !== Password::PASSWORD_RESET) {
-            throw new BusinessException(__($status), 400);
+        if (!$record) {
+            throw new BusinessException('TOKEN_INVALID', 400);
         }
+
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+            throw new BusinessException('TOKEN_EXPIRED', 400);
+        }
+
+        $user = User::where('email', $record->email)->first();
+
+        if (!$user) {
+            throw new BusinessException('DATA_NOT_FOUND', 400);
+        }
+
+        if ($user->trashed()) {
+            throw new BusinessException('USER_INACTIVE', 403);
+        }
+
+        $user->update([
+            'password' => Hash::make($data->password),
+        ]);
+
+        
+        DB::table('password_reset_tokens')
+            ->where('email', $record->email)
+            ->delete();
     }
+
 }

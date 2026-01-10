@@ -13,6 +13,8 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Data\Auth\ResetPasswordData;
+use Illuminate\Support\Facades\Auth;
+use App\Data\User\UserData;
 
 
 
@@ -27,33 +29,34 @@ class AuthController extends Controller
     //public function __construct(protected IAuthService $authService) {} co the de kieu nay cho gon
 
     public function login(
-        LoginRequest $request,
-        IAuthService $authService
+    LoginRequest $request,
+    IAuthService $authService
     ) {
         $data = LoginData::from($request->validated());
 
-        $result = $authService->login($data);
+        $userData = $authService->login($data);
 
         return $this->success(
             message: 'LOGIN_SUCCESS',
-            data: $result
+            data: $userData 
         );
     }
 
     public function logout(Request $request)
     {
-        $this->authService->logout($request->user());
+        Auth::logout();
 
-        return $this->success(
-            message: 'LOGOUT_SUCCESS'
-        );
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return $this->success(message: 'LOGOUT_SUCCESS');
     }
 
     public function me(Request $request)
     {
         return $this->success(
-            data: $request->user(),
-            message: 'GET_ME_SUCCESS'
+            message: 'GET_USER_SUCCESS',
+            data: UserData::fromModel($request->user())
         );
     }
 

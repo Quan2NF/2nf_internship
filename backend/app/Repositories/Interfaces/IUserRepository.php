@@ -4,7 +4,7 @@ namespace App\Repositories\Interfaces;
 
 use App\Models\User;
 
-interface IUserRepository
+interface IUserRepository extends IBaseRepository
 {
     public function findByEmail(string $email): ?User;
 }
