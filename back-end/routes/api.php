@@ -1,10 +1,16 @@
 <?php
 use App\Http\Controllers\AuthController;
-
 use Illuminate\Support\Facades\Route;
 
-Route::post('/register', [AuthController::class, 'register']);
+// Public
 Route::post('/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'user']);
+Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+// Protected
+Route::middleware('auth:sanctum')->group(function () {
+	Route::get('/profile', [AuthController::class, 'user']);
+	Route::post('/logout', [AuthController::class, 'logout']);
+});
 
 

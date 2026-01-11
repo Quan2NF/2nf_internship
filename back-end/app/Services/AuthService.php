@@ -29,10 +29,8 @@ class AuthService implements AuthServiceInterface
                 throw new BusinessException('ERR_LOGIN_FAILED', 401);
             }
 
-            // Step 1.3: session-based login
-            Auth::login($user);
-
-            // Regenerate session id will be done in controller via request context if needed
+            // Step 1.3: create Sanctum token
+            $token = $user->createToken('auth_token')->plainTextToken;
 
             // Step 1.4: check isAdmin
             $isAdmin = $this->users->userIsAdmin($user);
@@ -44,6 +42,8 @@ class AuthService implements AuthServiceInterface
                 'email' => $user->email,
                 'avatar' => $user->avatar ? url($user->avatar) : null,
                 'isAdmin' => $isAdmin,
+                'accessToken' => $token,
+                'tokenType' => 'Bearer',
             ];
         } catch (BusinessException $e) {
             throw $e; // bubble up
