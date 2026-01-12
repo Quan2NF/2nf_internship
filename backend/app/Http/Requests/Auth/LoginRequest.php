@@ -15,8 +15,12 @@ class LoginRequest extends FormRequest
         ];
     }
 
-    public function toData(): LoginData
+    //public function toData(): LoginData
+    //{
+    //    return LoginData::from($this->validated());
+    //}
+    public function authorize(): bool
     {
-        return LoginData::from($this->validated());
+        return true;
     }
 }

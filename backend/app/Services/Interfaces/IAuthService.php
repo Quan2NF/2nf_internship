@@ -7,12 +7,13 @@ use App\Data\Auth\AuthResponseData;
 use App\Data\Auth\ForgotPasswordData;
 use App\Data\Auth\ResetPasswordData;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 interface IAuthService
 {
     public function login(LoginData $data);
     
-    public function logout(User $user): void;
+    public function logout(Request $request): void;
 
     public function forgotPassword(ForgotPasswordData $data): void;
 

@@ -11,8 +11,11 @@ use App\Http\Controllers\Api\AuthController;
 | and assigned the "api" middleware group.
 */
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+//Route::post('/login', [AuthController::class, 'login']);
+//Route::post('/logout', [AuthController::class, 'logout']);
+//Route::get('/health', fn () => ['ok' => true]);
+
+
+
 
 

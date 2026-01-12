@@ -18,6 +18,7 @@ use App\Data\Auth\ResetPasswordData;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -50,12 +51,12 @@ class AuthService implements IAuthService
         return UserData::fromModel($user);
     }
 
-    public function logout(User $user): void
+    public function logout(Request $request): void
     {
-        /** @var PersonalAccessToken|null $token */
-        $token = $user->currentAccessToken();
+        Auth::logout();
 
-        $token?->delete();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
     }
 
     public function forgotPassword(ForgotPasswordData $data): void
@@ -82,13 +83,19 @@ class AuthService implements IAuthService
     public function resetPassword(ResetPasswordData $data): void
     {
         $record = DB::table('password_reset_tokens')
-            ->where('token', Hash::make($data->token))
+            ->where('email', $data->email)
             ->first();
 
         if (!$record) {
             throw new BusinessException('TOKEN_INVALID', 400);
         }
 
+        // ✅ SO SÁNH TOKEN ĐÚNG
+        if (!Hash::check($data->token, $record->token)) {
+            throw new BusinessException('TOKEN_INVALID', 400);
+        }
+
+        // ⏱ Check expire
         if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
             throw new BusinessException('TOKEN_EXPIRED', 400);
         }
@@ -103,11 +110,12 @@ class AuthService implements IAuthService
             throw new BusinessException('USER_INACTIVE', 403);
         }
 
+        // 🔐 Update password
         $user->update([
             'password' => Hash::make($data->password),
         ]);
 
-        
+        // 🧹 Xoá token sau khi dùng
         DB::table('password_reset_tokens')
             ->where('email', $record->email)
             ->delete();

@@ -42,14 +42,13 @@ class AuthController extends Controller
         );
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request, IAuthService $authService)
     {
-        Auth::logout();
+        $authService->logout($request);
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return $this->success(message: 'LOGOUT_SUCCESS');
+        return $this->success(
+            message: 'LOGOUT_SUCCESS'
+        );
     }
 
     public function me(Request $request)
