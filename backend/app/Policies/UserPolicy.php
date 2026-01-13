@@ -12,7 +12,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(['admin', 'manager']);
+        return $user->isAdmin() || $user->isManager();
     }
 
     /**
@@ -21,7 +21,8 @@ class UserPolicy
     public function view(User $user, User $model): bool
     {
         return $user->id === $model->id
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 
     /**
@@ -29,7 +30,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole(['admin']);
+        return $user->isAdmin();
     }
 
     /**
@@ -38,7 +39,7 @@ class UserPolicy
     public function update(User $user, User $model): bool
     {
         return $user->id === $model->id
-            || $user->hasRole(['admin']);
+            || $user->isAdmin();
     }
 
     /**
@@ -46,7 +47,7 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->id !== $model->id && $user->hasRole(['admin']);
+        return $user->id !== $model->id && $user->isAdmin();
     }
 
     /**
@@ -54,7 +55,7 @@ class UserPolicy
      */
     public function restore(User $user, User $model): bool
     {
-        return $user->hasRole(['admin']);
+        return $user->isAdmin();
     }
 
     /**
@@ -62,7 +63,7 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model): bool
     {
-        return $user->hasRole(['admin']);
+        return $user->isAdmin();
     }
 
     /**
@@ -70,7 +71,7 @@ class UserPolicy
      */
     public function assignRole(User $user, User $model): bool
     {
-        return $user->hasRole(['admin']);
+        return $user->isAdmin();
     }
 
     /**

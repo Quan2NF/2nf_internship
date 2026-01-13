@@ -25,16 +25,6 @@ class UserRepository implements UserRepositoryInterface
         return $this->model->find($id);
     }
 
-    public function findByEmail(string $email): ?User
-    {
-        return $this->model->where('email', $email)->first();
-    }
-
-    public function findByEmployeeCode(string $employeeCode): ?User
-    {
-        return $this->model->where('employee_code', $employeeCode)->first();
-    }
-
     public function create(array $data): User
     {
         return $this->model->create($data);
@@ -43,45 +33,52 @@ class UserRepository implements UserRepositoryInterface
     public function update(int $id, array $data): bool
     {
         $user = $this->find($id);
-        
         if (!$user) {
             return false;
         }
-
         return $user->update($data);
     }
 
     public function delete(int $id): bool
     {
         $user = $this->find($id);
-        
         if (!$user) {
             return false;
         }
-
         return $user->delete();
     }
 
     public function forceDelete(int $id): bool
     {
         $user = $this->model->withTrashed()->find($id);
-        
         if (!$user) {
             return false;
         }
-
         return $user->forceDelete();
     }
 
     public function restore(int $id): bool
     {
-        $user = $this->model->onlyTrashed()->find($id);
-        
+        $user = $this->model->withTrashed()->find($id);
         if (!$user) {
             return false;
         }
-
         return $user->restore();
+    }
+
+    public function getTrashed(): Collection
+    {
+        return $this->model->onlyTrashed()->get();
+    }
+
+    public function findByEmail(string $email): ?User
+    {
+        return $this->model->where('email', $email)->first();
+    }
+
+    public function findByEmployeeCode(string $employeeCode): ?User
+    {
+        return $this->model->where('employee_code', $employeeCode)->first();
     }
 
     public function getActive(): Collection

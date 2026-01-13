@@ -17,14 +17,35 @@ class IssuePolicy
     }
 
     /**
+     * Determine whether the user can view trashed models.
+     */
+    public function viewTrashed(User $user): bool
+    {
+        return $user->isAdmin() || $user->isManager();
+    }
+
+    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Issue $issue): bool
     {
-        return $user->id === $issue->reported_by
-            || $user->id === $issue->assigned_to
-            || $user->id === $issue->project->created_by
-            || $user->hasRole(['admin', 'manager']);
+        // Admin and Manager can view all issues
+        if ($user->isAdmin() || $user->isManager()) {
+            return true;
+        }
+
+        // Only assigned users or reporter can view
+        if ($user->id === $issue->assigned_to || $user->id === $issue->reported_by) {
+            return true;
+        }
+
+        // Project creator can view
+        if ($user->id === $issue->project->created_by) {
+            return true;
+        }
+
+        // Check if user is assigned to the project
+        return $issue->project->users->contains($user->id);
     }
 
     /**
@@ -32,7 +53,7 @@ class IssuePolicy
      */
     public function create(User $user): bool
     {
-        return true;
+        return $user->is_active === User::STATUS_ACTIVE;
     }
 
     /**
@@ -40,10 +61,23 @@ class IssuePolicy
      */
     public function update(User $user, Issue $issue): bool
     {
-        return $user->id === $issue->reported_by
-            || $user->id === $issue->assigned_to
-            || $user->id === $issue->project->created_by
-            || $user->hasRole(['admin', 'manager']);
+        // Admin and Manager can update
+        if ($user->isAdmin() || $user->isManager()) {
+            return true;
+        }
+
+        // Reporter and assigned user can update
+        if ($user->id === $issue->reported_by || $user->id === $issue->assigned_to) {
+            return true;
+        }
+
+        // Project creator can update
+        if ($user->id === $issue->project->created_by) {
+            return true;
+        }
+
+        // Check if user is assigned to the project
+        return $issue->project->users->contains($user->id);
     }
 
     /**
@@ -53,7 +87,8 @@ class IssuePolicy
     {
         return $user->id === $issue->reported_by
             || $user->id === $issue->project->created_by
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 
     /**
@@ -61,7 +96,7 @@ class IssuePolicy
      */
     public function restore(User $user, Issue $issue): bool
     {
-        return $user->hasRole(['admin', 'manager']);
+        return $user->isAdmin() || $user->isManager();
     }
 
     /**
@@ -69,7 +104,7 @@ class IssuePolicy
      */
     public function forceDelete(User $user, Issue $issue): bool
     {
-        return $user->hasRole(['admin']);
+        return $user->isAdmin();
     }
 
     /**
@@ -79,7 +114,8 @@ class IssuePolicy
     {
         return $user->id === $issue->reported_by
             || $user->id === $issue->project->created_by
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 
     /**
@@ -90,7 +126,8 @@ class IssuePolicy
         return $user->id === $issue->assigned_to
             || $user->id === $issue->reported_by
             || $user->id === $issue->project->created_by
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 }
 

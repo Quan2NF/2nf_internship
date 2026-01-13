@@ -17,14 +17,30 @@ class ProjectPolicy
     }
 
     /**
+     * Determine whether the user can view trashed models.
+     */
+    public function viewTrashed(User $user): bool
+    {
+        return $user->isAdmin() || $user->isManager();
+    }
+
+    /**
      * Determine whether the user can view the model.
      */
     public function view(User $user, Project $project): bool
     {
-        return $project->is_public
-            || $user->id === $project->created_by
-            || $project->users->contains($user->id)
-            || $user->hasRole(['admin', 'manager']);
+        // Admin and Manager can see all projects
+        if ($user->isAdmin() || $user->isManager()) {
+            return true;
+        }
+
+        // Public projects visible to all users
+        if ($project->is_public) {
+            return true;
+        }
+
+        // Only assigned users can view private projects
+        return $project->users->contains($user->id) || $user->id === $project->created_by;
     }
 
     /**
@@ -32,7 +48,7 @@ class ProjectPolicy
      */
     public function create(User $user): bool
     {
-        return true; // All authenticated users can create projects
+        return $user->is_active === User::STATUS_ACTIVE;
     }
 
     /**
@@ -41,7 +57,8 @@ class ProjectPolicy
     public function update(User $user, Project $project): bool
     {
         return $user->id === $project->created_by
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 
     /**
@@ -50,7 +67,7 @@ class ProjectPolicy
     public function delete(User $user, Project $project): bool
     {
         return $user->id === $project->created_by
-            || $user->hasRole(['admin']);
+            || $user->isAdmin();
     }
 
     /**
@@ -58,7 +75,7 @@ class ProjectPolicy
      */
     public function restore(User $user, Project $project): bool
     {
-        return $user->hasRole(['admin', 'manager']);
+        return $user->isAdmin() || $user->isManager();
     }
 
     /**
@@ -66,7 +83,7 @@ class ProjectPolicy
      */
     public function forceDelete(User $user, Project $project): bool
     {
-        return $user->hasRole(['admin']);
+        return $user->isAdmin();
     }
 
     /**
@@ -75,7 +92,8 @@ class ProjectPolicy
     public function addMember(User $user, Project $project): bool
     {
         return $user->id === $project->created_by
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 
     /**
@@ -84,7 +102,8 @@ class ProjectPolicy
     public function removeMember(User $user, Project $project): bool
     {
         return $user->id === $project->created_by
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 
     /**
@@ -93,7 +112,8 @@ class ProjectPolicy
     public function manageSettings(User $user, Project $project): bool
     {
         return $user->id === $project->created_by
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 
     /**
@@ -103,7 +123,8 @@ class ProjectPolicy
     {
         return $user->id === $project->created_by
             || $project->users->contains($user->id)
-            || $user->hasRole(['admin', 'manager']);
+            || $user->isAdmin()
+            || $user->isManager();
     }
 }
 

@@ -2,14 +2,12 @@
 
 namespace App\Providers;
 
-use App\Events\User\UserRegistered;
 use App\Events\Issue\IssueCreated;
 use App\Events\Issue\IssueUpdated;
 use App\Events\Issue\IssueDeleted;
 use App\Events\Issue\IssueAssigned;
 use App\Events\Issue\IssueStatusChanged;
 use App\Events\Issue\IssueCommented;
-use App\Listeners\SendWelcomeEmailListener;
 use App\Listeners\Issue\NotifyIssueCreatedListener;
 use App\Listeners\Issue\NotifyIssueUpdatedListener;
 use App\Listeners\Issue\NotifyIssueDeletedListener;
@@ -26,10 +24,6 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
-        UserRegistered::class => [
-            SendWelcomeEmailListener::class,
-        ],
-
         // Issue Events
         IssueCreated::class => [
             NotifyIssueCreatedListener::class,

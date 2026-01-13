@@ -33,45 +33,42 @@ class IssueRepository implements IssueRepositoryInterface
     public function update(int $id, array $data): bool
     {
         $issue = $this->find($id);
-
         if (!$issue) {
             return false;
         }
-
         return $issue->update($data);
     }
 
     public function delete(int $id): bool
     {
         $issue = $this->find($id);
-
         if (!$issue) {
             return false;
         }
-
         return $issue->delete();
     }
 
     public function forceDelete(int $id): bool
     {
         $issue = $this->model->withTrashed()->find($id);
-
         if (!$issue) {
             return false;
         }
-
         return $issue->forceDelete();
     }
 
     public function restore(int $id): bool
     {
-        $issue = $this->model->onlyTrashed()->find($id);
-
+        $issue = $this->model->withTrashed()->find($id);
         if (!$issue) {
             return false;
         }
-
         return $issue->restore();
+    }
+
+    public function getTrashed(): Collection
+    {
+        return $this->model->onlyTrashed()->get();
     }
 
     public function findByProject(int $projectId): Collection

@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'resign_date' => null,
             'avatar' => null,
             'is_active' => User::STATUS_ACTIVE,
+            'role' => User::ROLE_USER,
         ];
     }
 

@@ -13,6 +13,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Seed master data
+        $this->call([
+            TaskStatusSeeder::class,
+            TaskPrioritySeeder::class,
+            TaskTypeSeeder::class,
+        ]);
+
         // User::factory(10)->create();
 
         User::factory()->create([

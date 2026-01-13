@@ -19,6 +19,11 @@ class User extends Authenticatable
     const STATUS_ACTIVE = 1;
     const STATUS_INACTIVE = 2;
 
+    const ROLE_ADMIN = 'admin';
+    const ROLE_MANAGER = 'manager';
+    const ROLE_PM = 'pm';
+    const ROLE_USER = 'user';
+
     protected $fillable = [
         'employee_code',
         'name',
@@ -31,6 +36,7 @@ class User extends Authenticatable
         'resign_date',
         'avatar',
         'is_active',
+        'role',
     ];
 
     protected $hidden = [
@@ -62,6 +68,16 @@ class User extends Authenticatable
         return $query->where('is_active', self::STATUS_INACTIVE);
     }
 
+    public function scopeWithoutTrashed($query)
+    {
+        return $query->whereNull('deleted_at');
+    }
+
+    public function scopeOnlyTrashed($query)
+    {
+        return $query->whereNotNull('deleted_at');
+    }
+
     // Accessors
     public function getIsActiveStatusAttribute(): string
     {
@@ -75,6 +91,55 @@ class User extends Authenticatable
             self::GENDER_FEMALE => 'Female',
             self::GENDER_OTHER => 'Other',
             default => null,
+        };
+    }
+
+    // Relationships
+    public function projects()
+    {
+        return $this->belongsToMany(Project::class, 'project_user', 'user_id', 'project_id')
+                    ->withTimestamps();
+    }
+
+    // Role & Permission Methods
+    public function hasRole($roles): bool
+    {
+        if (is_string($roles)) {
+            return $this->role === $roles;
+        }
+
+        return in_array($this->role, (array) $roles);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isManager(): bool
+    {
+        return $this->role === self::ROLE_MANAGER;
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === self::ROLE_USER;
+    }
+
+    public function can($ability, $resource = null): bool
+    {
+        // Admins can do everything
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Handle specific abilities
+        return match ($ability) {
+            'manage users' => $this->isAdmin() || $this->isManager(),
+            'manage roles' => $this->isAdmin(),
+            'manage projects' => $this->isAdmin() || $this->isManager() || $this->role === self::ROLE_PM,
+            'manage settings' => $this->isAdmin(),
+            default => parent::can($ability, $resource),
         };
     }
 }

@@ -4,16 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Enums\ProjectStatus;
 
 class Project extends Model
 {
     use SoftDeletes;
-
-    const STATUS_PLANNING = 1;
-    const STATUS_ACTIVE = 2;
-    const STATUS_ON_HOLD = 3;
-    const STATUS_COMPLETED = 4;
-    const STATUS_CANCELLED = 5;
 
     protected $fillable = [
         'code',
@@ -34,6 +29,7 @@ class Project extends Model
     protected function casts(): array
     {
         return [
+            'status' => ProjectStatus::class,
             'planned_start_date' => 'date',
             'planned_end_date' => 'date',
             'start_date' => 'date',
@@ -53,6 +49,12 @@ class Project extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'project_user', 'project_id', 'user_id')
+                    ->withTimestamps();
     }
 
     public function issues()
@@ -86,15 +88,29 @@ class Project extends Model
         return $query->where('status', $status);
     }
 
+    public function scopeWithoutTrashed($query)
+    {
+        return $query->whereNull('deleted_at');
+    }
+
+    public function scopeOnlyTrashed($query)
+    {
+        return $query->whereNotNull('deleted_at');
+    }
+
     // Accessors
     public function getStatusLabelAttribute(): string
     {
+        if ($this->status instanceof ProjectStatus) {
+            return $this->status->label();
+        }
+
+        // Fallback for legacy string statuses
         return match($this->status) {
-            self::STATUS_PLANNING => 'Planning',
-            self::STATUS_ACTIVE => 'Active',
-            self::STATUS_ON_HOLD => 'On Hold',
-            self::STATUS_COMPLETED => 'Completed',
-            self::STATUS_CANCELLED => 'Cancelled',
+            'planning' => 'Planning',
+            'active' => 'Active',
+            'completed' => 'Completed',
+            'archived' => 'Archived',
             default => 'Unknown',
         };
     }

@@ -2,6 +2,11 @@
 
 namespace App\Services;
 
+use App\Events\Issue\IssueAssigned;
+use App\Events\Issue\IssueCreated;
+use App\Events\Issue\IssueDeleted;
+use App\Events\Issue\IssueStatusChanged;
+use App\Events\Issue\IssueUpdated;
 use App\Models\Issue;
 use App\Models\User;
 use App\Repositories\Contracts\IssueRepositoryInterface;
@@ -54,8 +59,8 @@ class IssueService
 
         $issue = $this->issueRepository->create($data);
 
-        // TODO: Dispatch event for issue created
-        // event(new IssueCreated($issue));
+        // Dispatch event for issue created
+        event(new IssueCreated($issue, $user));
 
         return $issue;
     }
@@ -71,22 +76,27 @@ class IssueService
         $data['updated_by'] = $user->id;
         $this->issueRepository->update($id, $data);
 
-        // TODO: Dispatch event for issue updated
-        // event(new IssueUpdated($issue));
+        $updatedIssue = $this->findById($id);
 
-        return $this->findById($id);
+        // Dispatch event for issue updated
+        event(new IssueUpdated($updatedIssue));
+
+        return $updatedIssue;
     }
 
     public function delete(int $id, User $user): bool
     {
-        // TODO: Add authorization check
-        // $this->authorize('delete', $issue);
+        $issue = $this->findById($id);
+
+        if (!$issue) {
+            return false;
+        }
 
         $result = $this->issueRepository->delete($id);
 
         if ($result) {
-            // TODO: Dispatch event for issue deleted
-            // event(new IssueDeleted($issue));
+            // Dispatch event for issue deleted
+            event(new IssueDeleted($issue));
         }
 
         return $result;
@@ -141,10 +151,12 @@ class IssueService
 
         $this->issueRepository->update($issueId, $data);
 
-        // TODO: Dispatch event for issue assigned
-        // event(new IssueAssigned($issue, $userId));
+        $updatedIssue = $this->findById($issueId);
 
-        return $this->findById($issueId);
+        // Dispatch event for issue assigned
+        event(new IssueAssigned($updatedIssue, $userId));
+
+        return $updatedIssue;
     }
 
     public function changeStatus(int $issueId, int $status, User $user): ?Issue
@@ -154,6 +166,8 @@ class IssueService
         if (!$issue) {
             return null;
         }
+
+        $oldStatus = $issue->status;
 
         $data = [
             'status' => $status,
@@ -167,9 +181,22 @@ class IssueService
 
         $this->issueRepository->update($issueId, $data);
 
-        // TODO: Dispatch event for status changed
-        // event(new IssueStatusChanged($issue, $status));
+        $updatedIssue = $this->findById($issueId);
 
-        return $this->findById($issueId);
+        // Dispatch event for status changed
+        event(new IssueStatusChanged($updatedIssue, $status, $oldStatus));
+
+        return $updatedIssue;
+    }
+
+    public function restore(int $id): bool
+    {
+        $issue = Issue::onlyTrashed()->findOrFail($id);
+        return $issue->restore();
+    }
+
+    public function getTrashed(): Collection
+    {
+        return Issue::onlyTrashed()->get();
     }
 }

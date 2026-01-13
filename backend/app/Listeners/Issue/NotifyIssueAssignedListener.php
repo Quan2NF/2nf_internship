@@ -5,35 +5,22 @@ namespace App\Listeners\Issue;
 use App\Events\Issue\IssueAssigned;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
-class NotifyIssueAssignedListener
+class NotifyIssueAssignedListener implements ShouldQueue
 {
-    /**
-     * Create the event listener.
-     */
-    public function __construct()
-    {
-        //
-    }
+    use InteractsWithQueue;
 
-    /**
-     * Handle the event.
-     */
     public function handle(IssueAssigned $event): void
     {
-        $issue = $event->issue;
-        $assignee = $event->assignee;
-        $assigner = $event->assigner;
+        Log::info('Issue assigned event triggered', [
+            'issue_id' => $event->issue->id,
+            'issue_title' => $event->issue->title,
+            'assigned_to' => $event->assigneeId,
+            'project_id' => $event->issue->project_id,
+        ]);
 
-        // TODO: Implement notification logic
-        // - Send email to assignee
-        // - Send in-app notification to assignee
-        // - Notify project members
-        // - Log assignment activity
-
-        \Log::info("Issue Assigned: {$issue->title} assigned to {$assignee->name} by {$assigner->name}");
-
-        // Here you could dispatch a job to send notifications asynchronously
-        // dispatch(new SendIssueAssignmentNotificationJob($issue, $assignee, $assigner));
+        // TODO: Dispatch SendIssueNotificationJob when email template ready
+        // dispatch(new SendIssueNotificationJob($event->issue, 'assigned', $event->assigneeId));
     }
 }

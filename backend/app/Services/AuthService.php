@@ -3,11 +3,9 @@
 namespace App\Services;
 
 use App\Data\Auth\LoginData;
-use App\Data\Auth\RegisterData;
 use App\Data\Auth\UserData;
-use App\Events\User\UserRegistered;
 use App\Exceptions\AuthenticationException;
-use App\Exceptions\ValidationException;
+use App\Exceptions\AuthorizationException;
 use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 use Illuminate\Support\Facades\Hash;
@@ -17,26 +15,6 @@ class AuthService
     public function __construct(
         protected UserRepositoryInterface $userRepository
     ) {}
-
-    public function register(RegisterData $data): array
-    {
-        $user = $this->userRepository->create([
-            'employee_code' => $data->employee_code,
-            'name' => $data->name,
-            'email' => $data->email,
-            'password' => Hash::make($data->password),
-            'phone_number' => $data->phone_number,
-            'birthday' => $data->birthday,
-            'gender' => $data->gender,
-            'join_date' => $data->join_date ?? now()->toDateString(),
-            'avatar' => $data->avatar,
-            'is_active' => User::STATUS_ACTIVE,
-        ]);
-
-        event(new UserRegistered($user));
-
-        return $this->issueToken($user);
-    }
 
     public function login(LoginData $data): array
     {
@@ -50,10 +28,8 @@ class AuthService
             throw new AuthorizationException('Account is inactive');
         }
 
-        if (!$data->remember) {
-            $user->tokens()->delete();
-        }
-
+        // Don't delete previous tokens on login
+        // Multiple tokens allow for multiple active sessions (e.g., multiple devices)
         return $this->issueToken($user);
     }
 
@@ -61,19 +37,33 @@ class AuthService
     {
         $token = $user->currentAccessToken();
 
-        if ($token) {
+        // Only delete actual PersonalAccessToken instances (not TransientToken used in tests)
+        if ($token && $token instanceof \Laravel\Sanctum\PersonalAccessToken) {
             $token->delete();
         }
     }
 
     public function logoutAll(User $user): void
     {
+        // Delete all real tokens (PersonalAccessToken)
         $user->tokens()->delete();
     }
 
     public function me(User $user): UserData
     {
         return UserData::from($user);
+    }
+
+    public function refresh(User $user): array
+    {
+        // Revoke current token
+        $token = $user->currentAccessToken();
+        if ($token) {
+            $token->delete();
+        }
+
+        // Issue new token
+        return $this->issueToken($user);
     }
 
     protected function issueToken(User $user): array

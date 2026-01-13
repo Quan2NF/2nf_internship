@@ -23,6 +23,12 @@ class AppServiceProvider extends ServiceProvider
             IssueRepositoryInterface::class,
             IssueRepository::class
         );
+
+        // Project Repository
+        $this->app->bind(
+            \App\Repositories\Contracts\ProjectRepositoryInterface::class,
+            \App\Repositories\Eloquent\ProjectRepository::class
+        );
     }
 
     public function boot(): void

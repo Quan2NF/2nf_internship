@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Events\User;
+namespace App\Events\Issue;
 
-use App\Models\User;
+use App\Models\Issue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class UserRegistered
+class IssueUpdated
 {
     use Dispatchable, SerializesModels;
 
     public function __construct(
-        public User $user
+        public Issue $issue
     ) {}
 }
-

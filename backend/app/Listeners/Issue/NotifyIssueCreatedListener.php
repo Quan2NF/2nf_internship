@@ -3,11 +3,15 @@
 namespace App\Listeners\Issue;
 
 use App\Events\Issue\IssueCreated;
+use App\Jobs\SendIssueNotificationJob;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
-class NotifyIssueCreatedListener
+class NotifyIssueCreatedListener implements ShouldQueue
 {
+    use InteractsWithQueue;
+
     /**
      * Create the event listener.
      */
@@ -24,12 +28,16 @@ class NotifyIssueCreatedListener
         $issue = $event->issue;
         $creator = $event->creator;
 
-        // TODO: Implement notification logic
-        // - Send email to assignee (if assigned)
-        // - Send email to project creator
-        // - Create in-app notification
-        // - Send Slack/Discord notification
+        // Log issue creation
+        Log::info("Issue Created", [
+            'issue_id' => $issue->id,
+            'title' => $issue->title,
+            'created_by' => $creator->name,
+            'created_at' => now()->toIso8601String(),
+        ]);
 
-        \Log::info("Issue Created: {$issue->title} by {$creator->name}");
+        // Dispatch job to send notifications
+        SendIssueNotificationJob::dispatch($issue, $creator);
     }
 }
+

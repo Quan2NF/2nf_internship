@@ -19,7 +19,7 @@ Schema::create('users', function (Blueprint $table) {
     $table->string('email', 100)->unique();
     $table->string('password');
 
-    $table->string('phone_number', 15)->nullable();
+    $table->string('phone_number', 30)->nullable();
     $table->date('birthday')->nullable();
     $table->tinyInteger('gender')->nullable()->comment('1: Male, 2: Female, 3: Other');
 
