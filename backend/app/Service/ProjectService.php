@@ -3,9 +3,9 @@
 namespace App\Service;
 
 use App\Contracts\Service\ProjectServiceInterface;
+use App\Data\Common\KeyOnlyData;
 use App\Data\Project\AssignMembersToProjectData;
-
-use App\Data\Project\ProjectData;
+use App\Data\Project\AssignPMData;
 use App\Data\Project\ProjectListFilterData;
 use App\Data\Project\ProjectScheduleAndInfoData;
 use App\Data\Project\ProjectSettingData;
@@ -18,7 +18,7 @@ class ProjectService extends BaseService implements ProjectServiceInterface
         throw new \Exception('Not implemented');
     }
 
-    public function assignPM(ProjectData $data): ApiResponseData
+    public function assignPM(AssignPMData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
@@ -28,7 +28,7 @@ class ProjectService extends BaseService implements ProjectServiceInterface
         throw new \Exception('Not implemented');
     }
 
-    public function getSetting(ProjectSettingData $data): ApiResponseData
+    public function getSetting(KeyOnlyData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
@@ -38,7 +38,7 @@ class ProjectService extends BaseService implements ProjectServiceInterface
         throw new \Exception('Not implemented');
     }
 
-    public function getScheduleAndInfo(ProjectScheduleAndInfoData $data): ApiResponseData
+    public function getScheduleAndInfo(KeyOnlyData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
