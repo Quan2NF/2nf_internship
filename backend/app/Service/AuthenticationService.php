@@ -17,6 +17,7 @@ class AuthenticationService implements AuthenticationServiceInterface
 {
     public function login(LoginRequestData $data): ApiResponseData
     {
+        /** @var User|null $user */
         $user = User::where('email', $data->email)
                     ->where('is_active', true)
                     ->first();
@@ -25,12 +26,17 @@ class AuthenticationService implements AuthenticationServiceInterface
             return ApiResponse::from(ResponseCode::INVALID_CREDENTIALS);
         }
 
-        $token = $user->createToken('access_token')->plainTextToken;
+        $abilities = $user->hasSystemPosition('ADMIN')
+            ? ['admin']
+            : ['user'];
+
+        $token = $user->createToken('access_token', $abilities)->plainTextToken;
 
         return ApiResponse::from(ResponseCode::SUCCESS, new LoginResponseData(
-            $user->employee_code,
+            $user->id,
             $user->name,
             $user->email,
+            $user->avatar,
             $token
         ));
     }

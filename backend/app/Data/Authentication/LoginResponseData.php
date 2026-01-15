@@ -7,9 +7,10 @@ use Spatie\LaravelData\Data;
 class LoginResponseData extends Data
 {
     public function __construct(
-        public string $employee_code,
+        public int $id,
         public string $name,
         public string $email,
+        public ?string $avatar,
         public string $token
     ) {}
 }

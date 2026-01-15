@@ -1,11 +1,13 @@
 <?php
 
-use App\Data\Response\ApiResponseData;
 use App\Enums\ResponseCode;
+use App\Http\Responses\ApiResponse;
+use Illuminate\Support\Facades\Log;
+use App\Data\Response\ApiResponseData;
 use Illuminate\Foundation\Application;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Responses\ApiResponse;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -18,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (ValidationException $e) {
+            return ApiResponse::from(ResponseCode::INVALID_TRANSMITTED_DATA);
+        });
+
+
         $exceptions->render(function (Throwable $ex) {
             return ApiResponse::from(ResponseCode::SERVER_ERROR);
         });

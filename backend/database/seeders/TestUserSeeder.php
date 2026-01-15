@@ -3,7 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Models\Position;
 use Illuminate\Database\Seeder;
+use App\Enums\Position\PositionScope;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class TestUserSeeder extends Seeder
@@ -13,7 +15,13 @@ class TestUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
+        if (!app()->environment(['local', 'testing'])) {
+            return;
+        }
+
+        $user = User::updateOrCreate(
+            ['employee_code' => 'EMP001'],   // lookup key ONLY
+            [
             'employee_code' => 'EMP001',
             'name'          => 'Nguyen Van A',
             'email'         => 'test@demo.com',
@@ -25,6 +33,23 @@ class TestUserSeeder extends Seeder
             'resign_date'   => null,
             'avatar'        => null,
             'is_active'     => 1,
+            ]
+        );
+
+        $adminPosition = Position::updateOrCreate(
+            ['code' => 'ADMIN'],
+            [
+                'name'  => 'System Administrator',
+                'scope' => PositionScope::System,
+            ]
+        );
+
+        // attach without duplication
+        $user->positions()->syncWithoutDetaching([
+            $adminPosition->id => [
+                'start_date' => now(),
+                'end_date'   => null,
+            ]
         ]);
     }
 }
