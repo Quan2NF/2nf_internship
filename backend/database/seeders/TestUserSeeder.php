@@ -24,7 +24,7 @@ class TestUserSeeder extends Seeder
             [
             'employee_code' => 'EMP001',
             'name'          => 'Nguyen Van A',
-            'email'         => 'test@demo.com',
+            'email'         => 'haminhdunghl@gmail.com',
             'password'      => '123456', // auto-hashed
             'phone_number'  => '0900000000',
             'birthday'      => '1995-01-01',

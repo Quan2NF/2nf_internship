@@ -8,6 +8,7 @@ use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Data\Response\ApiResponseData;
+use Illuminate\Support\Facades\Password;
 use App\Data\Authentication\LoginRequestData;
 use App\Data\Authentication\LoginResponseData;
 use App\Data\Authentication\ResetPasswordRequestData;
@@ -41,12 +42,34 @@ class AuthenticationService implements AuthenticationServiceInterface
 
     public function forgotPassword(ForgotPasswordRequestData $data): ApiResponseData
     {
-        throw new \Exception('Not implemented');
+        $status = Password::sendResetLink([
+            'email' => $data->email,
+        ]);
+
+        // Do NOT expose whether the email exists
+        return ApiResponse::from(ResponseCode::SUCCESS);
     }
 
     public function resetPassword(ResetPasswordRequestData $data): ApiResponseData
     {
-        throw new \Exception('Not implemented');
+        $status = Password::reset(
+            [
+                'email' => $data->email,
+                'password' => $data->password,
+                'password_confirmation' => $data->passwordConfirmation,
+                'token' => $data->token,
+            ],
+            function ($user) use ($data) {
+                $user->password = Hash::make($data->password);
+                $user->save();
+            }
+        );
+
+        if ($status !== Password::PASSWORD_RESET) {
+            return ApiResponse::from(ResponseCode::INVALID_PARAMETER);
+        }
+
+        return ApiResponse::from(ResponseCode::SUCCESS);
     }
 
     public function logout(): ApiResponseData
