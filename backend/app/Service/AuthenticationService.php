@@ -51,6 +51,11 @@ class AuthenticationService implements AuthenticationServiceInterface
 
     public function logout(): ApiResponseData
     {
-        throw new \Exception('Not implemented');
+        Auth::logout(); // remove user from session
+
+        request()->session()->invalidate(); // destroy session data
+        request()->session()->regenerateToken(); // new CSRF token
+
+        return ApiResponse::from(ResponseCode::SUCCESS);
     }
 }

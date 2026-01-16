@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\LogoutRequest;
 use App\Data\Authentication\LoginRequestData;
 use App\Contracts\Service\AuthenticationServiceInterface;
 
@@ -22,5 +23,10 @@ class AuthController extends Controller
                 $request->password
             )
         );
+    }
+
+    public function logout()
+    {
+        return $this->authService->logout();
     }
 }
