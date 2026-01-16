@@ -11,6 +11,6 @@ class LoginResponseData extends Data
         public string $name,
         public string $email,
         public ?string $avatar,
-        public string $token
+        public bool $isAdmin
     ) {}
 }

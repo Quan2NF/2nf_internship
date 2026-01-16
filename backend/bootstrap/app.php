@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
 
         $exceptions->render(function (Throwable $ex) {
+            Log::error($ex);
             return ApiResponse::from(ResponseCode::SERVER_ERROR);
         });
     })->create();
