@@ -10,7 +10,7 @@ use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 /**
  * Data Transfer Object representing a User.
  */
-class UserData extends EntityData
+class CreateUserData extends EntityData
 {
     /**
      * @param string $employee_code
@@ -23,8 +23,6 @@ class UserData extends EntityData
      * @param \DateTime|null $resign_date
      * @param string|null $avatar
      * @param bool $is_active
-     * @param \DateTime $created_at
-     * @param \DateTime $updated_at
      */
     public function __construct(
         public string $employee_code,

@@ -12,13 +12,11 @@ use App\Enums\Position\PositionScope;
 class PositionData extends Data
 {
     /**
-     * @param int $id Position ID
      * @param string $code Unique position code (e.g. admin, pm, pmo)
      * @param string $name Position display name
      * @param PositionScope $scope Position scope (Project/System)
      */
     public function __construct(
-        public int $id,
         public string $code,
         public string $name,
 

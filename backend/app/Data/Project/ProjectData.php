@@ -15,7 +15,6 @@ use Spatie\LaravelData\Attributes\WithCast;
 class ProjectData extends EntityData
 {
     /**
-     * @param int $id Project ID (inherited from EntityData)
      * @param string $code Project code (unique, not null)
      * @param string $name Project name (not null)
      * @param string|null $description Project description (nullable)
@@ -31,7 +30,6 @@ class ProjectData extends EntityData
      * @param int $updated_by User ID of the last updater (not null)
      */
     public function __construct(
-        public int $id,
         public string $code,
         public string $name,
         public ?string $description = null,

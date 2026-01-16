@@ -11,7 +11,6 @@ use Spatie\LaravelData\Attributes\WithCast;
 class TaskData extends EntityData
 {
     /**
-     * @param int $id
      * @param int $project_id
      * @param int|null $parent_id
      * @param string $subject
@@ -30,7 +29,6 @@ class TaskData extends EntityData
      * @param \DateTime|null $closed_at
      */
     public function __construct(
-        public int $id,
         public int $project_id,
         public ?int $parent_id,
 
