@@ -18,4 +18,10 @@ class UserRepository implements UserRepositoryInterface
     {
         return $user->positions()->where('is_admin', true)->exists();
     }
+    public function findByEmail(string $email): ?User
+  {
+    return User::where('email', $email)
+        ->whereNull('deleted_at')
+        ->first();
+}
 }

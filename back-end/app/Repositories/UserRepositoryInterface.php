@@ -9,4 +9,5 @@ interface UserRepositoryInterface
     public function findActiveByEmail(string $email): ?User;
 
     public function userIsAdmin(User $user): bool;
+    public function findByEmail(string $email): ?User;
 }

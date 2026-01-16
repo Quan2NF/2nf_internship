@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Data\LoginData;
+use App\Data\ForgotPasswordData;
+use App\Data\ResetPasswordData;
 use App\Exceptions\BusinessException;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Services\AuthServiceInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -36,77 +37,80 @@ class AuthController extends Controller
         }
     }
 
-    // GET USER (cần auth:sanctum)
-    public function user(Request $request)
-    {
-        return response()->json($request->user());
+    // GET USER 
+
+  
+ public function profile(Request $request)
+{   //Chuyển logic vào Service Layer
+    $user = $request->user();  //Lấy user từ auth:sanctum middleware
+
+    try {
+        $result = $this->authService->profile($user);  //Gọi Service
+
+        return response()->json([
+            'data' => $result,// đúng format
+        ], 200);
+    } catch (BusinessException $e) {
+        return response()->json([
+            'statusCode' => $e->getStatusCode(),
+            'message' => $e->getMessage(),
+        ], $e->getStatusCode());
     }
+}
 
     // LOGOUT (Sanctum token)
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()?->delete();
+        try {
+            $this->authService->logout($request);
 
-        return response()->json([
-            'message' => 'Logout successfully'
-        ], 200);
+            return response()->json([
+                'message' => 'Logout successfully'
+            ], 200);
+        } catch (BusinessException $e) {
+            return response()->json([
+                'statusCode' => $e->getStatusCode(),
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        }
     }
 
     // FORGOT PASSWORD
-    public function forgotPassword(Request $request)
+    public function forgotPassword(ForgotPasswordRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email'
-        ]);
+        $data = ForgotPasswordData::fromRequest($request);
 
-        $user = User::where('email', $request->email)->first();
-        if (!$user) {
-            return response()->json([
-                'message' => 'Email not found'
-            ], 404);
-        }
+        try {
+            $this->authService->forgotPassword($data);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        if ($status === Password::RESET_LINK_SENT) {
             return response()->json([
                 'message' => 'Reset password email sent'
             ], 200);
+        } catch (BusinessException $e) {
+            return response()->json([
+                'statusCode' => $e->getStatusCode(),
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
         }
-
-        return response()->json([
-            'message' => 'Cannot send reset password email'
-        ], 500);
     }
 
     // RESET PASSWORD
-    public function resetPassword(Request $request)
+    public function resetPassword(ResetPasswordRequest $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required|min:6|confirmed',
-        ]);
+        $data = ResetPasswordData::fromRequest($request);
 
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->password = Hash::make($password);
-                $user->save();
-            }
-        );
+        try {
+            $this->authService->resetPassword($data);
 
-        if ($status !== Password::PASSWORD_RESET) {
             return response()->json([
-                'message' => __($status)
-            ], 400);
+                'message' => 'Password reset successfully'
+            ], 200);
+        } catch (BusinessException $e) {
+            return response()->json([
+                'statusCode' => $e->getStatusCode(),
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
         }
-
-        return response()->json([
-            'message' => 'Password reset successfully'
-        ]);
     }
 }
 
