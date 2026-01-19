@@ -11,22 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('task_statuses', function (Blueprint $table) {
             $table->id();
+            $table->string('name', 100);
+            $table->integer('sort')->default(0);
 
-            $table->string('name', 255);
-            $table->text('description')->nullable();
-
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('status', 50)->default('new');
+            $table->unsignedTinyInteger('is_active')->default(1)
+                ->comment('1: Active, 2: Inactive');
 
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-            $table->timestamp('deleted_at')->nullable();
-
-            $table->index(['user_id', 'status']);
         });
-
     }
 
     /**
@@ -34,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('task_statuses');
     }
 };

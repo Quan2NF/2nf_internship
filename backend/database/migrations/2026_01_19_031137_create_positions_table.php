@@ -11,22 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('positions', function (Blueprint $table) {
             $table->id();
-
-            $table->string('name', 255);
-            $table->text('description')->nullable();
-
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('status', 50)->default('new');
+            $table->string('code', 100)->unique();
+            $table->string('name', 100);
 
             $table->timestamp('created_at')->useCurrent();
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
             $table->timestamp('deleted_at')->nullable();
-
-            $table->index(['user_id', 'status']);
         });
-
     }
 
     /**
@@ -34,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('positions');
     }
 };
