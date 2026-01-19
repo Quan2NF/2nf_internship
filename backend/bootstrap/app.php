@@ -11,6 +11,8 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -27,7 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return ApiResponse::from(ResponseCode::EXPIRED_TOKEN);
         });
 
-        $exceptions->render(function (AuthorizationException $e) { // thrown by authorize()
+        $exceptions->render(function (AuthorizationException|AccessDeniedHttpException $e) { // thrown by authorize()
             return ApiResponse::from(ResponseCode::FORBIDDEN);
         });
 
@@ -35,7 +37,7 @@ return Application::configure(basePath: dirname(__DIR__))
             return ApiResponse::from(ResponseCode::INVALID_TRANSMITTED_DATA);
         });
 
-        $exceptions->render(function (ModelNotFoundException $e) { // thrown by findOrFail(), firstOrFail(), route model binding
+        $exceptions->render(function (ModelNotFoundException|NotFoundHttpException $e) { // thrown by findOrFail(), firstOrFail(), route model binding
             return ApiResponse::from(ResponseCode::DATA_NOT_FOUND);
         });
 

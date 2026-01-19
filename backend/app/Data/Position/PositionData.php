@@ -3,8 +3,10 @@
 namespace App\Data\Position;
 
 use Spatie\LaravelData\Data;
-use Spatie\LaravelData\Attributes\WithCast;
 use App\Enums\Position\PositionScope;
+use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
+use Spatie\LaravelData\Transformers\EnumTransformer;
 
 /**
  * Data Transfer Object representing a Position.
@@ -17,10 +19,10 @@ class PositionData extends Data
      * @param PositionScope $scope Position scope (Project/System)
      */
     public function __construct(
-        public string $code,
-        public string $name,
+        public ?string $code,
+        public ?string $name,
 
-        #[WithCast('enum:App\Enums\Position\PositionScope')]
-        public PositionScope $scope,
+        #[WithTransformer(EnumTransformer::class)]
+        public ?PositionScope $scope,
     ) {}
 }

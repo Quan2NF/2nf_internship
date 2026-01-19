@@ -11,10 +11,10 @@ class AssignPositionsToUserData extends Data
 {
     /**
      * @param int $user_id
-     * @param UserPositionData[] $positions
+     * @param int[] $position_ids
      */
     public function __construct(
         public int $user_id,
-        public array $positions,
+        public array $position_ids,
     ) {}
 }

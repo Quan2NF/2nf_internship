@@ -12,6 +12,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+/**
+ * @property int $id
+ * @property string $employee_code
+ * @property string $name
+ * @property string $email
+ * @property string|null $phone_number
+ * @property \Carbon\Carbon|null $birthday
+ * @property UserGender|null $gender
+ * @property \Carbon\Carbon|null $join_date
+ * @property \Carbon\Carbon|null $resign_date
+ * @property string|null $avatar
+ * @property bool $is_active
+ */
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
@@ -71,6 +84,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class, 'project_members')
                     ->withPivot('id') // needed to get project_member id
                     ->withTimestamps();
+    }
+
+    public function projectMembers()
+    {
+        return $this->hasMany(ProjectMember::class);
     }
 
     public function hasSystemPosition(string $code): bool

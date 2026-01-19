@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Service\UserService;
+use App\Service\PositionService;
 use App\Service\AuthenticationService;
 use Illuminate\Support\ServiceProvider;
-use App\Contracts\Service\AuthenticationServiceInterface;
 use App\Contracts\Service\UserServiceInterface;
-use App\Service\UserService;
+use App\Contracts\Service\PositionServiceInterface;
+use App\Contracts\Service\AuthenticationServiceInterface;
 
 class DomainServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,11 @@ class DomainServiceProvider extends ServiceProvider
         $this->app->bind(
             UserServiceInterface::class,
             UserService::class
+        );
+
+        $this->app->bind(
+            PositionServiceInterface::class,
+            PositionService::class
         );
     }
 

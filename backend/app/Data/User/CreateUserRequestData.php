@@ -5,12 +5,14 @@ namespace App\Data\User;
 use App\Enums\User\UserGender;
 use App\Data\Common\EntityData;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 /**
  * Data Transfer Object representing a User.
  */
-class UserData extends EntityData
+class CreateUserRequestData extends EntityData
 {
     /**
      * @param string $employee_code
@@ -23,8 +25,6 @@ class UserData extends EntityData
      * @param \DateTime|null $resign_date
      * @param string|null $avatar
      * @param bool $is_active
-     * @param \DateTime $created_at
-     * @param \DateTime $updated_at
      */
     public function __construct(
         public string $employee_code,
@@ -33,16 +33,19 @@ class UserData extends EntityData
 
         public ?string $phone_number = null,
 
-        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
-        public ?\DateTime $birthday = null,
+        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?\DateTimeInterface $birthday = null,
 
         public ?UserGender $gender = null,
 
-        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
-        public ?\DateTime $join_date = null,
+        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?\DateTimeInterface $join_date = null,
 
-        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
-        public ?\DateTime $resign_date = null,
+        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?\DateTimeInterface $resign_date = null,
 
         public ?string $avatar = null,
         public bool $is_active = true,

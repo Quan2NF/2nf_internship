@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property int $id
+ * @property string $code
+ * @property string $name
+ * @property PositionScope $scope
+ */
 class Position extends Model
 {
     use HasFactory, SoftDeletes;

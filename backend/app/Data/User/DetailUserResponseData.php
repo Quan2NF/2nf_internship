@@ -9,25 +9,31 @@ use Spatie\LaravelData\Attributes\WithTransformer;
 use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
 use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
-/**
- * Filters used when listing users.
- */
-class UserListFilterData extends Data
+class DetailUserResponseData extends Data
 {
     public function __construct(
-        public ?string $keyword = null,
-        public ?bool $is_active = null,
+        public int $id,
+        public string $employee_code,
+        public string $name,
+        public string $email,
+
+        public ?string $phone_number = null,
+
+        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?\DateTimeInterface $birthday = null,
+
         public ?UserGender $gender = null,
 
         #[WithCast(DateTimeInterfaceCast::class)]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
-        public ?\DateTimeInterface $join_from = null,
+        public ?\DateTimeInterface $join_date = null,
 
         #[WithCast(DateTimeInterfaceCast::class)]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
-        public ?\DateTimeInterface $join_to = null,
+        public ?\DateTimeInterface $resign_date = null,
 
-        public int $page = 1,
-        public int $per_page = 20,
+        public ?string $avatar = null,
+        public bool $is_active = true,
     ) {}
 }
