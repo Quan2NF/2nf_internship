@@ -4,66 +4,55 @@ namespace App\Policies;
 
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\DB;
 
 class ProjectPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     *
-    *public function viewAny(User $user): bool
-    *{
-    *    return false;
-    *}
-    */
+    private function isOwner(User $user, Project $project): bool
+    {
+        return (int)$project->user_id === (int)$user->id;
+    }
 
-    /**
-     * Determine whether the user can view the model.
-     */
+    private function isMember(User $user, Project $project): bool
+    {
+        return DB::table('project_members')
+            ->where('project_id', $project->id)
+            ->where('user_id', $user->id)
+            ->exists();
+    }
+
+    private function hasRole(User $user, Project $project, array $roleCodes): bool
+    {
+        return DB::table('project_members as pm')
+            ->join('project_member_roles as pmr', 'pmr.project_member_id', '=', 'pm.id')
+            ->join('roles as r', 'r.id', '=', 'pmr.role_id')
+            ->where('pm.project_id', $project->id)
+            ->where('pm.user_id', $user->id)
+            ->whereIn('r.code', $roleCodes)
+            ->exists();
+    }
+
     public function view(User $user, Project $project): bool
     {
+        // owner OR member
+        return $this->isOwner($user, $project) || $this->isMember($user, $project);
+    }
+
+    public function create(User $user): bool
+    {
+        // ai đăng nhập cũng tạo được project (tuỳ bạn)
         return true;
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        return in_array($user->role, ['admin', 'PMO', 'PM']);
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Project $project): bool
     {
-        return in_array($user->role, ['admin','PMO','PM']);
+        // owner OR role quản lý trong project
+        return $this->isOwner($user, $project) || $this->hasRole($user, $project, ['PM', 'ADMIN']);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Project $project): bool
     {
-        return in_array($user->role, ['admin', 'PMO']);
+        // thường chỉ owner hoặc ADMIN
+        return $this->isOwner($user, $project) || $this->hasRole($user, $project, ['ADMIN']);
     }
-
-    /**
-     * Determine whether the user can restore the model.
-     *
-    *public function restore(User $user, Project $project): bool
-    *{
-    *    return false;
-    *}
-    */
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     *
-    *public function forceDelete(User $user, Project $project): bool
-    *{
-    *   return false;
-    *}
-    */
 }

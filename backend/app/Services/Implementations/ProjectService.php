@@ -16,11 +16,11 @@ class ProjectService implements IProjectService
         return $this->projectRepository->findByUser($userId);
     }
 
-    public function create(array $data)
+    public function create(array $data, int $userId)
     {
-        $this->projectRepository->create([
-        ...$data,
-        'user_id' => auth()->id,
+        return $this->projectRepository->create([
+            ...$data,
+            'user_id' => $userId, // ✅
         ]);
     }
 
