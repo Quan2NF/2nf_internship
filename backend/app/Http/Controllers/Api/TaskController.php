@@ -50,7 +50,11 @@ class TaskController extends Controller
 
         $task = $this->taskService->create($data);
 
-        return $this->success(message: 'CREATE_TASK_SUCCESS', data: $task);
+        return $this->success(
+        message: 'CREATE_TASK_SUCCESS',
+        data: \App\Data\Task\TaskData::fromModel($task)
+    );
+
     }
 
     /**

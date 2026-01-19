@@ -3,6 +3,8 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\TaskController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -27,8 +29,16 @@ Route::middleware(['web'])->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::middleware('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
+        Route::get('/projects/my', [ProjectController::class, 'myProjects']);
+        Route::post('/projects', [ProjectController::class, 'store']);
+        Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+
+        Route::get('/tasks', [TaskController::class, 'index']); // ?project_id=1
+        Route::post('/tasks', [TaskController::class, 'store']);
+        Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
     });
 
+    
 });
 
 Route::get('/reset-password/{token}', function ($token) {

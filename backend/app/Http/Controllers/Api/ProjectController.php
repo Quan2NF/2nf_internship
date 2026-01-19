@@ -38,11 +38,14 @@ class ProjectController extends Controller
     {
         $this->authorize('create', Project::class);
 
-        $userId = (int) $request->user()->id; // ✅ session-based, clean
+        $userId = (int) $request->user()->id; 
 
         $project = $this->projectService->create($request->validated(), $userId);
 
-        return $this->success(message: 'CREATE_PROJECT_SUCCESS', data: $project);
+        return $this->success(
+        message: 'CREATE_PROJECT_SUCCESS',
+        data: \App\Data\Project\ProjectData::fromModel($project)
+    );
     }
 
     /**
