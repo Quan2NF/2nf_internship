@@ -13,9 +13,15 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
+        'employee_code',
         'name',
         'email',
         'password',
+        'phone_number',
+        'birthday',
+        'gender',
+        'join_date',
+        'resign_date',
         'avatar',
         'is_active',
     ];
@@ -30,18 +36,29 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'is_active' => 'boolean',
+            'birthday' => 'date',
+            'join_date' => 'date',
+            'resign_date' => 'date',
+            'gender' => 'integer',
+            'is_active' => 'integer',
         ];
     }
 
     // Quan hệ: user - positions
     public function positions()
     {
-        return $this->belongsToMany(Position::class, 'user_positions');
+        return $this->belongsToMany(Position::class, 'user_positions')
+            ->withPivot(['start_date', 'end_date'])
+            ->withTimestamps();
     }
 
     public function isAdmin(): bool
     {
-        return $this->positions()->where('is_admin', true)->exists();
+        return $this->positions()
+            ->where(function ($q) {
+                $q->where('code', 'ADMIN')
+                  ->orWhere('is_admin', true);
+            })
+            ->exists();
     }
 }

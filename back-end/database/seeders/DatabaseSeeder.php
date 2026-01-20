@@ -11,8 +11,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Gọi UserSeeder để tạo admin test
         $this->call([
+            PositionSeeder::class,
             UserSeeder::class,
         ]);
     }
