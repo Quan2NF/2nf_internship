@@ -41,4 +41,9 @@ interface UserRepositoryInterface
      * API10: Assign positions to a user.
      */
     public function assignPositions(int $userId, AssignPositionsData $data): array;
+
+    /**
+     * API11: List roles (positions) of a user.
+     */
+    public function listUserPositions(int $userId): array;
 }

@@ -34,4 +34,9 @@ interface UserServiceInterface
      * API10: Assign positions to a user (admin-only).
      */
     public function assignPositions(int $userId, AssignPositionsData $data): array;
+
+    /**
+     * API11: List roles (positions) of a user (admin-only).
+     */
+    public function listUserPositions(int $userId): array;
 }

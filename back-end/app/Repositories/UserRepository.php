@@ -330,6 +330,38 @@ class UserRepository implements UserRepositoryInterface
         });
     }
 
+    public function listUserPositions(int $userId): array
+    {
+        $user = User::query()
+            ->whereKey($userId)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (! $user) {
+            throw new BusinessException('ERR_USER_NOT_FOUND', 404);
+        }
+
+        $user->load('positions');
+
+        $positions = $user->positions
+            ->map(function (Position $position) {
+                return [
+                    'id' => $position->id,
+                    'code' => $position->code,
+                    'name' => $position->name,
+                    'start_date' => $position->pivot?->start_date,
+                    'end_date' => $position->pivot?->end_date,
+                ];
+            })
+            ->values()
+            ->all();
+
+        return [
+            'user_id' => $user->id,
+            'positions' => $positions,
+        ];
+    }
+
     private function generateNextEmployeeCode(): string
     {
         $last = User::where('employee_code', 'like', 'EMP%')

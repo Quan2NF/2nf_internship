@@ -112,4 +112,21 @@ class UserController extends Controller
             ], $e->getStatusCode());
         }
     }
+
+    // API11 - List of user's roles (positions) (admin only)
+    public function listPositions(User $user)
+    {
+        try {
+            $result = $this->userService->listUserPositions($user->id);
+
+            return response()->json([
+                'data' => $result,
+            ], 200);
+        } catch (BusinessException $e) {
+            return response()->json([
+                'statusCode' => $e->getStatusCode(),
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        }
+    }
 }

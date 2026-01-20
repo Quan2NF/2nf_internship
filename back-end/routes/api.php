@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/users/{user}', [UserController::class, 'update']);
         Route::delete('/users/{user}', [UserController::class, 'destroy']);
         Route::post('/users/{user}/positions', [UserController::class, 'assignPositions']);
+        Route::get('/users/{user}/positions', [UserController::class, 'listPositions']);
     });
 });
 

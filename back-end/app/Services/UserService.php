@@ -41,4 +41,9 @@ class UserService implements UserServiceInterface
     {
         return $this->users->assignPositions($userId, $data);
     }
+
+    public function listUserPositions(int $userId): array
+    {
+        return $this->users->listUserPositions($userId);
+    }
 }
