@@ -74,4 +74,21 @@ class UserController extends Controller
             ], $e->getStatusCode());
         }
     }
+
+    // API09 - Delete user (admin only)
+    public function destroy(User $user)
+    {
+        try {
+            $this->userService->deleteUser($user->id);
+
+            return response()->json([
+                'message' => 'User deleted successfully',
+            ], 200);
+        } catch (BusinessException $e) {
+            return response()->json([
+                'statusCode' => $e->getStatusCode(),
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        }
+    }
 }

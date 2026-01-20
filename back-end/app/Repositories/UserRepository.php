@@ -257,6 +257,24 @@ class UserRepository implements UserRepositoryInterface
         });
     }
 
+    public function deleteUser(int $userId): bool
+    {
+        return DB::transaction(function () use ($userId) {
+            $user = User::query()
+                ->whereKey($userId)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if (! $user) {
+                throw new BusinessException('ERR_USER_NOT_FOUND', 404);
+            }
+
+            $user->delete();
+
+            return true;
+        });
+    }
+
     private function generateNextEmployeeCode(): string
     {
         $last = User::where('employee_code', 'like', 'EMP%')

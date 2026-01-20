@@ -23,4 +23,9 @@ interface UserServiceInterface
      * API08: Edit user + roles (admin-only).
      */
     public function updateUser(int $userId, UpdateUserData $data): array;
+
+    /**
+     * API09: Soft delete a user (admin-only).
+     */
+    public function deleteUser(int $userId): bool;
 }

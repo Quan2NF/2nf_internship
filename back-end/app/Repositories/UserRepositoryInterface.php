@@ -30,4 +30,9 @@ interface UserRepositoryInterface
      * API08: Edit user and (optionally) re-assign positions.
      */
     public function updateUser(int $userId, UpdateUserData $data): array;
+
+    /**
+     * API09: Soft delete a user.
+     */
+    public function deleteUser(int $userId): bool;
 }

@@ -30,4 +30,9 @@ class UserService implements UserServiceInterface
     {
         return $this->users->updateUser($userId, $data);
     }
+
+    public function deleteUser(int $userId): bool
+    {
+        return $this->users->deleteUser($userId);
+    }
 }
