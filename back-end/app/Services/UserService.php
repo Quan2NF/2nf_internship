@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Data\CreateUserData;
 use App\Data\ListUsersData;
+use App\Data\UpdateUserData;
 use App\Repositories\UserRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -23,5 +24,10 @@ class UserService implements UserServiceInterface
         $result = $this->users->createUser($data);
 
         return $result;
+    }
+
+    public function updateUser(int $userId, UpdateUserData $data): array
+    {
+        return $this->users->updateUser($userId, $data);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Data\CreateUserData;
 use App\Data\ListUsersData;
+use App\Data\UpdateUserData;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -24,4 +25,9 @@ interface UserRepositoryInterface
      * Returns an array safe for API responses.
      */
     public function createUser(CreateUserData $data): array;
+
+    /**
+     * API08: Edit user and (optionally) re-assign positions.
+     */
+    public function updateUser(int $userId, UpdateUserData $data): array;
 }

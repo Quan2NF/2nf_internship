@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Data\CreateUserData;
 use App\Data\ListUsersData;
+use App\Data\UpdateUserData;
 use App\Exceptions\BusinessException;
 use App\Http\Requests\CreateUserRequest;
 use App\Http\Requests\ListUsersRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Models\User;
 use App\Services\UserServiceInterface;
 
 class UserController extends Controller
@@ -45,6 +48,25 @@ class UserController extends Controller
             return response()->json([
                 'data' => $result,
             ], 201);
+        } catch (BusinessException $e) {
+            return response()->json([
+                'statusCode' => $e->getStatusCode(),
+                'message' => $e->getMessage(),
+            ], $e->getStatusCode());
+        }
+    }
+
+    // API08 - Edit user (admin only)
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        $data = UpdateUserData::fromArray($request->validated());
+
+        try {
+            $result = $this->userService->updateUser($user->id, $data);
+
+            return response()->json([
+                'data' => $result,
+            ], 200);
         } catch (BusinessException $e) {
             return response()->json([
                 'statusCode' => $e->getStatusCode(),

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Data\CreateUserData;
 use App\Data\ListUsersData;
+use App\Data\UpdateUserData;
 use App\Exceptions\BusinessException;
 use App\Models\Position;
 use App\Models\User;
@@ -157,6 +158,102 @@ class UserRepository implements UserRepositoryInterface
             }
 
             return $response;
+        });
+    }
+
+    public function updateUser(int $userId, UpdateUserData $data): array
+    {
+        return DB::transaction(function () use ($userId, $data) {
+            $user = User::query()
+                ->whereKey($userId)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if (! $user) {
+                throw new BusinessException('ERR_USER_NOT_FOUND', 404);
+            }
+
+            $updates = [];
+            if ($data->has('employee_code')) {
+                $updates['employee_code'] = $data->employee_code;
+            }
+            if ($data->has('name')) {
+                $updates['name'] = $data->name;
+            }
+            if ($data->has('email')) {
+                $updates['email'] = $data->email;
+            }
+            if ($data->has('phone_number')) {
+                $updates['phone_number'] = $data->phone_number;
+            }
+            if ($data->has('birthday')) {
+                $updates['birthday'] = $data->birthday;
+            }
+            if ($data->has('gender')) {
+                $updates['gender'] = $data->gender;
+            }
+            if ($data->has('join_date')) {
+                $updates['join_date'] = $data->join_date;
+            }
+            if ($data->has('resign_date')) {
+                $updates['resign_date'] = $data->resign_date;
+            }
+            if ($data->has('avatar')) {
+                $updates['avatar'] = $data->avatar;
+            }
+            if ($data->has('is_active')) {
+                $updates['is_active'] = $data->is_active;
+            }
+
+            // Password: only update when explicitly provided and non-null
+            if ($data->has('password') && $data->password !== null && $data->password !== '') {
+                $updates['password'] = $data->password;
+            }
+
+            if (! empty($updates)) {
+                $user->fill($updates);
+                $user->save();
+            }
+
+            // Positions: sync only when client sends the positions key
+            if ($data->has('positions')) {
+                $positionsInput = $data->positions ?? [];
+
+                $attach = [];
+                foreach ($positionsInput as $pos) {
+                    $positionId = $pos['position_id'] ?? null;
+
+                    if (! $positionId && ! empty($pos['position_code'])) {
+                        $positionId = Position::where('code', $pos['position_code'])->value('id');
+                    }
+
+                    if (! $positionId) {
+                        throw new BusinessException('ERR_POSITION_NOT_FOUND', 422);
+                    }
+
+                    $attach[$positionId] = [
+                        'start_date' => $pos['start_date'] ?? null,
+                        'end_date' => $pos['end_date'] ?? null,
+                    ];
+                }
+
+                $user->positions()->sync($attach);
+            }
+
+            $user->load(['positions' => function ($q) {
+                $q->select('positions.id', 'positions.code', 'positions.name');
+            }]);
+
+            return [
+                'id' => $user->id,
+                'employee_code' => $user->employee_code,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'join_date' => $user->join_date,
+                'is_active' => $user->is_active,
+                'positions' => $user->positions,
+            ];
         });
     }
 
