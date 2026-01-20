@@ -11,5 +11,7 @@ class SanctumValidateCsrfToken extends Middleware
         'api/forgot-password',
         'api/reset-password',
         'api/logout',
+        'api/users',
+        'api/users/*',
     ];
 }

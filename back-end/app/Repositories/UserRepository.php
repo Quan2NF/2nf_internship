@@ -2,9 +2,13 @@
 
 namespace App\Repositories;
 
+use App\Data\CreateUserData;
 use App\Data\ListUsersData;
+use App\Exceptions\BusinessException;
+use App\Models\Position;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -82,5 +86,91 @@ class UserRepository implements UserRepositoryInterface
         }
 
         return $query->paginate($filter->per_page);
+    }
+
+    public function createUser(CreateUserData $data): array
+    {
+        return DB::transaction(function () use ($data) {
+            $employeeCode = $data->employee_code ?: $this->generateNextEmployeeCode();
+            if (User::where('employee_code', $employeeCode)->exists()) {
+                throw new BusinessException('ERR_EMPLOYEE_CODE_EXISTS', 422);
+            }
+
+            $plainPassword = $data->password ?: 'password123';
+
+            $user = User::create([
+                'employee_code' => $employeeCode,
+                'name' => $data->name,
+                'email' => $data->email,
+                'password' => $plainPassword,
+                'phone_number' => $data->phone_number,
+                'birthday' => $data->birthday,
+                'gender' => $data->gender,
+                'join_date' => $data->join_date,
+                'resign_date' => $data->resign_date,
+                'avatar' => $data->avatar,
+                'is_active' => $data->is_active,
+            ]);
+
+            $positionsInput = $data->positions ?? [];
+            if (count($positionsInput) === 0) {
+                throw new BusinessException('ERR_POSITIONS_REQUIRED', 422);
+            }
+
+            $attach = [];
+            foreach ($positionsInput as $pos) {
+                $positionId = $pos['position_id'] ?? null;
+
+                if (! $positionId && ! empty($pos['position_code'])) {
+                    $positionId = Position::where('code', $pos['position_code'])->value('id');
+                }
+
+                if (! $positionId) {
+                    throw new BusinessException('ERR_POSITION_NOT_FOUND', 422);
+                }
+
+                $attach[$positionId] = [
+                    'start_date' => $pos['start_date'] ?? ($data->join_date ?: null),
+                    'end_date' => $pos['end_date'] ?? null,
+                ];
+            }
+
+            $user->positions()->sync($attach);
+
+            $user->load(['positions' => function ($q) {
+                $q->select('positions.id', 'positions.code', 'positions.name');
+            }]);
+
+            $response = [
+                'id' => $user->id,
+                'employee_code' => $user->employee_code,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'join_date' => $user->join_date,
+                'is_active' => $user->is_active,
+                'positions' => $user->positions,
+            ];
+
+            if (! $data->password && app()->environment('local')) {
+                $response['initial_password'] = $plainPassword;
+            }
+
+            return $response;
+        });
+    }
+
+    private function generateNextEmployeeCode(): string
+    {
+        $last = User::where('employee_code', 'like', 'EMP%')
+            ->orderBy('employee_code', 'desc')
+            ->value('employee_code');
+
+        $next = 1;
+        if (is_string($last) && preg_match('/^EMP(\d+)$/', $last, $m)) {
+            $next = ((int) $m[1]) + 1;
+        }
+
+        return 'EMP'.str_pad((string) $next, 6, '0', STR_PAD_LEFT);
     }
 }
