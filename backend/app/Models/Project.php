@@ -2,11 +2,45 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use App\Enums\Project\ProjectStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+
+/**
+ * Class Project
+ *
+ * @property int $id
+ * @property string $code
+ * @property string $name
+ * @property string|null $description
+ *
+ * @property ProjectStatus $status
+ *
+ * @property Carbon|null $planned_start_date
+ * @property Carbon|null $planned_end_date
+ * @property Carbon|null $start_date
+ * @property Carbon|null $end_date
+ *
+ * @property int $progress_rate
+ * @property bool $is_public
+ * @property bool $is_active
+ *
+ * @property int $created_by
+ * @property int $updated_by
+ *
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
+ *
+ * @property-read User $creator
+ * @property-read User $updater
+ *
+ * @property-read Collection<int, User> $users
+ * @property-read Collection<int, ProjectMember> $projectMembers
+ */
 class Project extends Model
 {
     use HasFactory, SoftDeletes;

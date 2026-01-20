@@ -103,4 +103,11 @@ class User extends Authenticatable
                     })
                     ->exists();
     }
+
+    public function hasAnyPosition(array $codes): bool
+    {
+        return $this->positions()
+            ->whereIn('code', $codes)
+            ->exists();
+    }
 }

@@ -8,7 +8,7 @@ use Spatie\LaravelData\Attributes\WithCast;
 /**
  * Data used to update a project's schedule and progress information.
  */
-class ProjectScheduleAndInfoData extends Data
+class ProjectSchedule extends Data
 {
     /**
      * @param int $project_id The ID of the project

@@ -2,8 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\PositionController;
+use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\PositionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,4 +33,28 @@ Route::prefix('positions')->middleware('auth:sanctum')->group(function () {
     Route::post('/', [PositionController::class, 'create']);
     Route::patch('{position}', [PositionController::class, 'update']);
     Route::delete('{position}', [PositionController::class, 'delete']);
+});
+
+Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [ProjectController::class, 'getFilteredList']);
+    Route::post('/', [ProjectController::class, 'create']);
+    Route::get('{project}', [ProjectController::class, 'view']);
+    Route::patch('{project}', [ProjectController::class, 'update']);
+    Route::delete('{project}', [ProjectController::class, 'delete']);
+    Route::put('{project}/pm', [ProjectController::class, 'assignPM']);
+    Route::put('{project}/members', [ProjectController::class, 'assignMembers']);
+    Route::get('{project}/settings', [ProjectController::class, 'getSettings']);
+    Route::patch('{project}/settings', [ProjectController::class, 'updateSettings']);
+    Route::get('{project}/schedule', [ProjectController::class, 'getSchedule']);
+    Route::patch('{project}/schedule', [ProjectController::class, 'updateSchedule']);
+});
+
+Route::prefix('tasks')->middleware('auth:sanctum')->group(function () {
+    Route::get('/', [TaskController::class, 'getFilteredList']);
+    Route::post('/', [TaskController::class, 'create']);
+    Route::patch('{task}', [TaskController::class, 'update']);
+    Route::delete('{task}', [TaskController::class, 'delete']);
+    Route::get('{task}/comments', [TaskController::class, 'getComments']);
+    Route::post('{task}/comments', [TaskController::class, 'postComment']);
+    Route::get('{task}/logs', [TaskController::class, 'getAuditLogs']);
 });

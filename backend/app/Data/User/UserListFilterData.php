@@ -19,13 +19,13 @@ class UserListFilterData extends Data
         public ?bool $is_active = null,
         public ?UserGender $gender = null,
 
-        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
-        public ?\DateTimeInterface $join_from = null,
+        public ?\DateTime $join_from = null,
 
-        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
-        public ?\DateTimeInterface $join_to = null,
+        public ?\DateTime $join_to = null,
 
         public int $page = 1,
         public int $per_page = 20,

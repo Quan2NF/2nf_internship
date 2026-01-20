@@ -15,15 +15,11 @@ class TestUserSeeder extends Seeder
      */
     public function run(): void
     {
-        if (!app()->environment(['local', 'testing'])) {
-            return;
-        }
-
         $user = User::updateOrCreate(
             ['employee_code' => 'EMP001'],   // lookup key ONLY
             [
             'employee_code' => 'EMP001',
-            'name'          => 'Nguyen Van A',
+            'name'          => 'Ha Minh Dung',
             'email'         => 'haminhdunghl@gmail.com',
             'password'      => '123456', // auto-hashed
             'phone_number'  => '0900000000',

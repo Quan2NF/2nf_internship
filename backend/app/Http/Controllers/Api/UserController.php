@@ -18,7 +18,7 @@ use App\Http\Requests\User\DeleteUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Contracts\Service\UserServiceInterface;
 use App\Http\Requests\User\AssignPositionsRequest;
-use App\Http\Requests\User\GetFilteredListRequest;
+use App\Http\Requests\User\GetFilteredUserListRequest;
 use App\Http\Requests\User\GetPositionsRequest;
 
 class UserController extends Controller
@@ -51,7 +51,7 @@ class UserController extends Controller
         return ApiResponse::from(ResponseCode::SUCCESS);
     }
 
-    public function getFilteredList(GetFilteredListRequest $request)
+    public function getFilteredList(GetFilteredUserListRequest $request)
     {
         return $this->userService->getFilteredList(UserListFilterData::from($request->validated()));
     }

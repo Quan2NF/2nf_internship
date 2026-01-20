@@ -7,7 +7,7 @@ use App\Enums\User\UserGender;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class GetFilteredListRequest extends FormRequest
+class GetFilteredUserListRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -10,15 +10,16 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use App\Models\ProjectMember;
 use App\Data\Common\KeyOnlyData;
+use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 use App\Data\User\UserListFilterData;
 use App\Data\Response\ApiResponseData;
-use App\Data\User\AssignPositionsToUserData;
 use App\Data\User\CreateUserRequestData;
 use App\Data\User\UpdateUserRequestData;
 use App\Data\User\CreateUserResponseData;
 use App\Data\User\DetailUserResponseData;
+use App\Data\User\AssignPositionsToUserData;
 use App\Contracts\Service\UserServiceInterface;
 
 class UserService implements UserServiceInterface
@@ -93,10 +94,8 @@ class UserService implements UserServiceInterface
 
         // Pagination
         $users = $query->paginate(
-            $data->per_page,
-            ['*'],
-            'page',
-            $data->page
+            perPage: $data->per_page,
+            page: $data->page
         );
 
         return ApiResponse::from(ResponseCode::SUCCESS, $users);
@@ -104,25 +103,33 @@ class UserService implements UserServiceInterface
 
     public function assignPositions(AssignPositionsToUserData $data): ApiResponseData
     {
-        $user = User::query()->findOrFail($data->user_id);
+        return DB::transaction(function () use ($data) {
 
-        $user->positions()->syncWithoutDetaching(
-            collect($data->position_ids)
-                ->mapWithKeys(fn ($id) => [
-                    $id => [
-                        'start_date' => now()->toDateString(),
-                        'end_date'   => null,
-                    ],
+            $user = User::query()->findOrFail($data->user_id);
+
+            $user->positions()->syncWithoutDetaching(
+                collect($data->position_ids)
+                    ->mapWithKeys(fn ($id) => [
+                        $id => [
+                            'start_date' => now()->toDateString(),
+                            'end_date'   => null,
+                        ],
+                    ])
+                    ->all()
+            );
+
+            // Ensure fresh pivot data
+            $user->load('positions');
+
+            return ApiResponse::from(
+                ResponseCode::SUCCESS,
+                $user->positions->map(fn ($position) => [
+                    'id'         => $position->id,
+                    'name'       => $position->name,
+                    'start_date' => $position->pivot->start_date,
+                    'end_date'   => $position->pivot->end_date,
                 ])
-                ->all()
-        );
-
-        return ApiResponse::from(ResponseCode::SUCCESS, $user->positions
-            ->map(fn ($position) => [
-                'id'         => $position->id,
-                'name'       => $position->name,
-                'start_date' => $position->pivot->start_date,
-                'end_date'   => $position->pivot->end_date,
-        ]));
+            );
+        });
     }
 }

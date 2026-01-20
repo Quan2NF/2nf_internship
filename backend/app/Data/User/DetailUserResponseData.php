@@ -19,19 +19,19 @@ class DetailUserResponseData extends Data
 
         public ?string $phone_number = null,
 
-        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
         public ?\DateTimeInterface $birthday = null,
 
         public ?UserGender $gender = null,
 
-        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
-        public ?\DateTimeInterface $join_date = null,
+        public ?\DateTime $join_date = null,
 
-        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
-        public ?\DateTimeInterface $resign_date = null,
+        public ?\DateTime $resign_date = null,
 
         public ?string $avatar = null,
         public bool $is_active = true,

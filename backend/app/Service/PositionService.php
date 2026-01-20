@@ -15,11 +15,9 @@ class PositionService implements PositionServiceInterface
 {
     public function create(PositionData $data): ApiResponseData
     {
-        $position = Position::query()->create([
-            ...$data->toArray()
-        ]);
+        $position = Position::query()->create($data->toArray());
 
-        return ApiResponse::from(ResponseCode::SUCCESS, [$position->id]);
+        return ApiResponse::from(ResponseCode::SUCCESS, ['id' => $position->id]);
     }
 
     public function update(int $id, PositionData $data): ApiResponseData

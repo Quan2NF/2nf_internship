@@ -16,9 +16,9 @@ class UpdateUserRequestData extends Data
         public ?string $name,
         public ?string $phone_number = null,
 
-        #[WithCast(DateTimeInterfaceCast::class)]
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
         #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
-        public ?\DateTimeInterface $birthday = null,
+        public ?\DateTime $birthday = null,
 
         public ?UserGender $gender = null,
 

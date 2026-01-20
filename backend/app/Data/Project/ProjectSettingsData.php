@@ -7,7 +7,7 @@ use Spatie\LaravelData\Data;
 /**
  * Data used to update project settings such as visibility and activity state.
  */
-class ProjectSettingData extends Data
+class ProjectSettingsData extends Data
 {
     /**
      * @param int $project_id The ID of the project
