@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Data\AssignPositionsData;
 use App\Data\CreateUserData;
 use App\Data\ListUsersData;
 use App\Data\UpdateUserData;
@@ -34,5 +35,10 @@ class UserService implements UserServiceInterface
     public function deleteUser(int $userId): bool
     {
         return $this->users->deleteUser($userId);
+    }
+
+    public function assignPositions(int $userId, AssignPositionsData $data): array
+    {
+        return $this->users->assignPositions($userId, $data);
     }
 }

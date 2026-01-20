@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Data\AssignPositionsData;
 use App\Data\CreateUserData;
 use App\Data\ListUsersData;
 use App\Data\UpdateUserData;
@@ -272,6 +273,60 @@ class UserRepository implements UserRepositoryInterface
             $user->delete();
 
             return true;
+        });
+    }
+
+    public function assignPositions(int $userId, AssignPositionsData $data): array
+    {
+        return DB::transaction(function () use ($userId, $data) {
+            $user = User::query()
+                ->whereKey($userId)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if (! $user) {
+                throw new BusinessException('ERR_USER_NOT_FOUND', 404);
+            }
+
+            $positionsInput = $data->positions ?? [];
+            if (count($positionsInput) === 0) {
+                throw new BusinessException('ERR_POSITIONS_REQUIRED', 422);
+            }
+
+            $attach = [];
+            foreach ($positionsInput as $pos) {
+                $positionId = $pos['position_id'] ?? null;
+
+                if (! $positionId && ! empty($pos['position_code'])) {
+                    $positionId = Position::where('code', $pos['position_code'])->value('id');
+                }
+
+                if (! $positionId) {
+                    throw new BusinessException('ERR_POSITION_NOT_FOUND', 422);
+                }
+
+                $attach[$positionId] = [
+                    'start_date' => $pos['start_date'] ?? ($user->join_date ?: null),
+                    'end_date' => $pos['end_date'] ?? null,
+                ];
+            }
+
+            $user->positions()->sync($attach);
+
+            $user->load(['positions' => function ($q) {
+                $q->select('positions.id', 'positions.code', 'positions.name');
+            }]);
+
+            return [
+                'id' => $user->id,
+                'employee_code' => $user->employee_code,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone_number' => $user->phone_number,
+                'join_date' => $user->join_date,
+                'is_active' => $user->is_active,
+                'positions' => $user->positions,
+            ];
         });
     }
 

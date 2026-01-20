@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Data\AssignPositionsData;
 use App\Data\CreateUserData;
 use App\Data\ListUsersData;
 use App\Data\UpdateUserData;
@@ -28,4 +29,9 @@ interface UserServiceInterface
      * API09: Soft delete a user (admin-only).
      */
     public function deleteUser(int $userId): bool;
+    
+    /**
+     * API10: Assign positions to a user (admin-only).
+     */
+    public function assignPositions(int $userId, AssignPositionsData $data): array;
 }

@@ -7,6 +7,7 @@ use App\Data\ListUsersData;
 use App\Data\UpdateUserData;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use App\Data\AssignPositionsData;
 
 interface UserRepositoryInterface
 {
@@ -35,4 +36,9 @@ interface UserRepositoryInterface
      * API09: Soft delete a user.
      */
     public function deleteUser(int $userId): bool;
+
+    /**
+     * API10: Assign positions to a user.
+     */
+    public function assignPositions(int $userId, AssignPositionsData $data): array;
 }
