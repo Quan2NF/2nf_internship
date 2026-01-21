@@ -8,7 +8,6 @@ use App\Http\Controllers\Concerns\ApiResponse;
 use App\Http\Requests\User\AssignRoleRequest;
 use App\Http\Requests\User\UserCreateRequest;
 use App\Http\Requests\User\UserUpdateRequest;
-use App\Models\User;
 use App\Services\Interfaces\IUserService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,12 +20,14 @@ class UserController extends Controller
         private readonly IUserService $userService
     ) {}
 
-    private function ensureAdmin(int $authUserId): void
+    /**
+     * Only system ADMIN can manage users.
+     */
+    private function ensureSystemAdmin(int $authUserId): void
     {
-        $isAdmin = DB::table('project_members as pm')
-            ->join('project_member_roles as pmr', 'pmr.project_member_id', '=', 'pm.id')
-            ->join('roles as r', 'r.id', '=', 'pmr.role_id')
-            ->where('pm.user_id', $authUserId)
+        $isAdmin = DB::table('user_system_roles as usr')
+            ->join('roles as r', 'r.id', '=', 'usr.role_id')
+            ->where('usr.user_id', $authUserId)
             ->where('r.code', 'ADMIN')
             ->exists();
 
@@ -36,19 +37,25 @@ class UserController extends Controller
     }
 
     /**
-     * GET /users?keyword=abc&per_page=15
+     * AP05/AP06: List / Filter Users (Admin only)
+     * GET /users?keyword=&is_active=&per_page=
      */
     public function index(Request $request)
     {
-        $this->ensureAdmin((int) $request->user()->id);
+        $this->ensureSystemAdmin((int) $request->user()->id);
 
+        $filters = [
+            'keyword' => $request->query('keyword'),
+            'is_active' => $request->query('is_active'),
+        ];
         $perPage = (int) $request->query('per_page', 15);
-        $keyword = (string) $request->query('keyword', '');
 
-        // Nếu bạn chưa có filter trong service thì tạm paginate thường
-        $p = $this->userService->paginate($perPage);
+        $p = $this->userService->paginateFiltered($filters, $perPage);
 
-        $items = collect($p->items())->map(fn ($u) => UserData::fromModel($u));
+        $items = array_map(
+            fn ($u) => UserData::fromModel($u),
+            $p->items()
+        );
 
         return $this->success(
             message: 'GET_USERS_SUCCESS',
@@ -65,11 +72,12 @@ class UserController extends Controller
     }
 
     /**
+     * AP07: Create User (Admin only)
      * POST /users
      */
     public function store(UserCreateRequest $request)
     {
-        $this->ensureAdmin((int) $request->user()->id);
+        $this->ensureSystemAdmin((int) $request->user()->id);
 
         $user = $this->userService->create($request->validated());
 
@@ -80,11 +88,12 @@ class UserController extends Controller
     }
 
     /**
+     * AP08: Edit User (Admin only)
      * PATCH /users/{id}
      */
     public function update(int $id, UserUpdateRequest $request)
     {
-        $this->ensureAdmin((int) $request->user()->id);
+        $this->ensureSystemAdmin((int) $request->user()->id);
 
         $ok = $this->userService->update($id, $request->validated());
         if (!$ok) {
@@ -100,11 +109,12 @@ class UserController extends Controller
     }
 
     /**
+     * AP09: Delete User (soft delete) (Admin only)
      * DELETE /users/{id}
      */
     public function destroy(int $id, Request $request)
     {
-        $this->ensureAdmin((int) $request->user()->id);
+        $this->ensureSystemAdmin((int) $request->user()->id);
 
         $ok = $this->userService->softDelete($id);
         if (!$ok) {
@@ -118,42 +128,38 @@ class UserController extends Controller
     }
 
     /**
+     * AP10: Assign Role (System roles) (Admin only)
      * POST /users/assign-role
-     * Assign roles to a user in a project
      */
     public function assignRole(AssignRoleRequest $request)
     {
-        $this->ensureAdmin((int) $request->user()->id);
+        $this->ensureSystemAdmin((int) $request->user()->id);
 
         $data = $request->validated();
+        $mode = $data['mode'] ?? 'sync';
 
-        // Bạn sẽ implement logic này trong service/repo 
-        $this->userService->assignRolesInProject(
-            projectId: (int) $data['project_id'],
+        $this->userService->assignSystemRoles(
             userId: (int) $data['user_id'],
-            roleCodes: $data['role_codes']
+            roleCodes: (array) $data['role_codes'],
+            mode: (string) $mode
         );
 
         return $this->success(message: 'ASSIGN_ROLE_SUCCESS');
     }
 
     /**
-     * GET /users/{id}/roles?project_id=1
+     * AP11: List User Roles (System roles) (Admin only)
+     * GET /users/{id}/roles
      */
     public function roles(int $id, Request $request)
     {
-        $this->ensureAdmin((int) $request->user()->id);
+        $this->ensureSystemAdmin((int) $request->user()->id);
 
-        $projectId = (int) $request->query('project_id', 0);
-        if ($projectId <= 0) {
-            abort(422, 'project_id is required');
-        }
-
-        $roles = $this->userService->getRolesInProject($projectId, $id);
+        $roles = $this->userService->getSystemRoles($id);
 
         return $this->success(
             message: 'GET_USER_ROLES_SUCCESS',
-            data: $roles
+            data: ['roles' => $roles]
         );
     }
 }

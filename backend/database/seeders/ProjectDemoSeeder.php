@@ -8,45 +8,72 @@ use Illuminate\Support\Facades\Hash;
 
 class ProjectDemoSeeder extends Seeder
 {
+    
     public function run(): void
     {
-        // 1) create a user
-        $userId = DB::table('users')->insertGetId([
-            'employee_code' => 'E0001',
-            'name' => 'Owner User',
-            'email' => 'minhadcarry@gmail.com',
-            'password' => Hash::make('minhadcarry'),
-            'is_active' => 1,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::transaction(function () {
+ 
+            $email = 'minhadcarry@gmail.com';
+            $employeeCode = 'E0001';
 
-        // 2) create a project (owner)
-        $projectId = DB::table('projects')->insertGetId([
-            'name' => 'Demo Project',
-            'description' => 'Project for policy testing',
-            'user_id' => $userId,
-            'status' => 'new',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            $userId = DB::table('users')->where('email', $email)->value('id');
+            if (!$userId) {
+                $userId = DB::table('users')->insertGetId([
+                    'employee_code' => $employeeCode,
+                    'name' => 'minhadcarry',
+                    'email' => $email,
+                    'password' => Hash::make('minhadcarry'),
+                    'is_active' => 1,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
 
-        // 3) add member record (owner is also member)
-        $projectMemberId = DB::table('project_members')->insertGetId([
-            'project_id' => $projectId,
-            'user_id' => $userId,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
 
-        // 4) attach role PM (or ADMIN) to that member
-        $roleId = DB::table('roles')->where('code', 'PM')->value('id');
+            $projectName = 'Demo Project';
 
-        DB::table('project_member_roles')->insert([
-            'project_member_id' => $projectMemberId,
-            'role_id' => $roleId,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+            $projectId = DB::table('projects')
+                ->where('name', $projectName)
+                ->where('user_id', $userId)
+                ->value('id');
+
+            if (!$projectId) {
+                $projectId = DB::table('projects')->insertGetId([
+                    'name' => $projectName,
+                    'description' => 'Project for policy testing',
+                    'user_id' => $userId,
+                    'status' => 'new',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+            $projectMemberId = DB::table('project_members')
+                ->where('project_id', $projectId)
+                ->where('user_id', $userId)
+                ->value('id');
+
+            if (!$projectMemberId) {
+                $projectMemberId = DB::table('project_members')->insertGetId([
+                    'project_id' => $projectId,
+                    'user_id' => $userId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+
+
+            $roleCode = 'PM';
+            $roleId = DB::table('roles')->where('code', $roleCode)->value('id');
+            if (!$roleId) {
+                throw new \RuntimeException("Role '{$roleCode}' not found. Please run RolesSeeder first.");
+            }
+
+
+            DB::table('project_member_roles')->updateOrInsert(
+                ['project_member_id' => $projectMemberId, 'role_id' => $roleId],
+                ['created_at' => now(), 'updated_at' => now()]
+            );
+        });
     }
 }

@@ -53,4 +53,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Task::class, 'assigned_to');
     }
+
+    public function systemRoles()
+    {
+        return $this->hasMany(UserSystemRole::class, 'user_id');
+    }
 }

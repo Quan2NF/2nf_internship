@@ -9,12 +9,15 @@ class RolesSeeder extends Seeder
 {
     public function run(): void
     {
-        Role::query()->insert([
-            ['code' => 'ADMIN', 'name' => 'Admin'],
-            ['code' => 'PM',    'name' => 'Project Manager'],
-            ['code' => 'DEV',   'name' => 'Developer'],
-            ['code' => 'QA',    'name' => 'QA'],
-            ['code' => 'TEST',  'name' => 'Tester'],
-        ]);
+        Role::query()->upsert([
+            ['code' => 'ADMIN',  'name' => 'Admin'],
+            ['code' => 'PMO',    'name' => 'PMO'],
+            ['code' => 'PM',     'name' => 'Project Manager'],
+            ['code' => 'DEV_FE', 'name' => 'Developer FrontEnd'],
+            ['code' => 'DEV_BE', 'name' => 'Developer BackEnd'],
+            ['code' => 'QA',     'name' => 'QA'],
+            ['code' => 'TEST',   'name' => 'Tester'],
+            ['code' => 'COMTOR', 'name' => 'Comtor'],
+        ], ['code'], ['name']);
     }
 }

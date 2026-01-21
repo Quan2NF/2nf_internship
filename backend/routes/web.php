@@ -32,12 +32,12 @@ Route::middleware(['web'])->group(function () {
     Route::middleware('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
 
-        Route::get('/users', [UserController::class, 'index']);
-        Route::post('/users', [UserController::class, 'store']);
-        Route::patch('/users/{id}', [UserController::class, 'update']);
-        Route::delete('/users/{id}', [UserController::class, 'destroy']);
-        Route::post('/users/assign-role', [UserController::class, 'assignRole']);
-        Route::get('/users/{id}/roles', [UserController::class, 'roles']); // ?project_id=1
+        Route::get('/users', [UserController::class, 'index']);            // AP05/AP06
+        Route::post('/users', [UserController::class, 'store']);           // AP07
+        Route::patch('/users/{id}', [UserController::class, 'update']);    // AP08
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);  // AP09
+        Route::post('/users/assign-role', [UserController::class, 'assignRole']); // AP10
+        Route::get('/users/{id}/roles', [UserController::class, 'roles']);        // AP11
 
         Route::get('/projects/my', [ProjectController::class, 'myProjects']);
         Route::post('/projects', [ProjectController::class, 'store']);

@@ -6,8 +6,8 @@ use App\Models\User;
 use App\Repositories\Interfaces\IUserRepository;
 use App\Services\Interfaces\IUserService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserService implements IUserService
 {
@@ -22,30 +22,29 @@ class UserService implements IUserService
 
     public function find(int $id): ?User
     {
-        $user = $this->userRepository->find($id);
-        return $user instanceof User ? $user : null;
+        $model = $this->userRepository->find($id);
+        return $model instanceof User ? $model : null;
     }
 
     public function create(array $data): User
     {
-        // Tránh lưu plain password
-        if (isset($data['password'])) {
+        if (!empty($data['password'])) {
             $data['password'] = Hash::make((string) $data['password']);
         }
 
-        $created = $this->userRepository->create($data);
-        if (!$created instanceof User) {
-            throw new \RuntimeException('Failed to create user.');
-        }
-
-        return $created;
+        /** @var User $user */
+        $user = $this->userRepository->create($data);
+        return $user;
     }
 
     public function update(int $id, array $data): bool
     {
-        // Nếu có update password
-        if (isset($data['password'])) {
-            $data['password'] = Hash::make((string) $data['password']);
+        if (array_key_exists('password', $data)) {
+            if (!empty($data['password'])) {
+                $data['password'] = Hash::make((string) $data['password']);
+            } else {
+                unset($data['password']);
+            }
         }
 
         return $this->userRepository->update($id, $data);
@@ -58,16 +57,89 @@ class UserService implements IUserService
 
     public function updateMyProfile(int $userId, array $data): bool
     {
-        // Chặn các field nhạy cảm (tuỳ bạn)
-        unset($data['password'], $data['email_verified_at'], $data['remember_token']);
+        if (array_key_exists('password', $data)) {
+            if (!empty($data['password'])) {
+                $data['password'] = Hash::make((string) $data['password']);
+            } else {
+                unset($data['password']);
+            }
+        }
 
         return $this->userRepository->update($userId, $data);
     }
 
+    /**
+     * AP05/AP06 - List & filter users.
+     */
+    public function paginateFiltered(array $filters, int $perPage = 15): LengthAwarePaginator
+    {
+        $q = User::query();
+
+        if (!empty($filters['keyword'])) {
+            $kw = (string) $filters['keyword'];
+            $q->where(function ($qq) use ($kw) {
+                $qq->where('name', 'like', "%{$kw}%")
+                    ->orWhere('email', 'like', "%{$kw}%")
+                    ->orWhere('employee_code', 'like', "%{$kw}%");
+            });
+        }
+
+        if (!empty($filters['is_active'])) {
+            $q->where('is_active', (int) $filters['is_active']);
+        }
+
+        return $q->paginate($perPage);
+    }
+
+    /**
+     * AP10 - Assign system roles to a user (user_system_roles).
+     */
+    public function assignSystemRoles(int $userId, array $roleCodes, string $mode = 'sync'): void
+    {
+        if (empty($roleCodes)) {
+            return;
+        }
+
+        DB::transaction(function () use ($userId, $roleCodes, $mode) {
+            $roleIds = DB::table('roles')->whereIn('code', $roleCodes)->pluck('id')->all();
+
+            if ($mode === 'sync') {
+                DB::table('user_system_roles')->where('user_id', $userId)->delete();
+            }
+
+            foreach ($roleIds as $rid) {
+                DB::table('user_system_roles')->updateOrInsert(
+                    ['user_id' => $userId, 'role_id' => $rid],
+                    ['created_at' => now(), 'updated_at' => now()]
+                );
+            }
+        });
+    }
+
+    /*
+     * AP11 - List system roles of a user.
+     */
+    public function getSystemRoles(int $userId): array
+    {
+        return DB::table('user_system_roles as usr')
+            ->join('roles as r', 'r.id', '=', 'usr.role_id')
+            ->where('usr.user_id', $userId)
+            ->select(['r.id', 'r.code', 'r.name'])
+            ->orderBy('r.code')
+            ->get()
+            ->map(fn ($r) => ['id' => (int) $r->id, 'code' => $r->code, 'name' => $r->name])
+            ->all();
+    }
+
+    //  Project roles 
+
     public function assignRolesInProject(int $projectId, int $userId, array $roleCodes): void
     {
+        if (empty($roleCodes)) {
+            return;
+        }
+
         DB::transaction(function () use ($projectId, $userId, $roleCodes) {
-            // 1) ensure project_member exists
             $projectMemberId = DB::table('project_members')
                 ->where('project_id', $projectId)
                 ->where('user_id', $userId)
@@ -82,26 +154,17 @@ class UserService implements IUserService
                 ]);
             }
 
-            // 2) get role ids
-            $roleIds = DB::table('roles')
-                ->whereIn('code', $roleCodes)
-                ->pluck('id')
-                ->all();
+            $roleIds = DB::table('roles')->whereIn('code', $roleCodes)->pluck('id')->all();
 
-            // 3) reset old roles then insert new roles
             DB::table('project_member_roles')
                 ->where('project_member_id', $projectMemberId)
                 ->delete();
 
-            $rows = array_map(fn ($roleId) => [
-                'project_member_id' => $projectMemberId,
-                'role_id' => $roleId,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ], $roleIds);
-
-            if (!empty($rows)) {
-                DB::table('project_member_roles')->insert($rows);
+            foreach ($roleIds as $rid) {
+                DB::table('project_member_roles')->updateOrInsert(
+                    ['project_member_id' => $projectMemberId, 'role_id' => $rid],
+                    ['created_at' => now(), 'updated_at' => now()]
+                );
             }
         });
     }
