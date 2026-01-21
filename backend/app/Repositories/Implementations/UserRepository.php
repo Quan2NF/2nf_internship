@@ -18,4 +18,12 @@ class UserRepository extends BaseRepository implements IUserRepository
             'email' => $email,
         ]);
     }
+
+    public function findByEmployeeCode(string $employeeCode): ?User
+    {
+        return $this->first([
+            'employee_code' => $employeeCode,
+        ]);
+    }
+
 }

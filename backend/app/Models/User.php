@@ -26,7 +26,7 @@ class User extends Model
         'is_active',
     ];
 
-    protected $hidden = ['password'];
+    protected $hidden = ['password','remember_token'];
 
     protected $casts = [
         'birthday' => 'date',

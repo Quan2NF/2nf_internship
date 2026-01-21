@@ -15,6 +15,9 @@ use App\Repositories\Interfaces\ITaskRepository;
 use App\Repositories\Implementations\TaskRepository;
 use App\Services\Interfaces\ITaskService;
 use App\Services\Implementations\TaskService;
+use App\Services\Interfaces\IUserService;
+use App\Services\Implementations\UserService;
+
 
 
 
@@ -37,16 +40,20 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(IAuthService::class, AuthService::class);
-        $this->app->bind(IUserRepository::class, UserRepository::class);
 
         // Repository
         $this->app->bind(IProjectRepository::class, ProjectRepository::class);
         $this->app->bind(ITaskRepository::class, TaskRepository::class);
+        $this->app->bind(IUserRepository::class, UserRepository::class);
+
     
 
         // Service
         $this->app->bind(IProjectService::class, ProjectService::class);
         $this->app->bind(ITaskService::class, TaskService::class);
+        $this->app->bind(IUserService::class, UserService::class);
+        $this->app->bind(IAuthService::class, AuthService::class);
+
     }
 
     

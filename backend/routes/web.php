@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
+use App\Http\Controllers\Api\UserController;
+
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,6 +31,14 @@ Route::middleware(['web'])->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::middleware('auth')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
+
+        Route::get('/users', [UserController::class, 'index']);
+        Route::post('/users', [UserController::class, 'store']);
+        Route::patch('/users/{id}', [UserController::class, 'update']);
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);
+        Route::post('/users/assign-role', [UserController::class, 'assignRole']);
+        Route::get('/users/{id}/roles', [UserController::class, 'roles']); // ?project_id=1
+
         Route::get('/projects/my', [ProjectController::class, 'myProjects']);
         Route::post('/projects', [ProjectController::class, 'store']);
         Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
