@@ -5,13 +5,9 @@ namespace App\Services\Implementations;
 use App\Services\Interfaces\IAuthService;
 use App\Repositories\Interfaces\IUserRepository;
 use App\Data\Auth\LoginData;
-use App\Data\Auth\AuthResponseData;
 use App\Data\User\UserData;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Contracts\Auth\Authenticatable;
 use App\Models\User;
-use Laravel\Sanctum\PersonalAccessToken;   
 use App\Data\Auth\ForgotPasswordData; 
 use App\Exceptions\Domain\BusinessException;
 use App\Data\Auth\ResetPasswordData;
@@ -21,7 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Password;
-use Illuminate\Validation\ValidationException;
+
 
 class AuthService implements IAuthService
 {
