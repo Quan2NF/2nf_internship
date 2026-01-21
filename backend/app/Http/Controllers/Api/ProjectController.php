@@ -3,12 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Project;
+use App\Data\Project\AssignPMData;
 use App\Http\Controllers\Controller;
 use App\Data\Response\ApiResponseData;
 use App\Data\Project\ProjectRequestData;
 use App\Data\Project\ProjectListFilterData;
+use App\Http\Requests\Project\GetPMRequest;
+use App\Http\Requests\Project\AssignPMRequest;
+use App\Data\Project\AssignMembersToProjectData;
+use App\Http\Requests\Project\GetMembersRequest;
 use App\Http\Requests\Project\ViewProjectRequest;
 use App\Contracts\Service\ProjectServiceInterface;
+use App\Http\Requests\Project\AssignMembersRequest;
 use App\Http\Requests\Project\CreateProjectRequest;
 use App\Http\Requests\Project\DeleteProjectRequest;
 use App\Http\Requests\Project\UpdateProjectRequest;
@@ -43,5 +49,25 @@ class ProjectController extends Controller
     public function delete(Project $project, DeleteProjectRequest $request): ApiResponseData
     {
         return $this->projectService->delete($project);
+    }
+
+    public function getPM(Project $project, GetPMRequest $request): ApiResponseData
+    {
+        return $this->projectService->getPM($project);
+    }
+
+    public function assignPM(Project $project, AssignPMRequest $request): ApiResponseData
+    {
+        return $this->projectService->assignPM($project, AssignPMData::from($request->validated()));
+    }
+
+    public function getMembers(Project $project, GetMembersRequest $request): ApiResponseData
+    {
+        return $this->projectService->getMembers($project);
+    }
+
+    public function assignMembers(Project $project, AssignMembersRequest $request): ApiResponseData
+    {
+        return $this->projectService->assignMembers($project, AssignMembersToProjectData::from($request->validated()));
     }
 }

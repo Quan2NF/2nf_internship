@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Models\Role;
+use App\Models\User;
 use App\Models\Project;
 use App\Enums\ResponseCode;
 use App\Models\ProjectMember;
@@ -16,7 +17,9 @@ use App\Data\Response\ApiResponseData;
 use App\Data\Project\ProjectRequestData;
 use App\Data\Project\ProjectResponseData;
 use App\Data\Project\ProjectSettingsData;
+use App\Data\User\DetailUserResponseData;
 use App\Data\Project\ProjectListFilterData;
+use App\Data\Project\ProjectMemberResponseData;
 use App\Data\Project\AssignMembersToProjectData;
 use App\Contracts\Service\ProjectServiceInterface;
 
@@ -106,8 +109,36 @@ class ProjectService implements ProjectServiceInterface
     public function delete(Project $project): ApiResponseData
     {
         $project->delete();
-
         return ApiResponse::from(ResponseCode::SUCCESS);
+    }
+
+    public function getPM(Project $project): ApiResponseData
+    {
+        $member = $project->projectMembers()
+            ->whereHas('roles', fn ($q) => $q->where('roles.code', 'PM'))
+            ->with('user')
+            ->firstOrFail();
+
+        return ApiResponse::from(
+            ResponseCode::SUCCESS,
+            DetailUserResponseData::from($member->user)
+        );
+    }
+
+    public function getMembers(Project $project): ApiResponseData
+    {
+        $members_response_data = $project->projectMembers()
+            ->with([
+                'user',
+                'roles:id,code,name',
+            ])
+            ->get()
+            ->map(fn ($member) => ProjectMemberResponseData::from($member));
+
+        return ApiResponse::from(
+            ResponseCode::SUCCESS,
+            $members_response_data
+        );
     }
 
     public function assignPM(Project $project, AssignPMData $data): ApiResponseData
@@ -144,20 +175,45 @@ class ProjectService implements ProjectServiceInterface
     public function assignMembers(Project $project, AssignMembersToProjectData $data): ApiResponseData
     {
         return DB::transaction(function () use ($project, $data) {
-            foreach ($data->user_ids as $userId) {
-                ProjectMember::query()->firstOrCreate([
+            $pmRoleId = Role::where('code', 'PM')->value('id');
+
+            foreach ($data->members as $memberData) {
+
+                // Ensure project membership exists
+                $member = ProjectMember::query()->firstOrCreate([
                     'project_id' => $project->id,
-                    'user_id'    => $userId,
+                    'user_id'    => $memberData->user_id,
                 ]);
+
+                // Does this member currently have PM?
+                $hasPm = $member->roles()
+                    ->where('roles.id', $pmRoleId)
+                    ->exists();
+
+                // Resolve role IDs by code
+                $roleIds = Role::query()
+                    ->whereIn('code', $memberData->roles)
+                    ->pluck('id')
+                    ->all();
+
+                // Assign roles to this project member
+                $member->roles()->sync($roleIds);
+
+                // Re-attach PM if it existed
+                if ($hasPm) {
+                    $member->roles()->syncWithoutDetaching([$pmRoleId]);
+                }
             }
 
-            return ApiResponse::from(ResponseCode::SUCCESS, [
-                'project_id' => $project->id,
-                'member_ids' => ProjectMember::query()
-                ->where('project_id', $project->id)
-                ->pluck('user_id')
-                ->values(),
-            ]);
+            // Return fresh state
+            $members = $project->projectMembers()
+                ->with(['user', 'roles:id,code,name'])
+                ->get();
+
+            return ApiResponse::from(
+                ResponseCode::SUCCESS,
+                $members->map(fn ($m) => ProjectMemberResponseData::from($m))
+            );
         });
     }
 

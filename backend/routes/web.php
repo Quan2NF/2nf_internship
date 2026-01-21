@@ -41,7 +41,9 @@ Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
     Route::get('{project}', [ProjectController::class, 'view']);
     Route::patch('{project}', [ProjectController::class, 'update']);
     Route::delete('{project}', [ProjectController::class, 'delete']);
+    Route::get('{project}/pm', [ProjectController::class, 'getPM']);
     Route::put('{project}/pm', [ProjectController::class, 'assignPM']);
+    Route::get('{project}/members', [ProjectController::class, 'getMembers']);
     Route::put('{project}/members', [ProjectController::class, 'assignMembers']);
     Route::get('{project}/settings', [ProjectController::class, 'getSettings']);
     Route::patch('{project}/settings', [ProjectController::class, 'updateSettings']);

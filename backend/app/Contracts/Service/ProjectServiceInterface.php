@@ -24,6 +24,10 @@ interface ProjectServiceInterface
 
     public function delete(Project $project): ApiResponseData;
 
+    public function getPM(Project $project): ApiResponseData;
+
+    public function getMembers(Project $project): ApiResponseData;
+    
     public function assignPM(Project $project, AssignPMData $data): ApiResponseData;
 
     public function assignMembers(Project $project, AssignMembersToProjectData $data): ApiResponseData;
