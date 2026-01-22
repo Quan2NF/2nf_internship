@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\RoleController;
 
 
 Route::get('/', function () {
@@ -25,25 +26,30 @@ Route::get('/dashboard', function () {
 
 Route::middleware(['web'])->group(function () {
 
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::post('/login', [AuthController::class, 'login']); //API01
+    Route::post('/logout', [AuthController::class, 'logout']); //API04
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']); //API02
+    Route::post('/reset-password', [AuthController::class, 'resetPassword']); //API03
     Route::middleware('auth')->group(function () {
-        Route::get('/me', [AuthController::class, 'me']);
+        Route::get('/me', [AuthController::class, 'me']); //API THÊM ĐỂ TEST XEM AI ĐANG ĐĂNG NHẬP
 
-        Route::get('/users', [UserController::class, 'index']);            // AP05/AP06
-        Route::post('/users', [UserController::class, 'store']);           // AP07
-        Route::patch('/users/{id}', [UserController::class, 'update']);    // AP08
-        Route::delete('/users/{id}', [UserController::class, 'destroy']);  // AP09
-        Route::post('/users/assign-role', [UserController::class, 'assignRole']); // AP10
-        Route::get('/users/{id}/roles', [UserController::class, 'roles']);        // AP11
+        Route::get('/users', [UserController::class, 'index']);            // API05/AP06
+        Route::post('/users', [UserController::class, 'store']);           // API07
+        Route::patch('/users/{id}', [UserController::class, 'update']);    // API08
+        Route::delete('/users/{id}', [UserController::class, 'destroy']);  // API09
+        Route::post('/users/assign-role', [UserController::class, 'assignRole']); // API10
+        Route::get('/users/{id}/roles', [UserController::class, 'roles']);        // API11
+
+        Route::get('/roles', [RoleController::class, 'index']);            // API12
+        Route::post('/roles', [RoleController::class, 'store']);           // API13
+        Route::patch('/roles/{id}', [RoleController::class, 'update']);    // API14
+        Route::delete('/roles/{id}', [RoleController::class, 'destroy']);  // API15
 
         Route::get('/projects/my', [ProjectController::class, 'myProjects']);
         Route::post('/projects', [ProjectController::class, 'store']);
         Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
 
-        Route::get('/tasks', [TaskController::class, 'index']); // ?project_id=1
+        Route::get('/tasks', [TaskController::class, 'index']); 
         Route::post('/tasks', [TaskController::class, 'store']);
         Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
     });

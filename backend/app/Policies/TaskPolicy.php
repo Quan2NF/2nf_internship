@@ -43,7 +43,7 @@ class TaskPolicy
 
     public function create(User $user, int $projectId): bool
     {
-        // ai là member thì tạo task được, hoặc chỉ role DEV/PM tuỳ bạn
+        // ai là member thì tạo task được, hoặc chỉ role DEV/PM 
         return $this->isProjectOwner($user, $projectId)
             || $this->hasProjectRole($user, $projectId, ['PM', 'DEV', 'ADMIN']);
     }
@@ -57,7 +57,7 @@ class TaskPolicy
 
     public function delete(User $user, Task $task): bool
     {
-        // thường chỉ PM/ADMIN/Owner
+        // chỉ PM/ADMIN/Owner
         return $this->isProjectOwner($user, (int)$task->project_id)
             || $this->hasProjectRole($user, (int)$task->project_id, ['ADMIN']);
     }
