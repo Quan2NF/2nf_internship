@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'reset-password',
             'users*',
             'roles*',
+            'projects*',
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

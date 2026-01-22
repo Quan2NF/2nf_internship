@@ -45,9 +45,10 @@ Route::middleware(['web'])->group(function () {
         Route::patch('/roles/{id}', [RoleController::class, 'update']);    // API14
         Route::delete('/roles/{id}', [RoleController::class, 'destroy']);  // API15
 
-        Route::get('/projects/my', [ProjectController::class, 'myProjects']);
-        Route::post('/projects', [ProjectController::class, 'store']);
-        Route::delete('/projects/{id}', [ProjectController::class, 'destroy']);
+        Route::get('/projects', [ProjectController::class, 'index']);      // API16 VA API17
+        Route::post('/projects', [ProjectController::class, 'store']);     // API18
+        Route::put('/projects/{id}', [ProjectController::class, 'update']); // API19
+        Route::delete('/projects/{id}', [ProjectController::class, 'destroy']); // API20
 
         Route::get('/tasks', [TaskController::class, 'index']); 
         Route::post('/tasks', [TaskController::class, 'store']);

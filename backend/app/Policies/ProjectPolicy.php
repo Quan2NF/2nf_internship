@@ -8,12 +8,16 @@ use Illuminate\Support\Facades\DB;
 
 class ProjectPolicy
 {
-    private function isOwner(User $user, Project $project): bool
+    private function hasSystemRole(User $user, array $roleCodes): bool
     {
-        return (int)$project->user_id === (int)$user->id;
+        return DB::table('user_system_roles as usr')
+            ->join('roles as r', 'r.id', '=', 'usr.role_id')
+            ->where('usr.user_id', $user->id)
+            ->whereIn('r.code', $roleCodes)
+            ->exists();
     }
 
-    private function isMember(User $user, Project $project): bool
+    private function isProjectMember(User $user, Project $project): bool
     {
         return DB::table('project_members')
             ->where('project_id', $project->id)
@@ -21,7 +25,7 @@ class ProjectPolicy
             ->exists();
     }
 
-    private function hasRole(User $user, Project $project, array $roleCodes): bool
+    private function hasProjectRole(User $user, Project $project, array $roleCodes): bool
     {
         return DB::table('project_members as pm')
             ->join('project_member_roles as pmr', 'pmr.project_member_id', '=', 'pm.id')
@@ -32,27 +36,38 @@ class ProjectPolicy
             ->exists();
     }
 
-    public function view(User $user, Project $project): bool
+    // API16/17
+    public function viewAny(User $user): bool
     {
-        // owner OR member
-        return $this->isOwner($user, $project) || $this->isMember($user, $project);
-    }
-
-    public function create(User $user): bool
-    {
-        // ai đăng nhập cũng tạo được project (tuỳ bạn)
         return true;
     }
 
-    public function update(User $user, Project $project): bool
+    public function view(User $user, Project $project): bool
     {
-        // owner OR role quản lý trong project
-        return $this->isOwner($user, $project) || $this->hasRole($user, $project, ['PM', 'ADMIN']);
+        if ($this->hasSystemRole($user, ['ADMIN', 'PMO'])) {
+            return true;
+        }
+        return $this->isProjectMember($user, $project);
     }
 
+    // API18: chỉ ADMIN/PMO được tạo
+    public function create(User $user): bool
+    {
+        return $this->hasSystemRole($user, ['ADMIN', 'PMO']);
+    }
+
+    // API19: ADMIN/PMO hoặc PM trong project
+    public function update(User $user, Project $project): bool
+    {
+        if ($this->hasSystemRole($user, ['ADMIN', 'PMO'])) {
+            return true;
+        }
+        return $this->hasProjectRole($user, $project, ['PM']);
+    }
+
+    // API20: ADMIN/PMO
     public function delete(User $user, Project $project): bool
     {
-        // thường chỉ owner hoặc ADMIN
-        return $this->isOwner($user, $project) || $this->hasRole($user, $project, ['ADMIN']);
+        return $this->hasSystemRole($user, ['ADMIN', 'PMO']);
     }
 }

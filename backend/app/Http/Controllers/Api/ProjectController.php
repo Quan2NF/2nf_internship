@@ -2,55 +2,76 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\Project\ProjectData;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Concerns\ApiResponse;
 use App\Http\Requests\Project\ProjectCreateRequest;
+use App\Http\Requests\Project\ProjectUpdateRequest;
 use App\Models\Project;
 use App\Services\Interfaces\IProjectService;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
-    use ApiResponse;
-
     public function __construct(
         private readonly IProjectService $projectService
     ) {}
 
-    /**
-     * GET /api/projects/my
-     */
-    public function myProjects(Request $request)
+    // API16 + API17
+    public function index(Request $request)
     {
-        $userId = (int) $request->user()->id();
-        $projects = $this->projectService->getMyProjects($userId);
+        $this->authorize('viewAny', Project::class);
 
-        return $this->success(
-            message: 'GET_MY_PROJECTS_SUCCESS',
-            data: $projects
-        );
+        $actorId = (int) $request->user()->id;
+
+        $filters = [
+            'keyword'   => $request->query('keyword', ''),
+            'status'    => $request->query('status', ''),
+            'is_active' => $request->query('is_active', ''),
+        ];
+
+        $perPage = (int) $request->query('per_page', 15);
+
+        $page = $this->projectService->listProjects($actorId, $filters, $perPage);
+
+        // map data
+        $items = collect($page->items())->map(fn ($p) => ProjectData::fromModel($p));
+
+        return $this->success(message: 'GET_PROJECTS_SUCCESS', data: [
+            'projects' => $items,
+            'total' => $page->total(),
+            'per_page' => $page->perPage(),
+            'current_page' => $page->currentPage(),
+            'last_page' => $page->lastPage(),
+        ]);
     }
 
-    /**
-     * POST /api/projects
-     */
+    // API18
     public function store(ProjectCreateRequest $request)
     {
         $this->authorize('create', Project::class);
 
-        $userId = (int) $request->user()->id; 
+        $actorId = (int) $request->user()->id;
+        $project = $this->projectService->create($request->validated(), $actorId);
 
-        $project = $this->projectService->create($request->validated(), $userId);
-
-        return $this->success(
-        message: 'CREATE_PROJECT_SUCCESS',
-        data: \App\Data\Project\ProjectData::fromModel($project)
-    );
+        return $this->success(message: 'CREATE_PROJECT_SUCCESS', data: ProjectData::fromModel($project));
     }
 
-    /**
-     * DELETE /api/projects/{id}
-     */
+    // API19
+    public function update(ProjectUpdateRequest $request, int $id)
+    {
+        $project = Project::query()->findOrFail($id);
+        $this->authorize('update', $project);
+
+        $actorId = (int) $request->user()->id;
+
+        $ok = $this->projectService->update($id, $request->validated(), $actorId);
+
+        return $this->success(message: 'UPDATE_PROJECT_SUCCESS', data: [
+            'updated' => $ok,
+        ]);
+    }
+
+    // API20
     public function destroy(int $id)
     {
         $project = Project::query()->findOrFail($id);
@@ -58,8 +79,8 @@ class ProjectController extends Controller
 
         $this->projectService->delete($id);
 
-        return $this->success(
-            message: 'DELETE_PROJECT_SUCCESS'
-        );
+        return $this->success(message: 'DELETE_PROJECT_SUCCESS', data: [
+            'deleted' => true,
+        ]);
     }
 }

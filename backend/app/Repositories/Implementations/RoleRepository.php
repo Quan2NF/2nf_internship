@@ -7,8 +7,8 @@ use App\Repositories\Interfaces\IRoleRepository;
 
 class RoleRepository extends BaseRepository implements IRoleRepository
 {
-    public function __construct(Role $model)
+    public function __construct(Role $role)
     {
-        parent::__construct($model);
+        $this->model = $role;
     }
 }

@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
@@ -14,34 +12,30 @@ class Project extends Model
     protected $table = 'projects';
 
     protected $fillable = [
+        'code',
         'name',
         'description',
-        'user_id',
         'status',
+        'planned_start_date',
+        'planned_end_date',
+        'start_date',
+        'end_date',
+        'progress_rate',
+        'is_public',
+        'is_active',
+        'created_by',
+        'updated_by',
     ];
 
-    public function owner(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function tasks(): HasMany
-    {
-        return $this->hasMany(Task::class, 'project_id');
-    }
-
-    public function versions(): HasMany
-    {
-        return $this->hasMany(Version::class, 'project_id');
-    }
-
-    public function documents(): HasMany
-    {
-        return $this->hasMany(Document::class, 'project_id');
-    }
-
-    public function wikis(): HasMany
-    {
-        return $this->hasMany(Wiki::class, 'project_id');
-    }
+    protected $casts = [
+        'planned_start_date' => 'date',
+        'planned_end_date'   => 'date',
+        'start_date'         => 'date',
+        'end_date'           => 'date',
+        'progress_rate'      => 'integer',
+        'is_public'          => 'integer', 
+        'is_active'          => 'integer', 
+        'created_by'         => 'integer',
+        'updated_by'         => 'integer',
+    ];
 }
