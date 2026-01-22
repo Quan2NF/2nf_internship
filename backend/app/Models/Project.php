@@ -40,6 +40,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  *
  * @property-read Collection<int, User> $users
  * @property-read Collection<int, ProjectMember> $projectMembers
+ * @property-read Wiki|null $wiki
+ * @property-read Document|null $document
  */
 class Project extends Model
 {
@@ -107,5 +109,20 @@ class Project extends Model
     public function projectMembers()
     {
         return $this->hasMany(ProjectMember::class, 'project_id');
+    }
+
+    public function wiki()
+    {
+        return $this->hasOne(Wiki::class, 'project_id');
+    }
+
+    public function document()
+    {
+        return $this->hasOne(Document::class, 'project_id');
+    }
+
+    public function version()
+    {
+        return $this->hasOne(Version::class, 'project_id');
     }
 }

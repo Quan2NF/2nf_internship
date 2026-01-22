@@ -3,14 +3,13 @@
 namespace App\Contracts\Service;
 
 use App\Models\Project;
-use App\Data\Common\KeyOnlyData;
 use App\Data\Project\AssignPMData;
-use App\Data\Project\ProjectSchedule;
 use App\Data\Response\ApiResponseData;
 use App\Data\Project\ProjectRequestData;
 use App\Data\Project\ProjectSettingsData;
 use App\Data\Project\ProjectListFilterData;
 use App\Data\Project\AssignMembersToProjectData;
+use App\Data\Project\ProjectScheduleData;
 
 interface ProjectServiceInterface
 {
@@ -32,11 +31,11 @@ interface ProjectServiceInterface
 
     public function assignMembers(Project $project, AssignMembersToProjectData $data): ApiResponseData;
 
-    public function getSettings(KeyOnlyData $data): ApiResponseData;
+    public function getSettings(Project $project): ApiResponseData;
 
-    public function updateSettings(ProjectSettingsData $data): ApiResponseData;
+    public function updateSettings(Project $project, ProjectSettingsData $data): ApiResponseData;
 
-    public function getSchedule(KeyOnlyData $data): ApiResponseData;
+    public function getSchedule(Project $project): ApiResponseData;
 
-    public function updateSchedule(ProjectSchedule $data): ApiResponseData;
+    public function updateSchedule(Project $project, ProjectScheduleData $data): ApiResponseData;
 }

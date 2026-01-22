@@ -48,7 +48,7 @@ Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
     Route::get('{project}/settings', [ProjectController::class, 'getSettings']);
     Route::patch('{project}/settings', [ProjectController::class, 'updateSettings']);
     Route::get('{project}/schedule', [ProjectController::class, 'getSchedule']);
-    Route::patch('{project}/schedule', [ProjectController::class, 'updateSchedule']);
+    Route::put('{project}/schedule', [ProjectController::class, 'updateSchedule']);
 });
 
 Route::prefix('tasks')->middleware('auth:sanctum')->group(function () {

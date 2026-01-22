@@ -4,18 +4,21 @@ namespace App\Service;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Wiki;
 use App\Models\Project;
+use App\Models\Document;
 use App\Enums\ResponseCode;
+use App\Models\WikiContent;
 use App\Models\ProjectMember;
 use App\Data\Common\KeyOnlyData;
 use App\Data\Project\AssignPMData;
 use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Auth;
-use App\Data\Project\ProjectSchedule;
 use App\Data\Response\ApiResponseData;
 use App\Data\Project\ProjectRequestData;
 use App\Data\Project\ProjectResponseData;
+use App\Data\Project\ProjectScheduleData;
 use App\Data\Project\ProjectSettingsData;
 use App\Data\User\DetailUserResponseData;
 use App\Data\Project\ProjectListFilterData;
@@ -84,8 +87,8 @@ class ProjectService implements ProjectServiceInterface
     {
         $project = Project::query()->create([
             ...$data->toArray(),
-            'created_by' => Auth::user()->id,
-            'updated_by' => Auth::user()->id,
+            'created_by' => Auth::id(),
+            'updated_by' => Auth::id(),
         ]);
 
         return ApiResponse::from(ResponseCode::SUCCESS, ['id' => $project->id]);
@@ -100,7 +103,7 @@ class ProjectService implements ProjectServiceInterface
     {
         $project->update([
             ...array_filter($data->toArray(), fn ($v) => $v !== null),
-            'updated_by' => Auth::user()->id
+            'updated_by' => Auth::id()
         ]);
 
         return ApiResponse::from(ResponseCode::SUCCESS, ProjectResponseData::from($project));
@@ -217,23 +220,104 @@ class ProjectService implements ProjectServiceInterface
         });
     }
 
-    public function getSettings(KeyOnlyData $data): ApiResponseData
+    public function getSettings(Project $project): ApiResponseData
     {
-        throw new \Exception('Not implemented');
+        $wiki = $project->wiki()->first();
+        $document = $project->document()->first();
+
+        return ApiResponse::from(ResponseCode::SUCCESS, [
+            'project_id' => $project->id,
+
+            'wiki' => $wiki ? [
+                'content' => $wiki->content()->first()->content,
+            ] : null,
+
+            'document' => $document ? [
+                'title'       => $document->title,
+                'description' => $document->description,
+                'created_by'  => $document->created_by,
+            ] : null,
+        ]);
     }
 
-    public function updateSettings(ProjectSettingsData $data): ApiResponseData
+    public function updateSettings(Project $project, ProjectSettingsData $data): ApiResponseData
     {
-        throw new \Exception('Not implemented');
+        return DB::transaction(function () use ($project, $data) {
+            // Wiki
+            $wiki = $project->wiki()->first();
+            if ($data->wiki_content !== null) {
+                $wiki = $wiki ?? $project->wiki()->create();
+
+                $wiki->content()->updateOrCreate(
+                    [],
+                    ['content' => $data->wiki_content]
+                );
+            }
+
+            // Document
+            $document = $project->document()->first();
+            if ($data->document !== null) {
+                if (!$document) {
+                    $document = $project->document()->create([
+                        'title'       => $data->document->title,
+                        'description' => $data->document->description,
+                        'created_by'  => Auth::id(),
+                    ]);
+                } else {
+                    $document->update([
+                        'title'       => $data->document->title,
+                        'description' => $data->document->description,
+                    ]);
+                }
+            }
+
+            return ApiResponse::from(ResponseCode::SUCCESS, [
+                'project_id' => $project->id,
+
+                'wiki' => $wiki ? [
+                    'content' => $wiki->content()->first()->content,
+                ] : null,
+
+                'document' => $document ? [
+                    'title'       => $document->title,
+                    'description' => $document->description,
+                    'created_by'  => $document->created_by,
+                ] : null,
+            ]);
+        });
     }
 
-    public function getSchedule(KeyOnlyData $data): ApiResponseData
+    public function getSchedule(Project $project): ApiResponseData
     {
-        throw new \Exception('Not implemented');
+        $version = $project->version()->first();
+        return ApiResponse::from(
+            ResponseCode::SUCCESS,
+            [
+                'project_id'    => $project->id,
+                'version'       => $version ? ProjectScheduleData::from($version) : null,
+            ]
+        );
     }
 
-    public function updateSchedule(ProjectSchedule $data): ApiResponseData
+    public function updateSchedule(Project $project, ProjectScheduleData $data): ApiResponseData
     {
-        throw new \Exception('Not implemented');
+        return DB::transaction(function () use ($project, $data) {
+            $version = $project->version()->updateOrCreate(
+                [
+                    'name'          => $data->name,
+                    'description'   => $data->description,
+                    'start_date'    => $data->start_date,
+                    'end_date'      => $data->end_date,
+                ]
+            );
+
+            return ApiResponse::from(
+                ResponseCode::SUCCESS,
+                [
+                    'project_id'    => $project->id,
+                    'version'       => ProjectScheduleData::from($version),
+                ]
+            );
+        });
     }
 }

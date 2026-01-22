@@ -82,28 +82,18 @@ class ProjectPolicy
     }
 
     /**
-     * Get and update setting
+     * Update settings
      * ADMIN and PMO or PM of project
      */
-    public function getSetting(User $user, Project $project): bool
-    {
-        return $this->isProjectPM($user, $project);
-    }
-
-    public function updateSetting(User $user, Project $project): bool
+    public function updateSettings(User $user, Project $project): bool
     {
         return $this->isProjectPM($user, $project);
     }
 
     /**
-     * Get and update schedule and status
+     * Update schedule and status
      * ADMIN and PMO or PM of project
      */
-    public function getSchedule(User $user, Project $project): bool
-    {
-        return $this->isProjectPM($user, $project);
-    }
-
     public function updateSchedule(User $user, Project $project): bool
     {
         return $this->isProjectPM($user, $project);
