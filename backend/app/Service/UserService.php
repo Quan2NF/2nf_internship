@@ -3,7 +3,9 @@
 namespace App\Service;
 
 use App\Contracts\Service\UserServiceInterface;
+use App\Data\Common\KeyOnlyData;
 use App\Data\Response\ApiResponseData;
+use App\Data\User\AssignPositionsToUserData;
 use App\Data\User\AssignRolesToUserData;
 use App\Data\User\UserData;
 use App\Data\User\UserListFilterData;
@@ -15,12 +17,12 @@ class UserService extends BaseService implements UserServiceInterface
         throw new \Exception('Not implemented');
     }
 
-    public function assignRoles(AssignRolesToUserData $data): ApiResponseData
+    public function assignPositions(AssignPositionsToUserData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }
 
-    public function getRoles(UserData $data): ApiResponseData
+    public function getPositions(KeyOnlyData $data): ApiResponseData
     {
         throw new \Exception('Not implemented');
     }

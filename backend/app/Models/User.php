@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Enums\Position\PositionScope;
 use App\Enums\User\UserGender;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -70,5 +71,18 @@ class User extends Authenticatable
         return $this->belongsToMany(Project::class, 'project_members')
                     ->withPivot('id') // needed to get project_member id
                     ->withTimestamps();
+    }
+
+    public function hasSystemPosition(string $code): bool
+    {
+        return $this->positions()
+                    ->where('positions.code', $code)
+                    ->where('positions.scope', PositionScope::System)
+                    ->whereNull('positions.deleted_at')
+                    ->where(function ($q) {
+                        $q->whereNull('user_positions.end_date')
+                        ->orWhere('user_positions.end_date', '>=', now());
+                    })
+                    ->exists();
     }
 }
