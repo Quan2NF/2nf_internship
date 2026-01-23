@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Service\TaskService;
 use App\Service\UserService;
 use App\Service\ProjectService;
 use App\Service\PositionService;
 use App\Service\AuthenticationService;
 use Illuminate\Support\ServiceProvider;
+use App\Contracts\Service\TaskServiceInterface;
 use App\Contracts\Service\UserServiceInterface;
 use App\Contracts\Service\ProjectServiceInterface;
 use App\Contracts\Service\PositionServiceInterface;
@@ -37,6 +39,11 @@ class DomainServiceProvider extends ServiceProvider
         $this->app->bind(
             ProjectServiceInterface::class,
             ProjectService::class
+        );
+
+        $this->app->bind(
+            TaskServiceInterface::class,
+            TaskService::class
         );
     }
 

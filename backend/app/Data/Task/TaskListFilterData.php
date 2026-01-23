@@ -4,41 +4,45 @@ namespace App\Data\Task;
 
 use Spatie\LaravelData\Data;
 use Spatie\LaravelData\Attributes\WithCast;
+use Spatie\LaravelData\Attributes\WithTransformer;
+use Spatie\LaravelData\Casts\DateTimeInterfaceCast;
+use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 
 /**
  * Filters used when listing tasks.
  */
 class TaskListFilterData extends Data
 {
-    /**
-     * @param int|null $project_id
-     * @param int|null $status_id
-     * @param int|null $type_id
-     * @param int|null $priority_id
-     * @param int|null $assigned_to
-     * @param bool|null $is_private
-     * @param string|null $keyword
-     * @param \DateTime|null $start_from
-     * @param \DateTime|null $due_to
-     * @param int $page
-     * @param int $per_page
-     */
     public function __construct(
-        public ?int $project_id = null,
-        public ?int $status_id = null,
-        public ?int $type_id = null,
-        public ?int $priority_id = null,
-        public ?int $assigned_to = null,
-        public ?bool $is_private = null,
-        public ?string $keyword = null,
+        public ?int $status_id,
+        public ?int $type_id,
+        public ?int $priority_id,
+        public ?int $assigned_to,
+        public ?int $created_by,
+        public ?bool $is_private,
 
-        #[WithCast('date')]
-        public ?\DateTime $start_from = null,
+        public ?string $keyword,
 
-        #[WithCast('date')]
-        public ?\DateTime $due_to = null,
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?string $start_date_from,
+
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?string $start_date_to,
+
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?string $due_date_from,
+
+        #[WithCast(DateTimeInterfaceCast::class, format: 'Y-m-d')]
+        #[WithTransformer(DateTimeInterfaceTransformer::class, format: 'Y-m-d')]
+        public ?string $due_date_to,
 
         public int $page = 1,
-        public int $per_page = 20,
+        public int $per_page = 15,
+
+        public ?string $sort_by = 'id',
+        public string $sort_dir = 'desc',
     ) {}
 }

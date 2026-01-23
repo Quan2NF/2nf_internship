@@ -18,6 +18,11 @@ class DatabaseSeeder extends Seeder
                 Development\RoleSeeder::class,
                 Development\UserSeeder::class,
                 Development\ProjectSeeder::class,
+
+                Development\TaskStatusSeeder::class,
+                Development\TaskPrioritySeeder::class,
+                Development\TaskTypeSeeder::class,
+                Development\TaskSeeder::class,
             ]);
         }
     }

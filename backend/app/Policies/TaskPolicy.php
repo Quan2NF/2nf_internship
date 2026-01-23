@@ -14,7 +14,7 @@ class TaskPolicy
      */
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->positions()->whereIn('code', ['ADMIN', 'PMO'])->exists()) {
+        if ($user->hasAnyPosition(['ADMIN', 'PMO'])) {
             return true;
         }
 
@@ -32,9 +32,8 @@ class TaskPolicy
     /**
      * View a single task
      */
-    public function view(User $user, Task $task): bool
+    public function view(User $user, Project $project): bool
     {
-        $project = $task->project; // make sure project is eager-loaded in service
         return $this->isProjectMember($user, $project);
     }
 
@@ -42,9 +41,8 @@ class TaskPolicy
      * Create a task
      * PM of project can create
      */
-    public function create(User $user, Task $task): bool
+    public function create(User $user, Project $project): bool
     {
-        $project = $task->project; // eager-loaded
         return $this->isProjectPM($user, $project);
     }
 
@@ -52,28 +50,26 @@ class TaskPolicy
      * Update a task
      * PM of project can update
      */
-    public function update(User $user, Task $task): bool
+    public function update(User $user, Project $project): bool
     {
-        $project = $task->project; // eager-loaded
         return $this->isProjectPM($user, $project);
     }
 
     /**
      * Delete a task
-     * ADMIN / PMO only (handled by before)
+     * PM of project can create
      */
-    public function delete(User $user, Task $task): bool
+    public function delete(User $user, Project $project): bool
     {
-        return false;
+        return $this->isProjectPM($user, $project);
     }
 
     /**
      * Post comment to task
      * Member of project can comment
      */
-    public function postComment(User $user, Task $task): bool
+    public function postComment(User $user, Project $project): bool
     {
-        $project = $task->project; // eager-loaded
         return $this->isProjectMember($user, $project);
     }
 

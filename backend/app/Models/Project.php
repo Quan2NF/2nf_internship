@@ -125,4 +125,9 @@ class Project extends Model
     {
         return $this->hasOne(Version::class, 'project_id');
     }
+
+    public function tasks()
+    {
+        return $this->hasMany(Task::class, 'project_id');
+    }
 }

@@ -51,9 +51,10 @@ Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
     Route::put('{project}/schedule', [ProjectController::class, 'updateSchedule']);
 });
 
-Route::prefix('tasks')->middleware('auth:sanctum')->group(function () {
+Route::prefix('projects/{project}/tasks')->middleware('auth:sanctum')->scopeBindings()->group(function () {
     Route::get('/', [TaskController::class, 'getFilteredList']);
     Route::post('/', [TaskController::class, 'create']);
+    Route::get('{task}', [TaskController::class, 'view']);
     Route::patch('{task}', [TaskController::class, 'update']);
     Route::delete('{task}', [TaskController::class, 'delete']);
     Route::get('{task}/comments', [TaskController::class, 'getComments']);
