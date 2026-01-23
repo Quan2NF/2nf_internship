@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps(); // created_at & updated_at
 
             // Index
-            $table->unique('task_id', 'task_logs_task_idx');
+            $table->index('task_id', 'task_logs_task_idx');
 
             // Foreign keys with explicit names
             $table->foreign('task_id', 'tl_task_fk')

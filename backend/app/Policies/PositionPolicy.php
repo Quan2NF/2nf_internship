@@ -12,7 +12,7 @@ class PositionPolicy
      */
     public function before(User $user, string $ability): ?bool
     {
-        if ($user->positions()->whereIn('code', ['ADMIN', 'PMO'])->exists()) {
+        if ($user->hasSystemPosition('ADMIN')) {
             return true;
         }
 

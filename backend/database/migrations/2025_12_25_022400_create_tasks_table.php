@@ -33,14 +33,13 @@ return new class extends Migration
             $table->timestamps(); // created_at & updated_at
             $table->softDeletes(); // deleted_at
 
-            // Unique indexes
-            $table->unique('project_id', 'tasks_project_idx');
-            $table->unique('status_id', 'tasks_status_idx');
-            $table->unique('type_id', 'tasks_type_idx');
-            $table->unique('assigned_to', 'tasks_assigne_idx');
-
             // Regular indexes
+            $table->index('project_id', 'tasks_project_idx');
+            $table->index('status_id', 'tasks_status_idx');
+            $table->index('type_id', 'tasks_type_idx');
             $table->index('priority_id', 'tasks_priority_idx');
+            $table->index('assigned_to', 'tasks_assigned_to_idx');
+            $table->index('created_by', 'tasks_created_by_idx');
 
             // Foreign keys with explicit names
             $table->foreign('project_id', 'tasks_project_fk')

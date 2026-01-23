@@ -10,11 +10,9 @@ use Spatie\LaravelData\Data;
 class AssignPMData extends Data
 {
     /**
-     * @param int $project_id The ID of the project
      * @param int $pm_id The user ID of the project manager to assign
      */
     public function __construct(
-        public int $project_id,
         public int $pm_id,
     ) {}
 }

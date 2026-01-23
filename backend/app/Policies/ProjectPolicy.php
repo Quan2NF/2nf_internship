@@ -13,12 +13,16 @@ class ProjectPolicy
      */
     public function before(User $user, string $ability): bool|null
     {
-        if (
-            $user->positions()->whereIn('code', ['ADMIN', 'PMO'])->exists()
-        ) {
+        if ($user->hasAnyPosition(['ADMIN', 'PMO'])) {
             return true;
         }
+
         return null;
+    }
+
+    public function viewAny(User $user): bool
+    {
+        return true;
     }
 
     /**
@@ -50,7 +54,7 @@ class ProjectPolicy
     /**
      * ADMIN and PMO only
      */
-    public function delete(User $user, Project $project): bool
+    public function delete(User $user): bool
     {
         return false;
     }
@@ -59,7 +63,7 @@ class ProjectPolicy
      * Assign PM
      * ADMIN and PMO only
      */
-    public function assignPM(User $user, Project $project): bool
+    public function assignPM(User $user): bool
     {
         return false;
     }
@@ -74,29 +78,19 @@ class ProjectPolicy
     }
 
     /**
-     * Get and update setting
+     * Update settings
      * ADMIN and PMO or PM of project
      */
-    public function getSetting(User $user, Project $project): bool
-    {
-        return $this->isProjectPM($user, $project);
-    }
-
-    public function updateSetting(User $user, Project $project): bool
+    public function updateSettings(User $user, Project $project): bool
     {
         return $this->isProjectPM($user, $project);
     }
 
     /**
-     * Get and update schedule and status
+     * Update schedule and status
      * ADMIN and PMO or PM of project
      */
-    public function getScheduleAndInfo(User $user, Project $project): bool
-    {
-        return $this->isProjectPM($user, $project);
-    }
-
-    public function updateScheduleAndInfo(User $user, Project $project): bool
+    public function updateSchedule(User $user, Project $project): bool
     {
         return $this->isProjectPM($user, $project);
     }

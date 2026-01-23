@@ -5,6 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property int $id
+ * @property int $wiki_id
+ * @property string $content
+ * 
+ * @property-read Wiki $wiki
+ */
 class WikiContent extends Model
 {
     use HasFactory;

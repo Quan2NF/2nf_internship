@@ -3,15 +3,14 @@
 namespace App\Data\Project;
 
 use Spatie\LaravelData\Data;
+use App\Data\Project\ProjectMemberAssignData;
 
 class AssignMembersToProjectData extends Data
 {
     /**
-     * @param int $project_id The ID of the project
-     * @param array<int, array<string>> $user_roles Mapping of user IDs to an array of roles
+     * @param ProjectMemberAssignData[] $members
      */
     public function __construct(
-        public int $project_id,
-        public array $user_roles,
+        public array $members,
     ) {}
 }

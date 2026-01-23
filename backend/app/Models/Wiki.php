@@ -5,6 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @property int $id
+ * @property int $project_id
+ * 
+ * @property-read Project $project
+ * @property-read WikiContent|null $content
+ */
 class Wiki extends Model
 {
     use HasFactory;
@@ -25,5 +32,10 @@ class Wiki extends Model
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_id');
+    }
+
+    public function content()
+    {
+        return $this->hasOne(WikiContent::class, 'wiki_id');
     }
 }

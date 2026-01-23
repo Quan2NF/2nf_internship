@@ -12,7 +12,7 @@ class UserPolicy
      */
     public function before(User $user, string $ability): bool|null
     {
-        if ($user->positions()->where('code', 'ADMIN')->exists()) {
+        if ($user->hasSystemPosition('ADMIN')) {
             return true;
         }
 
@@ -34,7 +34,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -48,11 +48,10 @@ class UserPolicy
 
     /**
      * Edit user
-     * ADMIN only (handled by before)
      */
     public function update(User $user, User $model): bool
     {
-        return false;
+        return $user->id === $model->id;
     }
 
     /**
@@ -79,6 +78,6 @@ class UserPolicy
      */
     public function getPositions(User $user, User $model): bool
     {
-        return false;
+        return true;
     }
 }

@@ -6,6 +6,47 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * Class Task
+ *
+ * @property int $id
+ * @property int $project_id
+ * @property int|null $parent_id
+ *
+ * @property string $subject
+ * @property string|null $description
+ *
+ * @property int $status_id
+ * @property int $type_id
+ * @property int $priority_id
+ *
+ * @property int|null $assigned_to
+ * @property int $created_by
+ *
+ * @property \Illuminate\Support\Carbon|null $start_date
+ * @property \Illuminate\Support\Carbon|null $due_date
+ *
+ * @property string|null $estimated_hours
+ * @property string|null $actual_hours
+ *
+ * @property int $progress_rate
+ * @property bool $is_private
+ *
+ * @property \Illuminate\Support\Carbon|null $closed_at
+ *
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read \App\Models\Project|null $project
+ * @property-read \App\Models\User|null $assignee
+ * @property-read \App\Models\User|null $creator
+ * @property-read \App\Models\TaskStatus|null $status
+ * @property-read \App\Models\TaskType|null $type
+ * @property-read \App\Models\TaskPriority|null $priority
+ * @property-read Task|null $parent
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Task> $children
+ */
 class Task extends Model
 {
     use HasFactory, SoftDeletes;
@@ -96,5 +137,10 @@ class Task extends Model
     public function children()
     {
         return $this->hasMany(Task::class, 'parent_id');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(TaskComment::class, 'task_id');
     }
 }
