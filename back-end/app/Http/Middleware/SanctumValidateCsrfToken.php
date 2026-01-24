@@ -15,5 +15,7 @@ class SanctumValidateCsrfToken extends Middleware
         'api/users/*',
         'api/roles',
         'api/roles/*',
+        'api/projects',
+        'api/projects/*',
     ];
 }

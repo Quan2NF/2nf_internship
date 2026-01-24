@@ -1,6 +1,7 @@
 <?php
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,23 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/roles/{role}', [RoleController::class, 'update']);
         Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
     });
+
+    // Projects endpoints - require role checks inside controller/service
+    Route::get('/projects', [ProjectController::class, 'index']);
+    Route::get('/projects/filter', [ProjectController::class, 'index']);
+
+    Route::post('/projects', [ProjectController::class, 'store']);
+    Route::put('/projects/{project}', [ProjectController::class, 'update']);
+    Route::delete('/projects/{project}', [ProjectController::class, 'destroy']);
+
+    Route::post('/projects/{project}/assign-pm', [ProjectController::class, 'assignPm']);
+    Route::post('/projects/{project}/members', [ProjectController::class, 'assignMembers']);
+
+    Route::post('/projects/{project}/settings', [ProjectController::class, 'setSettings']);
+    Route::put('/projects/{project}/settings', [ProjectController::class, 'updateSettings']);
+
+    Route::get('/projects/{project}/schedule', [ProjectController::class, 'getSchedule']);
+    Route::put('/projects/{project}/schedule', [ProjectController::class, 'updateSchedule']);
 });
 
 
