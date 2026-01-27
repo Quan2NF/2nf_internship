@@ -3,6 +3,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -46,6 +47,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/projects/{project}/schedule', [ProjectController::class, 'getSchedule']);
     Route::put('/projects/{project}/schedule', [ProjectController::class, 'updateSchedule']);
+
+    // API27: List Of Issues (list/filter tasks/issues)
+    Route::get('/tasks', [TaskController::class, 'index']);
+    Route::post('/tasks', [TaskController::class, 'store']);
+    Route::put('/tasks/{id}', [TaskController::class, 'update']);
+    Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
+    Route::post('/tasks/{id}/comments', [TaskController::class, 'comment']);
+    Route::get('/tasks/{id}/logs', [TaskController::class, 'logs']);
 });
 
 
