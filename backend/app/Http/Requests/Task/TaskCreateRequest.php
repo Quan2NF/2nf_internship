@@ -34,6 +34,7 @@ class TaskCreateRequest extends FormRequest
 
             'progress_rate' => ['nullable', 'integer', 'min:0', 'max:100'],
             'is_private' => ['nullable', 'integer', 'in:0,1'],
+            'closed_at' => ['nullable', 'date'],
         ];
     }
 }

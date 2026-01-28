@@ -24,6 +24,7 @@ class TaskData extends Data
         public ?float $actual_hours,
         public ?int $progress_rate,
         public ?int $is_private,
+        public ?string $closed_at,
         public ?string $created_at,
         public ?string $updated_at,
     ) {}
@@ -50,6 +51,7 @@ class TaskData extends Data
             actual_hours: $task->actual_hours !== null ? (float) $task->actual_hours : null,
             progress_rate: $task->progress_rate !== null ? (int) $task->progress_rate : null,
             is_private: $task->is_private !== null ? (int) $task->is_private : null,
+            closed_at: $task->closed_at?->toDateTimeString(),
             created_at: optional($task->created_at)?->toISOString(),
             updated_at: optional($task->updated_at)?->toISOString(),
         );

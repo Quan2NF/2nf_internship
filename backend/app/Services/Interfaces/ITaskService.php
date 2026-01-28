@@ -2,21 +2,27 @@
 
 namespace App\Services\Interfaces;
 
-use App\Models\Task;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-
 interface ITaskService
 {
-    public function getByProject(int $projectId): Collection;
+    /**
+     * @return array{items: array, total: int, page: int, total_pages: int}
+     */
+    public function list(array $filter, int $perPage, int $userId): array;
 
-    public function paginateByProject(int $projectId, int $perPage = 15): LengthAwarePaginator;
+    /**
+     * @return array TaskData payload
+     */
+    public function create(array $data, int $userId): array;
 
-    public function find(int $id): ?Task;
+    /**
+     * @return array TaskData payload
+     */
+    public function update(int $id, array $data, int $userId): array;
 
-    public function create(array $data): Task;
+    public function delete(int $id, int $userId): void;
 
-    public function update(int $id, array $data): bool;
+    public function comment(int $taskId, string $content, int $userId): void;
 
-    public function delete(int $id): bool;
+    public function logs(int $taskId, int $userId): array;
+
 }

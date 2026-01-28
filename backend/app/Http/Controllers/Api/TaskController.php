@@ -3,72 +3,81 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\Concerns\ApiResponse;
+use App\Http\Requests\Task\TaskCommentRequest;
 use App\Http\Requests\Task\TaskCreateRequest;
-use App\Models\Task;
+use App\Http\Requests\Task\TaskUpdateRequest;
 use App\Services\Interfaces\ITaskService;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    use ApiResponse;
-
     public function __construct(
         private readonly ITaskService $taskService
     ) {}
 
-    /**
-     * GET /api/tasks?project_id=1
-     */
     public function index(Request $request)
     {
-        $projectId = (int) $request->query('project_id');
-        if ($projectId <= 0) {
-            abort(422, 'project_id is required');
-        }
-
-        $tasks = $this->taskService->getByProject($projectId);
-
-        return $this->success(
-            message: 'GET_TASKS_SUCCESS',
-            data: $tasks
+        $result = $this->taskService->list(
+            filter: $request->only([
+                'project_id', 'keyword', 'status_id', 'type_id',
+                'priority_id', 'assigned_to', 'is_private',
+            ]),
+            perPage: (int) $request->get('per_page', 15),
+            userId: (int) $request->user()->id
         );
+
+        return $this->success(message: 'GET_TASKS_SUCCESS', data: $result);
     }
 
-    /**
-     * POST /api/tasks
-     */
     public function store(TaskCreateRequest $request)
     {
-        $data = $request->validated();
+        $task = $this->taskService->create(
+            data: $request->validated(),
+            userId: (int) $request->user()->id
+        );
 
-        $projectId = (int) $data['project_id'];
-        $this->authorize('create', [Task::class, $projectId]);
-
-        $userId = (int) $request->user()->id;
-        $data['created_by'] = $userId;
-
-        $task = $this->taskService->create($data);
-
-        return $this->success(
-        message: 'CREATE_TASK_SUCCESS',
-        data: \App\Data\Task\TaskData::fromModel($task)
-    );
-
+        return $this->success(message: 'CREATE_TASK_SUCCESS', data: $task);
     }
 
-    /**
-     * DELETE /api/tasks/{id}
-     */
-    public function destroy(int $id)
+    public function update(TaskUpdateRequest $request, int $id)
     {
-        $task = Task::query()->findOrFail($id);
-        $this->authorize('delete', $task);
-
-        $this->taskService->delete($id);
-
-        return $this->success(
-            message: 'DELETE_TASK_SUCCESS'
+        $task = $this->taskService->update(
+            id: $id,
+            data: $request->validated(),
+            userId: (int) $request->user()->id
         );
+
+        return $this->success(message: 'UPDATE_TASK_SUCCESS', data: $task);
+    }
+
+    public function destroy(Request $request, int $id)
+    {
+        $this->taskService->delete(
+            id: $id,
+            userId: (int) $request->user()->id
+        );
+
+        return $this->success(message: 'DELETE_TASK_SUCCESS', data: null);
+    }
+
+    public function comment(TaskCommentRequest $request, int $id)
+    {
+        $this->taskService->comment(
+            taskId: $id,
+            content: (string) $request->validated()['content'],
+            userId: (int) $request->user()->id
+        );
+
+        return $this->success(message: 'COMMENT_TASK_SUCCESS', data: null);
+    }
+
+        public function logs(Request $request, int $id)
+    {
+        $result = $this->taskService->logs(
+            taskId: $id,
+            userId: (int) $request->user()->id
+        );
+
+        return $this->success(message: 'GET_TASK_LOGS_SUCCESS', data: $result);
     }
 }

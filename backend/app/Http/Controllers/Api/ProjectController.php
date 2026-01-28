@@ -83,4 +83,98 @@ class ProjectController extends Controller
             'deleted' => true,
         ]);
     }
+
+    // API21
+    public function assignPm(Request $request, int $id)
+    {
+        $project = Project::query()->findOrFail($id);
+        $this->authorize('update', $project);
+
+        $data = $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
+
+        $actorId = (int) $request->user()->id;
+        $ok = $this->projectService->assignPm($id, (int) $data['user_id'], $actorId);
+
+        return $this->success(message: 'ASSIGN_PM_SUCCESS', data: ['updated' => $ok]);
+    }
+
+    // API22
+    public function assignMembers(Request $request, int $id)
+    {
+        $project = Project::query()->findOrFail($id);
+        $this->authorize('update', $project);
+
+        $data = $request->validate([
+            'members' => ['required', 'array', 'min:1'],
+            'members.*.user_id' => ['required', 'integer', 'exists:users,id'],
+            'members.*.role_codes' => ['nullable', 'array'],
+            'members.*.role_codes.*' => ['string', 'exists:roles,code'],
+        ]);
+
+        $actorId = (int) $request->user()->id;
+        $ok = $this->projectService->assignMembers($id, $data['members'], $actorId);
+
+        return $this->success(message: 'ASSIGN_MEMBERS_SUCCESS', data: ['updated' => $ok]);
+    }
+
+    // API23
+    public function getSetting(Request $request, int $id)
+    {
+        $project = Project::query()->findOrFail($id);
+        $this->authorize('view', $project);
+
+        $data = $this->projectService->getSetting($id);
+
+        return $this->success(message: 'GET_PROJECT_SETTING_SUCCESS', data: $data);
+    }
+
+    // API24
+    public function updateSetting(Request $request, int $id)
+    {
+        $project = Project::query()->findOrFail($id);
+        $this->authorize('update', $project);
+
+        $data = $request->validate([
+            'content' => ['required', 'string'],
+        ]);
+
+        $actorId = (int) $request->user()->id;
+        $ok = $this->projectService->updateSetting($id, (string) $data['content'], $actorId);
+
+        return $this->success(message: 'UPDATE_PROJECT_SETTING_SUCCESS', data: ['updated' => $ok]);
+    }
+
+    // API25
+    public function getSchedule(Request $request, int $id)
+    {
+        $project = Project::query()->findOrFail($id);
+        $this->authorize('view', $project);
+
+        $data = $this->projectService->getSchedule($id);
+
+        return $this->success(message: 'GET_PROJECT_SCHEDULE_SUCCESS', data: $data);
+    }
+
+    // API26
+    public function updateSchedule(Request $request, int $id)
+    {
+        $project = Project::query()->findOrFail($id);
+        $this->authorize('update', $project);
+
+        $data = $request->validate([
+            'versions' => ['required', 'array', 'min:1'],
+            'versions.*.id' => ['nullable', 'integer'],
+            'versions.*.name' => ['required', 'string'],
+            'versions.*.description' => ['nullable', 'string'],
+            'versions.*.start_date' => ['nullable', 'date'],
+            'versions.*.end_date' => ['nullable', 'date'],
+        ]);
+
+        $actorId = (int) $request->user()->id;
+        $ok = $this->projectService->updateSchedule($id, $data['versions'], $actorId);
+
+        return $this->success(message: 'UPDATE_PROJECT_SCHEDULE_SUCCESS', data: ['updated' => $ok]);
+    }   
 }

@@ -39,20 +39,17 @@ use App\Policies\TaskPolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
+    
     public function register(): void
     {
-        $this->app->bind(IAuthService::class, AuthService::class);
+        //$this->app->bind(IAuthService::class, AuthService::class);
 
         // Repository
         $this->app->bind(IProjectRepository::class, ProjectRepository::class);
         $this->app->bind(ITaskRepository::class, TaskRepository::class);
         $this->app->bind(IUserRepository::class, UserRepository::class);
         $this->app->bind(IRoleRepository::class, RoleRepository::class);
-    
-
+        $this->app->bind(ITaskRepository::class, TaskRepository::class);
     
 
         // Service
@@ -61,6 +58,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(IUserService::class, UserService::class);
         $this->app->bind(IAuthService::class, AuthService::class);
         $this->app->bind(IRoleService::class, RoleService::class);
+        $this->app->bind(ITaskService::class, TaskService::class);
 
     }
 
@@ -71,7 +69,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Project::class, ProjectPolicy::class);
-        Gate::policy(Task::class, TaskPolicy::class); // thêm cái này
+        Gate::policy(Task::class, TaskPolicy::class); 
         
     }
 }

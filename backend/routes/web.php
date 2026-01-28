@@ -31,7 +31,7 @@ Route::middleware(['web'])->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']); //API02
     Route::post('/reset-password', [AuthController::class, 'resetPassword']); //API03
     Route::middleware('auth')->group(function () {
-        Route::get('/me', [AuthController::class, 'me']); //API THÊM ĐỂ TEST XEM AI ĐANG ĐĂNG NHẬP
+        Route::get('/me', [AuthController::class, 'me']); //API/me THÊM ĐỂ TEST XEM AI ĐANG ĐĂNG NHẬP
 
         Route::get('/users', [UserController::class, 'index']);            // API05/AP06
         Route::post('/users', [UserController::class, 'store']);           // API07
@@ -49,11 +49,23 @@ Route::middleware(['web'])->group(function () {
         Route::post('/projects', [ProjectController::class, 'store']);     // API18
         Route::put('/projects/{id}', [ProjectController::class, 'update']); // API19
         Route::delete('/projects/{id}', [ProjectController::class, 'destroy']); // API20
+        
+        Route::post('/projects/{id}/assign-pm', [ProjectController::class, 'assignPm']);// API21: Assign PM
+        Route::post('/projects/{id}/members', [ProjectController::class, 'assignMembers']);// API22: Assign Members
+        Route::get('/projects/{id}/setting', [ProjectController::class, 'getSetting']);// API23: Get Setting (wikis + wiki_contents)
+        Route::put('/projects/{id}/setting', [ProjectController::class, 'updateSetting']);// API24: Update Setting (wikis + wiki_contents)
+        Route::get('/projects/{id}/schedule', [ProjectController::class, 'getSchedule']); // API25: Get Schedule (versions)
+        Route::put('/projects/{id}/schedule', [ProjectController::class, 'updateSchedule']); // API26: Update Schedule (versions)
 
-        Route::get('/tasks', [TaskController::class, 'index']); 
-        Route::post('/tasks', [TaskController::class, 'store']);
-        Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
-    });
+        Route::get('/tasks', [TaskController::class, 'index']);                 // API27 + API28
+        Route::post('/tasks', [TaskController::class, 'store']);                // API29
+        Route::patch('/tasks/{id}', [TaskController::class, 'update']);          // API30
+        Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);        // API31
+        Route::post('/tasks/{id}/comments', [TaskController::class, 'comment']); // API32
+        Route::get('/tasks/{id}/logs', [TaskController::class, 'logs']);         // API33
+
+
+        });
 
     
 });
