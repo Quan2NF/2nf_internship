@@ -13,7 +13,8 @@ class TaskPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        // Allow listing for admins/PMO; controllers may further filter by project membership
+        return $user->isAdmin() || $user->isPMO();
     }
 
     /**
@@ -21,6 +22,11 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
+        if ($user->isAdmin() || $user->isPMO()) return true;
+        if ($user->id === $task->assigned_to) return true;
+        if ($user->id === $task->created_by) return true;
+        if ($user->isPmOfProject($task->project_id)) return true;
+        if ($user->isMemberOfProject($task->project_id)) return true;
         return false;
     }
 
@@ -29,7 +35,9 @@ class TaskPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        // Allow creation for admins/PMO and project members/PMs. For project-scoped checks,
+        // controllers can call the policy with the project id as an additional argument.
+        return $user->isAdmin() || $user->isPMO() || $user->isPM();
     }
     
     
@@ -38,6 +46,10 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
+        if ($user->isAdmin() || $user->isPMO()) return true;
+        if ($user->id === $task->assigned_to) return true;
+        if ($user->id === $task->created_by) return true;
+        if ($user->isPmOfProject($task->project_id)) return true;
         return false;
     }
 
@@ -46,6 +58,9 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
+        if ($user->isAdmin() || $user->isPMO()) return true;
+        if ($user->id === $task->created_by) return true;
+        if ($user->isPmOfProject($task->project_id)) return true;
         return false;
     }
 
@@ -54,7 +69,7 @@ class TaskPolicy
      */
     public function restore(User $user, Task $task): bool
     {
-        return false;
+        return $user->isAdmin() || $user->isPMO();
     }
 
     /**
@@ -62,6 +77,6 @@ class TaskPolicy
      */
     public function forceDelete(User $user, Task $task): bool
     {
-        return false;
+        return $user->isAdmin();
     }
 }
