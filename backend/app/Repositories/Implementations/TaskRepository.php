@@ -108,7 +108,7 @@ class TaskRepository extends BaseRepository implements ITaskRepository
                 'tl.task_id',
                 'tl.user_id',
                 'u.name as user_name',
-                'tl.action',
+                'tl.field',
                 'tl.old_value',
                 'tl.new_value',
                 'tl.created_at',
