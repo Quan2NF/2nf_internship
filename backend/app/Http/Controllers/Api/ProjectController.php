@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Models\Project;
 use App\Data\Project\AssignPMData;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Data\Response\ApiResponseData;
 use App\Data\Project\ProjectRequestData;
 use App\Data\Project\ProjectScheduleData;
@@ -34,7 +35,7 @@ class ProjectController extends Controller
 
     public function getFilteredList(GetFilteredProjectListRequest $request): ApiResponseData
     {
-        return $this->projectService->getFilteredList(ProjectListFilterData::from($request->validated()));
+        return $this->projectService->getFilteredList(Auth::user(), ProjectListFilterData::from($request->validated()));
     }
 
     public function create(CreateProjectRequest $request): ApiResponseData

@@ -12,7 +12,7 @@ use Spatie\LaravelData\Transformers\DateTimeInterfaceTransformer;
 /**
  * Data Transfer Object representing a User.
  */
-class CreateUserRequestData extends EntityData
+class UserData extends EntityData
 {
     /**
      * @param string $employee_code

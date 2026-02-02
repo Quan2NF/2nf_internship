@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Data\Authentication\LoginRequestData;
@@ -20,12 +19,7 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        return $this->authService->login(
-            new LoginRequestData(
-                $request->email,
-                $request->password
-            )
-        );
+        return $this->authService->login(LoginRequestData::from($request->validated()));
     }
 
     public function logout()
@@ -35,22 +29,11 @@ class AuthController extends Controller
 
     public function forgotPassword(ForgotPasswordRequest $request)
     {
-        return $this->authService->forgotPassword(
-            new ForgotPasswordRequestData(
-                $request->email,
-            )
-        );
+        return $this->authService->forgotPassword(ForgotPasswordRequestData::from($request->validated()));
     }
 
     public function resetPassword(ResetPasswordRequest $request)
     {
-        return $this->authService->resetPassword(
-            new ResetPasswordRequestData(
-                $request->email,
-                $request->password,
-                $request->password_confirmation,
-                $request->token,
-            )
-        );
+        return $this->authService->resetPassword(ResetPasswordRequestData::from($request->validated()));
     }
 }

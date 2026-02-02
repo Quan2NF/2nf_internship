@@ -2,20 +2,25 @@
 
 namespace App\Contracts\Service;
 
-use App\Data\Common\KeyOnlyData;
+use App\Models\User;
+use App\Data\User\UserData;
 use App\Data\User\UserListFilterData;
 use App\Data\Response\ApiResponseData;
 use App\Data\User\AssignPositionsToUserData;
-use App\Data\User\CreateUserRequestData;
-use App\Data\User\UpdateUserRequestData;
 
 interface UserServiceInterface
 {
-    public function create(CreateUserRequestData $data): ApiResponseData;
+    public function create(UserData $data): ApiResponseData;
 
-    public function update(UpdateUserRequestData $data): ApiResponseData;
+    public function view(User $user): ApiResponseData;
+
+    public function update(User $user, UserData $data): ApiResponseData;
+
+    public function delete(User $user): ApiResponseData;
 
     public function getFilteredList(UserListFilterData $data): ApiResponseData;
 
-    public function assignPositions(AssignPositionsToUserData $data): ApiResponseData;
+    public function assignPositions(User $user, AssignPositionsToUserData $data): ApiResponseData;
+
+    public function getPositions(User $user);
 }

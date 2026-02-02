@@ -2,18 +2,19 @@
 
 namespace App\Contracts\Service;
 
+use App\Models\User;
 use App\Models\Project;
 use App\Data\Project\AssignPMData;
 use App\Data\Response\ApiResponseData;
 use App\Data\Project\ProjectRequestData;
+use App\Data\Project\ProjectScheduleData;
 use App\Data\Project\ProjectSettingsData;
 use App\Data\Project\ProjectListFilterData;
 use App\Data\Project\AssignMembersToProjectData;
-use App\Data\Project\ProjectScheduleData;
 
 interface ProjectServiceInterface
 {
-    public function getFilteredList(ProjectListFilterData $data): ApiResponseData;
+    public function getFilteredList(User $user, ProjectListFilterData $data): ApiResponseData;
 
     public function create(ProjectRequestData $data): ApiResponseData;
 

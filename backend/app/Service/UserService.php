@@ -2,36 +2,24 @@
 
 namespace App\Service;
 
-use App\Models\Role;
 use App\Models\User;
-use App\Models\Project;
 use App\Enums\ResponseCode;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use App\Models\ProjectMember;
-use App\Data\Common\KeyOnlyData;
 use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 use App\Data\User\UserListFilterData;
 use App\Data\Response\ApiResponseData;
-use App\Data\User\CreateUserRequestData;
-use App\Data\User\UpdateUserRequestData;
 use App\Data\User\CreateUserResponseData;
 use App\Data\User\DetailUserResponseData;
 use App\Data\User\AssignPositionsToUserData;
 use App\Contracts\Service\UserServiceInterface;
+use App\Data\User\UserData;
 
 class UserService implements UserServiceInterface
 {
-    protected User $user;
-
-    public function __construct(User $user)
-    {
-        $this->user = $user;
-    }
-
-    public function create(CreateUserRequestData $data): ApiResponseData
+    public function create(UserData $data): ApiResponseData
     {
         $temporaryPassword = Str::random(12);
 
@@ -40,59 +28,66 @@ class UserService implements UserServiceInterface
             'password' => Hash::make($temporaryPassword),
         ]);
 
-        return ApiResponse::from(ResponseCode::SUCCESS, new CreateUserResponseData(
-            $user->id,
-        ));
+        return ApiResponse::from(ResponseCode::SUCCESS, [
+            'id' => $user->id,
+        ]);
     }
 
-    public function update(UpdateUserRequestData $data): ApiResponseData
+    public function view(User $user): ApiResponseData
     {
-        $user = User::query()->findOrFail($data->id);
+        return ApiResponse::from(ResponseCode::SUCCESS, DetailUserResponseData::from($user));
+    }
 
-        $user->fill(
+    public function update(User $user, UserData $data): ApiResponseData
+    {
+        $user->update(
             array_filter(
-                Arr::except($data->toArray(), ['id']),
+                $data->toArray(),
                 fn ($v) => $v !== null
             )
         );
 
-        $user->save();
-
         return ApiResponse::from(ResponseCode::SUCCESS, DetailUserResponseData::from($user->fresh()));
+    }
+
+    public function delete(User $user): ApiResponseData
+    {
+        $user->delete();
+        return ApiResponse::from(ResponseCode::SUCCESS);
     }
 
     public function getFilteredList(UserListFilterData $data): ApiResponseData
     {
-        $query = User::query();
+        $query = User::query()
 
-        // Keyword search (name, email)
-        if ($data->keyword !== null && $data->keyword !== '') {
-            $query->where(function ($q) use ($data) {
-                $q->where('name', 'like', '%' . $data->keyword . '%')
-                ->orWhere('email', 'like', '%' . $data->keyword . '%');
-            });
-        }
+            ->when(
+                $data->keyword !== null && $data->keyword !== '',
+                fn ($q) => $q->where(fn ($q2) =>
+                    $q2->where('name', 'like', "%{$data->keyword}%")
+                    ->orWhere('email', 'like', "%{$data->keyword}%")
+                )
+            )
 
-        // Active / inactive
-        if ($data->is_active !== null) {
-            $query->where('is_active', $data->is_active);
-        }
+            ->when(
+                $data->is_active !== null,
+                fn ($q) => $q->where('is_active', $data->is_active)
+            )
 
-        // Gender (Enum)
-        if ($data->gender !== null) {
-            $query->where('gender', $data->gender->value);
-        }
+            ->when(
+                $data->gender !== null,
+                fn ($q) => $q->where('gender', $data->gender->value)
+            )
 
-        // Join date range
-        if ($data->join_from !== null) {
-            $query->where('join_date', '>=', $data->join_from);
-        }
+            ->when(
+                $data->join_from !== null,
+                fn ($q) => $q->where('join_date', '>=', $data->join_from)
+            )
 
-        if ($data->join_to !== null) {
-            $query->where('join_date', '<=', $data->join_to);
-        }
+            ->when(
+                $data->join_to !== null,
+                fn ($q) => $q->where('join_date', '<=', $data->join_to)
+            );
 
-        // Pagination
         $users = $query->paginate(
             perPage: $data->per_page,
             page: $data->page
@@ -101,11 +96,9 @@ class UserService implements UserServiceInterface
         return ApiResponse::from(ResponseCode::SUCCESS, $users);
     }
 
-    public function assignPositions(AssignPositionsToUserData $data): ApiResponseData
+    public function assignPositions(User $user, AssignPositionsToUserData $data): ApiResponseData
     {
-        return DB::transaction(function () use ($data) {
-
-            $user = User::query()->findOrFail($data->user_id);
+        return DB::transaction(function () use ($user, $data) {
 
             $user->positions()->syncWithoutDetaching(
                 collect($data->position_ids)
@@ -131,5 +124,17 @@ class UserService implements UserServiceInterface
                 ])
             );
         });
+    }
+
+    public function getPositions(User $user)
+    {
+        return ApiResponse::from(ResponseCode::SUCCESS, $user->positions
+            ->map(fn ($position) => [
+                'id'         => $position->id,
+                'name'       => $position->name,
+                'start_date' => $position->pivot->start_date,
+                'end_date'   => $position->pivot->end_date,
+            ])
+        );
     }
 }

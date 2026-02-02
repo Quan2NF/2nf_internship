@@ -13,6 +13,13 @@ use App\Contracts\Service\PositionServiceInterface;
 
 class PositionService implements PositionServiceInterface
 {
+    public function getList(): ApiResponseData
+    {
+        $positions = Position::query()->get();
+
+        return ApiResponse::from(ResponseCode::SUCCESS, $positions);
+    }
+
     public function create(PositionData $data): ApiResponseData
     {
         $position = Position::query()->create($data->toArray());
@@ -20,26 +27,21 @@ class PositionService implements PositionServiceInterface
         return ApiResponse::from(ResponseCode::SUCCESS, ['id' => $position->id]);
     }
 
-    public function update(int $id, PositionData $data): ApiResponseData
+    public function update(Position $position, PositionData $data): ApiResponseData
     {
-        $position = Position::query()->findOrFail($id);
-
-        $position->fill(
+        $position->update(
             array_filter(
                 $data->toArray(),
                 fn ($v) => $v !== null
             )
         );
 
-        $position->save();
-
         return ApiResponse::from(ResponseCode::SUCCESS, DetailPositionResponseData::from($position->fresh()));
     }
 
-    public function getList(): ApiResponseData
+    public function delete(Position $position): ApiResponseData
     {
-        $positions = Position::query()->get();
-
-        return ApiResponse::from(ResponseCode::SUCCESS, $positions);
+        $position->delete();
+        return ApiResponse::from(ResponseCode::SUCCESS);
     }
 }

@@ -31,12 +31,11 @@ class PositionController extends Controller
 
     public function update(Position $position, UpdatePositionRequest $request)
     {
-        return $this->positionService->update($position->id, PositionData::from($request->validated()));
+        return $this->positionService->update($position, PositionData::from($request->validated()));
     }
 
     public function delete(Position $position, DeletePositionRequest $request)
     {
-        $position->delete();
-        return ApiResponse::from(ResponseCode::SUCCESS);
+        return $this->positionService->delete($position);
     }
 }

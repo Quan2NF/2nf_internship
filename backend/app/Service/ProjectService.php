@@ -28,53 +28,48 @@ use App\Contracts\Service\ProjectServiceInterface;
 
 class ProjectService implements ProjectServiceInterface
 {
-    public function getFilteredList(ProjectListFilterData $data): ApiResponseData
+    public function getFilteredList(User $user, ProjectListFilterData $data): ApiResponseData
     {
-        /** @var User $user */
-        $user = Auth::user();
+        $query = Project::query()
 
-        $query = Project::query();
+            ->when(
+                ! $user->hasAnyPosition(['ADMIN', 'PMO']),
+                fn ($q) => $q->whereHas('users', fn ($q2) => $q2->whereKey($user->id))
+            )
 
-        if (! $user->hasAnyPosition(['ADMIN', 'PMO'])) {
-            $query->whereHas('users', function ($q) use ($user) {
-                $q->where('users.id', $user->id);
-            });
-        }
+            ->when(
+                $data->keyword !== null && $data->keyword !== '',
+                fn ($q) => $q->where(fn ($q2) =>
+                    $q2->where('code', 'like', "%{$data->keyword}%")
+                    ->orWhere('name', 'like', "%{$data->keyword}%")
+                )
+            )
 
-        // Keyword search (code or name)
-        if ($data->keyword) {
-            $query->where(function ($q) use ($data) {
-                $q->where('code', 'like', "%{$data->keyword}%")
-                ->orWhere('name', 'like', "%{$data->keyword}%");
-            });
-        }
+            ->when(
+                $data->status !== null,
+                fn ($q) => $q->where('status', $data->status->value)
+            )
 
-        // Status filter
-        if ($data->status) {
-            $query->where('status', $data->status->value);
-        }
+            ->when(
+                $data->start_date !== null,
+                fn ($q) => $q->where('start_date', '>=', $data->start_date)
+            )
 
-        // Start date filter
-        if ($data->start_date) {
-            $query->where('start_date', '>=', $data->start_date);
-        }
+            ->when(
+                $data->end_date !== null,
+                fn ($q) => $q->where('end_date', '<=', $data->end_date)
+            )
 
-        // End date filter
-        if ($data->end_date) {
-            $query->where('end_date', '<=', $data->end_date);
-        }
+            ->when(
+                $data->is_active !== null,
+                fn ($q) => $q->where('is_active', $data->is_active)
+            )
 
-        // Active flag
-        if (!is_null($data->is_active)) {
-            $query->where('is_active', $data->is_active);
-        }
+            ->when(
+                $data->is_public !== null,
+                fn ($q) => $q->where('is_public', $data->is_public)
+            );
 
-        // Public flag
-        if (!is_null($data->is_public)) {
-            $query->where('is_public', $data->is_public);
-        }
-
-        // Pagination
         $projects = $query->paginate(
             perPage: $data->per_page,
             page: $data->page
