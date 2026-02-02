@@ -39,5 +39,15 @@ services:
     depends_on:
       - db
 
+  frontend:
+    image: node:22.22.0-alpine3.23
+    container_name: pms_frontend
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "if [ ! -d node_modules ]; then npm install; fi && npm run dev -- --host"
+
 volumes:
   mysql_data:
