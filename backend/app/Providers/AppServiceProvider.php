@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Providers;
+use Illuminate\Auth\Notifications\ResetPassword;
+
 
 #use Illuminate\Support\ServiceProvider;
 use App\Services\Interfaces\IAuthService;
@@ -70,6 +72,10 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Project::class, ProjectPolicy::class);
         Gate::policy(Task::class, TaskPolicy::class); 
-        
+        ResetPassword::createUrlUsing(function ($notifiable, string $token) {
+            $frontend = rtrim(config('app.frontend_url', env('FRONTEND_URL', 'http://localhost:5173')), '/');
+            $email = urlencode($notifiable->getEmailForPasswordReset());
+            return "{$frontend}/auth/reset-password/{$token}?email={$email}";
+        });
     }
 }
