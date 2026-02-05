@@ -1,0 +1,90 @@
+<script setup lang="ts">
+import { ref } from "vue";
+import { apiCreateProject, getErrorMessage } from "../../lib/api";
+
+const emit = defineEmits<{ (e: "close"): void; (e: "created"): void }>();
+
+const loading = ref(false);
+const error = ref("");
+
+const form = ref({
+  project_code: "",
+  title: "",
+  start_date: "",
+  end_date: "",
+  description: "",
+  status: "active",
+  is_public: false,
+});
+
+async function save() {
+  loading.value = true;
+  error.value = "";
+  try {
+    await apiCreateProject({ ...form.value });
+    emit("created");
+  } catch (e: unknown) {
+    error.value = getErrorMessage(e);
+  } finally {
+    loading.value = false;
+  }
+}
+</script>
+
+<template>
+  <div class="modal-overlay" @click.self="emit('close')">
+    <div class="modal">
+      <div class="modal-title">Create Project</div>
+      <div v-if="error" class="error-box">{{ error }}</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <div class="label">ID *</div>
+          <input class="input" v-model="form.project_code" />
+        </div>
+
+        <div class="form-group">
+          <div class="label">Title *</div>
+          <input class="input" v-model="form.title" />
+        </div>
+
+        <div class="form-group">
+          <div class="label">Start date</div>
+          <input class="input" type="date" v-model="form.start_date" />
+        </div>
+
+        <div class="form-group">
+          <div class="label">End date</div>
+          <input class="input" type="date" v-model="form.end_date" />
+        </div>
+
+        <div class="form-group full">
+          <div class="label">Description</div>
+          <textarea class="input" rows="4" v-model="form.description"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-cancel" @click="emit('close')">Cancel</button>
+        <button class="btn-save" :disabled="loading" @click="save">
+          {{ loading ? "Saving..." : "Save" }}
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center; z-index:9999; }
+.modal{ width:860px; max-width:calc(100vw - 24px); background:#fff; border-radius:12px; border:1px solid var(--border); padding:16px; max-height:calc(100vh - 48px); overflow:auto; }
+.modal-title{ font-size:20px; font-weight:900; margin-bottom:10px; }
+.form-grid{ display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+.form-group.full{ grid-column: 1 / -1; }
+.label{ font-weight:800; margin-bottom:6px; }
+.input{ width:100%; border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+.modal-actions{ display:flex; justify-content:center; gap:14px; margin-top:16px; }
+.btn-cancel{ border:0; padding:10px 22px; border-radius:22px; background:#cfcfcf; color:#fff; font-weight:800; cursor:pointer; }
+.btn-save{ border:0; padding:10px 22px; border-radius:22px; background:#ef3b3b; color:#fff; font-weight:800; cursor:pointer; }
+.btn-save:disabled{ opacity:.6; cursor:not-allowed; }
+.error-box{ margin:10px 0; padding:10px; border:1px solid var(--border); border-radius:10px; }
+</style>

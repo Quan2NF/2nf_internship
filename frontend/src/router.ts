@@ -12,22 +12,14 @@ export default createRouter({
     { path: "/", redirect: "/app/users" },
     { path: "/app/users", component: () => import("./pages/UsersPage.vue") },
 
-    // stub để sidebar không lỗi
-    { path: "/app/projects", component: { template: "<div>Projects</div>" } },
     { path: "/app/tasks", component: { template: "<div>Tasks</div>" } },
     { path: "/app/work-logs", component: { template: "<div>Work Logs</div>" } },
     { path: "/app/performance", component: { template: "<div>Performance</div>" } },
     { path: "/app/positions", component: { template: "<div>Positions</div>" } },
-    {
-  path: "/app/roles",
-  name: "roles",
-  component: () => import("./pages/RolesPage.vue"),
-},
-{
-  path: "/app/users/:id/roles",
-  name: "user-roles",
-  component: () => import("./pages/UserRolesPage.vue"),
-},
+    {path: "/app/roles",name: "roles",component: () => import("./pages/RolesPage.vue"),},
+    {path: "/app/users/:id/roles",name: "user-roles",component: () => import("./pages/UserRolesPage.vue"),},
+
+    {path: "/app/projects",name: "projects",component: () => import("./pages/ProjectsPage.vue"),},
 
     // fallback
     { path: "/:pathMatch(.*)*", redirect: "/app/users" },

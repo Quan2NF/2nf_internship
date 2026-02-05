@@ -98,8 +98,6 @@ export async function apiGetUsers(params?: { keyword?: string; role?: string; pa
   return res.data;
 }
 
-
-
 export async function apiCreateUser(payload: any) {
   const res = await api.post("/users", payload);
   return res.data;
@@ -120,28 +118,93 @@ export async function apiGetRoles() {
   return res.data;
 }
 
-// API11 - list roles of a user
+
 export async function apiGetUserRoles(userId: number) {
   const res = await api.get(`/users/${userId}/roles`);
   return res.data;
 }
 
-// API13 - create role
+
 export async function apiCreateRole(payload: { code: string; name: string }) {
   const res = await api.post("/roles", payload);
   return res.data;
 }
 
-// API14 - edit role
+
 export async function apiUpdateRole(id: number, payload: { code: string; name: string }) {
   const res = await api.patch(`/roles/${id}`, payload);
   return res.data;
 }
 
-// API15 - delete role (để sẵn)
+
 export async function apiDeleteRole(id: number) {
   const res = await api.delete(`/roles/${id}`);
   return res.data;
 }
 
+export type Project = {
+  id: number;
+  project_code?: string | null; 
+  code?: string | null;
+  title?: string | null;
+  name?: string | null;
+  start_date?: string | null;
+  end_date?: string | null;
+  description?: string | null;
+  status?: string | number | null;
+  is_public?: boolean | number | null;
+  pm?: { id: number; name: string } | null;
+  members?: Array<{ id: number; name: string; email?: string; role?: { id: number; name: string } }> | null;
+};
+
+export type Role = { id: number; code: string; name: string };
+export type UserLite = { id: number; name: string; email: string; employee_code?: string | null };
+
+
+export async function apiGetProjects(params?: { keyword?: string; page?: number; per_page?: number }) {
+
+  if (params?.keyword && params.keyword.trim() !== "") {
+    const res = await api.get("/filter/projects", { params });
+    return res.data;
+  }
+  const res = await api.get("/projects", { params });
+  return res.data;
+}
+
+
+export async function apiCreateProject(payload: any) {
+  const res = await api.post("/projects", payload);
+  return res.data;
+}
+
+
+export async function apiUpdateProject(id: number, payload: any) {
+  const res = await api.put(`/projects/${id}`, payload);
+  return res.data;
+}
+
+
+export async function apiDeleteProject(id: number) {
+  const res = await api.delete(`/projects/${id}`);
+  return res.data;
+}
+
+export async function apiGetRolesLite(): Promise<Role[]> {
+  const res = await api.get("/roles");
+  return res.data?.roles ?? res.data?.data?.roles ?? [];
+}
+
+
+export async function apiGetUsersLite(params?: { keyword?: string; page?: number; per_page?: number }): Promise<UserLite[]> {
+  const res = await api.get("/users", { params });
+  return res.data?.data?.items ?? res.data?.items ?? [];
+}
+
+export async function apiAssignMembers(
+  projectId: number,
+  payload: { members: Array<{ user_id: number; role_id: number }> }
+) {
+  const res = await api.post(`/projects/${projectId}/members`, payload);
+  return res.data;
+}
 
