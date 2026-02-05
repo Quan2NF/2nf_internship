@@ -82,3 +82,66 @@ export async function apiResetPassword(payload: {
   const res = await api.post("/reset-password", payload);
   return res.data;
 }
+
+export async function apiMe() {
+  const res = await api.get("/me");
+  return res.data;
+}
+
+export async function apiLogout() {
+  const res = await api.post("/logout");
+  return res.data;
+}
+
+export async function apiGetUsers(params?: { keyword?: string; role?: string; page?: number; per_page?: number }) {
+  const res = await api.get("/users", { params });
+  return res.data;
+}
+
+
+
+export async function apiCreateUser(payload: any) {
+  const res = await api.post("/users", payload);
+  return res.data;
+}
+
+export async function apiUpdateUser(id: number, payload: any) {
+  const res = await api.patch(`/users/${id}`, payload);
+  return res.data;
+}
+
+export async function apiDeleteUser(id: number) {
+  const res = await api.delete(`/users/${id}`);
+  return res.data;
+}
+
+export async function apiGetRoles() {
+  const res = await api.get("/roles");
+  return res.data;
+}
+
+// API11 - list roles of a user
+export async function apiGetUserRoles(userId: number) {
+  const res = await api.get(`/users/${userId}/roles`);
+  return res.data;
+}
+
+// API13 - create role
+export async function apiCreateRole(payload: { code: string; name: string }) {
+  const res = await api.post("/roles", payload);
+  return res.data;
+}
+
+// API14 - edit role
+export async function apiUpdateRole(id: number, payload: { code: string; name: string }) {
+  const res = await api.patch(`/roles/${id}`, payload);
+  return res.data;
+}
+
+// API15 - delete role (để sẵn)
+export async function apiDeleteRole(id: number) {
+  const res = await api.delete(`/roles/${id}`);
+  return res.data;
+}
+
+

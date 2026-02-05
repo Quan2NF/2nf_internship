@@ -4,7 +4,7 @@
   --muted: #6b6b6b;
   --border: #e6e6e6;
   --input-border: #dcdcdc;
-  --danger: #e53935; /* đỏ giống ảnh */
+  --danger: #e53935; 
   --danger-hover: #d72f2c;
 }
 
@@ -133,7 +133,7 @@ a:hover{ text-decoration: underline; }
   height: 44px;
   margin-top: 14px;
   border: none;
-  border-radius: 999px;  /* bo tròn như ảnh */
+  border-radius: 999px;  
   background: var(--danger);
   color: #fff;
   font-weight: 600;
@@ -163,3 +163,193 @@ a:hover{ text-decoration: underline; }
 }
 .error{ color: var(--danger); }
 .hint{ color: #2e7d32; }
+
+/* ===== After login layout ===== */
+.main{
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: #eef5ff;
+}
+
+.sidebar{
+  background: #fff;
+  border-right: 1px solid var(--border);
+  padding: 18px 14px;
+}
+
+.sidebar__brand{
+  display:flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 6px 14px;
+}
+.sidebar__logo{ height: 70px; }
+.sidebar__tag{ font-size: 11px; color: #888; margin-left: 2px; }
+
+.menu{ display:flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.menu__item{
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #4b5563;
+  font-size: 13px;
+}
+.menu__item.router-link-active{
+  background: #ffecec;
+  color: var(--danger);
+  font-weight: 600;
+}
+.menu__sep{ height: 10px; }
+
+.content{ display:flex; flex-direction: column; }
+.topbar2{
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  padding: 0 18px;
+  box-shadow: 0 8px 18px rgba(0,0,0,.06);
+}
+.topbar2__right{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+}
+.icon-btn{
+  border:none;
+  background: transparent;
+  font-size: 16px;
+  cursor: pointer;
+}
+.profile{ line-height: 1.1; text-align: right; }
+.profile__name{ font-size: 13px; font-weight: 600; }
+.profile__role{ font-size: 11px; color:#888; }
+.avatar{
+  width: 34px; height: 34px;
+  border-radius: 999px;
+  background:#f1f5f9;
+  display:flex; align-items:center; justify-content:center;
+}
+.link-btn{
+  border:none;
+  background: transparent;
+  color: var(--danger);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.content__inner{
+  padding: 18px 18px 28px;
+}
+
+/* ===== Page header ===== */
+.page-title{
+  font-size: 22px;
+  font-weight: 700;
+  margin: 6px 0 14px;
+}
+
+.card{
+  background:#fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+/* ===== Filter bar ===== */
+.filter-row{
+  display:grid;
+  grid-template-columns: 80px 1fr 1fr 120px;
+  gap: 12px;
+  align-items:center;
+}
+.btn-danger{
+  height: 38px;
+  border:none;
+  border-radius: 999px;
+  background: var(--danger);
+  color:#fff;
+  font-weight: 600;
+  cursor:pointer;
+}
+.btn-danger:hover{ background: var(--danger-hover); }
+
+.btn-create{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+  padding: 10px 16px;
+  border:none;
+  border-radius: 999px;
+  background: var(--danger);
+  color:#fff;
+  font-weight: 700;
+  cursor:pointer;
+}
+
+/* ===== Table ===== */
+.table{
+  width:100%;
+  border-collapse: collapse;
+  margin-top: 14px;
+}
+.table th, .table td{
+  padding: 12px 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+.table th{
+  text-align:left;
+  font-weight:700;
+  color:#111;
+  background:#fff;
+}
+.status-active{ color: #16a34a; font-weight: 600; }
+.status-inactive{ color: var(--danger); font-weight: 600; }
+
+.actions{
+  display:flex;
+  gap: 10px;
+}
+.action{
+  cursor:pointer;
+  color:#6b7280;
+}
+.action.danger{ color: var(--danger); }
+
+/* ===== Pagination ===== */
+.paging{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  margin-top: 14px;
+  color:#666;
+  font-size: 13px;
+}
+.paging__nums{
+  display:flex;
+  gap: 6px;
+  align-items:center;
+}
+.paging__btn{
+  width: 34px; height: 34px;
+  border: 1px solid var(--border);
+  background:#fff;
+  border-radius: 6px;
+  cursor:pointer;
+}
+.paging__btn.is-active{
+  background: var(--danger);
+  color:#fff;
+  border-color: var(--danger);
+}
+.select{
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0 10px;
+}
+
