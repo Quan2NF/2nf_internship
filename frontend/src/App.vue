@@ -3,7 +3,10 @@
   import BaseButton from '@/components/base/BaseButton.vue'
   import BaseInput from '@/components/base/BaseInput.vue'
   import BaseLink from '@/components/base/BaseLink.vue'
-  import AppHeader from '@/components/layout/AppHeader.vue'
+  import AppHeaderGuest from '@/components/layout/AppHeaderGuest.vue'
+  import AppHeaderAuth from '@/components/layout/AppHeaderAuth.vue'
+  import BaseTextSearch from '@/components/base/BaseTextSearch.vue'
+  import BasePagination from '@/components/common/BasePagination.vue'
 
   const email = ref('')
   const password = ref('')
@@ -13,12 +16,15 @@
   })
 
   import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
+  import PageTitle from '@/components/common/PageTitle.vue'
 
   const rememberMe = ref(false)
+
+  const page = ref(10)
 </script>
 
 <template>
-  <AppHeader/>
+  <AppHeaderAuth/>
 
   <h1>You did it!</h1>
   <p>
@@ -26,7 +32,9 @@
     documentation
   </p>
 
-  <div style="padding: 40px">
+  <div style="padding: 40px 300px">
+    <PageTitle>Log in</PageTitle>
+
     <BaseButton>Log in</BaseButton>
 
     <BaseButton block>
@@ -59,6 +67,17 @@
     />
 
     <BaseLink to="/login">Go to Login</BaseLink>
+
+    <BaseTextSearch
+      v-model="keyword"
+      @enter="handleSearch"
+    />
+
+    <BasePagination
+      :total-items="240"
+      :page-size="10"
+      v-model:current-page="page"
+    />
   </div>
 </template>
 
