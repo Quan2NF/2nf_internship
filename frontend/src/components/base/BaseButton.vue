@@ -1,3 +1,14 @@
+<script setup>
+defineProps({
+  block: Boolean,
+  disabled: Boolean,
+  size: {
+    type: String,
+    default: 'md' // sm | md | lg
+  },
+})
+</script>
+
 <template>
   <button
     class="base-btn"
@@ -10,17 +21,6 @@
     <slot />
   </button>
 </template>
-
-<script setup>
-defineProps({
-  block: Boolean,
-  disabled: Boolean,
-  size: {
-    type: String,
-    default: 'md' // sm | md | lg
-  },
-})
-</script>
 
 <style scoped>
 .base-btn {
