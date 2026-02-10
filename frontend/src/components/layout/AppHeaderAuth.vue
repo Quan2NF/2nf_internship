@@ -34,9 +34,11 @@
   width: 100%;
   display: flex;
   align-items: center;
+  background-color: #ffffff;
 
   border-bottom: 1px solid rgba(102, 102, 102, 0.25);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
+  z-index: 10;
 }
 
 .app-header-auth__content {

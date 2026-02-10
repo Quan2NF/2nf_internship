@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import IconPaginationLeft from '@/components/icons/IconPaginationLeft.vue';
+import IconPaginationRight from '@/components/icons/IconPaginationRight.vue';
+import IconPaginationEllipsis from '../icons/IconPaginationEllipsis.vue';
 
 const props = defineProps<{
   totalItems: number
@@ -8,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:currentPage', page: number): void
+  (e: 'change', page: number): void
 }>()
 
 const totalPages = computed(() =>
@@ -17,7 +20,7 @@ const totalPages = computed(() =>
 
 const goTo = (page: number) => {
   if (page < 1 || page > totalPages.value || page === props.currentPage) return
-  emit('update:currentPage', page)
+  emit('change', page)
 }
 
 const pages = computed(() => {
@@ -47,10 +50,10 @@ const pages = computed(() => {
     <div class="total-text">Total {{ totalItems }} items</div>
 
     <div class="pagination">
-      <button class="page-btn" @click="goTo(currentPage - 1)">‹</button>
+      <button class="page-btn" @click="goTo(currentPage - 1)"><IconPaginationLeft/></button>
 
       <template v-for="(p, i) in pages" :key="i">
-        <div v-if="p === '...'" class="page-btn ellipsis">…</div>
+        <div v-if="p === '...'" class="page-btn ellipsis"><IconPaginationEllipsis/></div>
 
         <button
           v-else
@@ -62,7 +65,7 @@ const pages = computed(() => {
         </button>
       </template>
 
-      <button class="page-btn" @click="goTo(currentPage + 1)">›</button>
+      <button class="page-btn" @click="goTo(currentPage + 1)"><IconPaginationRight/></button>
     </div>
   </div>
 </template>
@@ -72,7 +75,7 @@ const pages = computed(() => {
   height: 56px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
 }
 
 /* Total text */

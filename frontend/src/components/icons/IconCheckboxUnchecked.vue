@@ -12,6 +12,6 @@
     aria-hidden="true"
   >
     <!-- Rounded square border -->
-    <rect x="3.5" y="3.5" width="17" height="17" rx="1.5" />
+    <rect x="3.5" y="3.5" width="17" height="17" rx="1.5" fill="#fff" />
   </svg>
 </template>

@@ -7,6 +7,7 @@
   import AppHeaderAuth from '@/components/layout/AppHeaderAuth.vue'
   import BaseTextSearch from '@/components/base/BaseTextSearch.vue'
   import BasePagination from '@/components/common/BasePagination.vue'
+  import ProjectCard from './components/common/ProjectCard.vue'
 
   const email = ref('')
   const password = ref('')
@@ -17,6 +18,7 @@
 
   import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
   import PageTitle from '@/components/common/PageTitle.vue'
+  import AppSidebar from './components/layout/AppSidebar.vue'
 
   const rememberMe = ref(false)
 
@@ -24,61 +26,92 @@
 </script>
 
 <template>
-  <AppHeaderAuth/>
+  <div class="app-layout">
+    <AppHeaderAuth/>
 
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+    <div class="app-body">
+      <AppSidebar/>
 
-  <div style="padding: 40px 300px">
-    <PageTitle>Log in</PageTitle>
+      <main class="app-main">
+        <h1>You did it!</h1>
+        <p>
+          Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
+          documentation
+        </p>
 
-    <BaseButton>Log in</BaseButton>
+        <div style="padding: 40px 300px">
+          <PageTitle>Log in</PageTitle>
 
-    <BaseButton block>
-      Submit Form
-    </BaseButton>
+          <BaseButton>Log in</BaseButton>
 
-    <BaseButton disabled>
-      Disabled Button
-    </BaseButton>
+          <BaseButton block>
+            Submit Form
+          </BaseButton>
 
-    <BaseInput
-      v-model="email"
-      label="Email"
-      type="email"
-      placeholder="you@example.com"
-      :error="errors.email"
-    />
+          <BaseButton disabled>
+            Disabled Button
+          </BaseButton>
 
-    <BaseInput
-      v-model="password"
-      label="Password"
-      type="password"
-      showToggle
-      required
-    />
+          <BaseInput
+            v-model="email"
+            label="Email"
+            type="email"
+            placeholder="you@example.com"
+            :error="errors.email"
+          />
 
-    <BaseCheckbox
-      v-model="rememberMe"
-      label="Remember me"
-    />
+          <BaseInput
+            v-model="password"
+            label="Password"
+            type="password"
+            showToggle
+            required
+          />
 
-    <BaseLink to="/login">Go to Login</BaseLink>
+          <BaseCheckbox
+            v-model="rememberMe"
+            label="Remember me"
+          />
 
-    <BaseTextSearch
-      v-model="keyword"
-      @enter="handleSearch"
-    />
+          <BaseLink to="/login">Go to Login</BaseLink>
 
-    <BasePagination
-      :total-items="240"
-      :page-size="10"
-      v-model:current-page="page"
-    />
+          <BaseTextSearch
+            v-model="keyword"
+            @enter="handleSearch"
+          />
+
+          <BasePagination
+            :total-items="240"
+            :current-page="page"
+            :page-size="10"
+            @change="page = $event"
+          />
+
+          <ProjectCard
+            title="Jobmatching"
+            code="PROJ-01"
+            pmCode="PM-01"
+            status="Active"
+            timeline="01/07/2025 - 30/06/2026"
+            :progress="25"
+            :tasksDone="50"
+            :tasksTotal="600"
+            :bugs="25"
+            :members="[
+              { initials: 'A', color: '#fd7e14' },
+              { initials: 'K', color: '#198754' },
+              { initials: 'M', color: '#dc3545' }
+            ]"
+          />
+        </div>
+        
+        <router-view />
+      </main>
+    </div>
   </div>
+  
+
+  
 </template>
 
 <style scoped></style>
