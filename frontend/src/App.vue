@@ -8,7 +8,15 @@
   import BaseTextSearch from '@/components/base/BaseTextSearch.vue'
   import BasePagination from '@/components/common/BasePagination.vue'
   import ProjectCard from './components/common/ProjectCard.vue'
+  import BaseDateInput from './components/base/BaseDateInput.vue'
 
+  
+  import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
+  import PageTitle from '@/components/common/PageTitle.vue'
+  import AppSidebar from './components/layout/AppSidebar.vue'
+  import PageTitleForEmployee from './components/common/PageTitleForEmployee.vue'
+  import BaseSelectInput from './components/base/BaseSelectInput.vue'
+  
   const email = ref('')
   const password = ref('')
 
@@ -16,10 +24,10 @@
     email: '',
   })
 
-  import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
-  import PageTitle from '@/components/common/PageTitle.vue'
-  import AppSidebar from './components/layout/AppSidebar.vue'
-
+  const form = ref({
+    birthDate: '',
+    role: '',
+  })
   const rememberMe = ref(false)
 
   const page = ref(10)
@@ -103,8 +111,33 @@
               { initials: 'M', color: '#dc3545' }
             ]"
           />
+
+          <PageTitleForEmployee>Projects</PageTitleForEmployee>
+          <BaseDateInput
+            v-model="form.birthDate"
+            label="Birth date"
+            required
+            min="1900-01-01"
+          />
+          
+          <BaseSelectInput
+            v-model="form.role"
+            label="Role"
+            :options="[
+              { label: 'Admin', value: 'admin' },
+              { label: 'Editor', value: 'editor' },
+              { label: 'User', value: 'user' }
+            ]"
+          />
+
+
+
+
+
+
+
+
         </div>
-        
         <router-view />
       </main>
     </div>
