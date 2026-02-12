@@ -14,18 +14,15 @@ class UserService implements IUserService
     public function __construct(
         private readonly IUserRepository $userRepository
     ) {}
-
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
         return $this->userRepository->paginate($perPage);
     }
-
     public function find(int $id): ?User
     {
         $model = $this->userRepository->find($id);
         return $model instanceof User ? $model : null;
     }
-
     public function create(array $data): User
     {
         if (!empty($data['password'])) {
@@ -36,7 +33,6 @@ class UserService implements IUserService
         $user = $this->userRepository->create($data);
         return $user;
     }
-
     public function update(int $id, array $data): bool
     {
         if (array_key_exists('password', $data)) {
@@ -46,15 +42,12 @@ class UserService implements IUserService
                 unset($data['password']);
             }
         }
-
         return $this->userRepository->update($id, $data);
     }
-
     public function softDelete(int $id): bool
     {
         return $this->userRepository->delete($id);
     }
-
     public function updateMyProfile(int $userId, array $data): bool
     {
         if (array_key_exists('password', $data)) {
@@ -64,10 +57,8 @@ class UserService implements IUserService
                 unset($data['password']);
             }
         }
-
         return $this->userRepository->update($userId, $data);
     }
-
     /**
      * AP05/AP06 - List & filter users.
      */
@@ -87,10 +78,8 @@ class UserService implements IUserService
         if (!empty($filters['is_active'])) {
             $q->where('is_active', (int) $filters['is_active']);
         }
-
         return $q->paginate($perPage);
     }
-
     /**
      * AP10 - Assign system roles to a user (user_system_roles).
      */
@@ -99,7 +88,6 @@ class UserService implements IUserService
         if (empty($roleCodes)) {
             return;
         }
-
         DB::transaction(function () use ($userId, $roleCodes, $mode) {
             $roleIds = DB::table('roles')->whereIn('code', $roleCodes)->pluck('id')->all();
 
@@ -115,7 +103,6 @@ class UserService implements IUserService
             }
         });
     }
-
     /*
      * AP11 - List system roles of a user.
      */
@@ -130,9 +117,7 @@ class UserService implements IUserService
             ->map(fn ($r) => ['id' => (int) $r->id, 'code' => $r->code, 'name' => $r->name])
             ->all();
     }
-
     //  Project roles 
-
     public function assignRolesInProject(int $projectId, int $userId, array $roleCodes): void
     {
         if (empty($roleCodes)) {
@@ -168,7 +153,6 @@ class UserService implements IUserService
             }
         });
     }
-
     public function getRolesInProject(int $projectId, int $userId): array
     {
         return DB::table('project_members as pm')

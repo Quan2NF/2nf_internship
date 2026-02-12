@@ -14,7 +14,6 @@ class ProjectService implements IProjectService
     public function __construct(
         private readonly IProjectRepository $projectRepository
     ) {}
-
     public function listProjects(int $actorId, array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
         $canViewAll = $this->isSystemRole($actorId, ['ADMIN', 'PMO']);
@@ -26,7 +25,6 @@ class ProjectService implements IProjectService
             perPage: $perPage
         );
     }
-
     public function create(array $data, int $actorId): Project
     {
         return DB::transaction(function () use ($data, $actorId) {
@@ -36,7 +34,6 @@ class ProjectService implements IProjectService
                 'created_by' => $actorId,
                 'updated_by' => $actorId,
             ]);
-
             // add creator into project_members
             $projectMemberId = DB::table('project_members')->insertGetId([
                 'project_id' => $project->id,
@@ -44,7 +41,6 @@ class ProjectService implements IProjectService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-
             // assign PM role to creator (default)
             $pmRoleId = (int) DB::table('roles')->where('code', 'PM')->value('id');
             if ($pmRoleId > 0) {
@@ -57,7 +53,6 @@ class ProjectService implements IProjectService
             return $project;
         });
     }
-
     public function update(int $projectId, array $data, int $actorId): bool
     {
         return $this->projectRepository->updateProject($projectId, [
@@ -65,12 +60,10 @@ class ProjectService implements IProjectService
             'updated_by' => $actorId,
         ]);
     }
-
     public function delete(int $projectId): void
     {
         $this->projectRepository->delete($projectId); // soft delete nếu model dùng SoftDeletes
     }
-
     private function isSystemRole(int $userId, array $roleCodes): bool
     {
         return DB::table('user_system_roles as usr')
@@ -79,7 +72,6 @@ class ProjectService implements IProjectService
             ->whereIn('r.code', $roleCodes)
             ->exists();
     }
-
     public function assignPm(int $projectId, int $pmUserId, int $actorId): bool
     {
         return DB::transaction(function () use ($projectId, $pmUserId, $actorId) {

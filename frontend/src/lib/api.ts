@@ -13,12 +13,10 @@ export const api = axios.create({
     "X-Requested-With": "XMLHttpRequest",
   },
 });
-
 type LaravelErrorPayload = {
   message?: string;
   errors?: Record<string, unknown>;
 };
-
 function pickFirstValidationMessage(errors: Record<string, unknown>): string | null {
   const keys = Object.keys(errors);
   const firstKey = keys.length > 0 ? keys[0] : undefined;
@@ -30,7 +28,6 @@ function pickFirstValidationMessage(errors: Record<string, unknown>): string | n
 
   return null;
 }
-
 /**
  * Extract a user-friendly error message from Axios/Laravel error responses.
  */

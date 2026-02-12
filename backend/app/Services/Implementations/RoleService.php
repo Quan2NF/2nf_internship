@@ -12,7 +12,6 @@ class RoleService implements IRoleService
     public function __construct(
         private readonly IRoleRepository $roleRepository
     ) {}
-
     public function list(): Collection
     {
         return Role::query()
@@ -20,19 +19,14 @@ class RoleService implements IRoleService
             ->orderBy('code')
             ->get();
     }
-
     public function create(array $data)
     {
         return $this->roleRepository->create($data);
     }
-
-   
     public function update(int $id, array $data): bool
     {
         return $this->roleRepository->update($id, $data);
     }
-
-    
     public function delete(int $id): bool
     {
         // ngăn không cho xóa admin
@@ -40,7 +34,6 @@ class RoleService implements IRoleService
         if ($role instanceof Role && $role->code === 'ADMIN') {
             return false;
         }
-
         return $this->roleRepository->delete($id);
     }
 }
