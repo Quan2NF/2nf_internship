@@ -68,6 +68,23 @@ function onClickOutside(e) {
   if (!root.value?.contains(e.target)) close()
 }
 
+function onKeydown(e) {
+  if (props.disabled) return
+
+  switch (e.key) {
+    case 'Enter':
+    case ' ':
+    case 'ArrowDown':
+      e.preventDefault()
+      if (!isOpen.value) open()
+      break
+
+    case 'Escape':
+      close()
+      break
+  }
+}
+
 onMounted(() => document.addEventListener('click', onClickOutside))
 onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 </script>
@@ -88,7 +105,12 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
         ref="trigger"
         class="select"
         :class="{ open: isOpen, error: error, disabled }"
+        tabindex="0"
+        role="combobox"
+        aria-haspopup="listbox"
+        :aria-expanded="isOpen"
         @click="toggle"
+        @keydown="onKeydown"
       >
         <span v-if="selectedOption" class="select__value">
           {{ selectedOption.label }}
@@ -109,12 +131,15 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
           ref="dropdown"
           class="dropdown"
           :style="dropdownStyle"
+          role="listbox"
         >
           <div
             v-for="opt in options"
             :key="opt.value"
             class="dropdown__item"
             :class="{ active: modelValue === opt.value }"
+            role="option"
+            :aria-selected="modelValue === opt.value"
             @click="select(opt)"
           >
             {{ opt.label }}
@@ -250,12 +275,11 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 /* Animation */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .12s ease, transform .12s ease;
+  transition: opacity .12s ease;
 }
 
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translateY(-4px);
 }
 </style>

@@ -26,7 +26,7 @@ defineProps({
 .base-btn {
   font-family: inherit;
   padding: 0 24px;
-  border-radius: 32px;
+  border-radius: 999px;
   border: 1px solid #FF383C;
   background-color: #FF383C;
   color: white;

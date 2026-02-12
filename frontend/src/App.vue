@@ -16,6 +16,36 @@
   import AppSidebar from './components/layout/AppSidebar.vue'
   import PageTitleForEmployee from './components/common/PageTitleForEmployee.vue'
   import BaseSelectInput from './components/base/BaseSelectInput.vue'
+  import BaseRadio from '@/components/base/BaseRadio.vue'
+  import BaseSwitch from './components/base/BaseSwitch.vue'
+  import BaseMemberTable from './components/common/BaseMemberTable.vue'
+  import BaseDeleteModal from './components/common/BaseDeleteModal.vue'
+
+  const showDeleteModal = ref(false)
+
+  function deleteMember() {
+    members.value = members.value.filter(m => m.id !== memberToDelete.value.id)
+    showDeleteModal.value = false
+  }
+
+  const memberToDelete = ref(null)
+
+  const members = ref([
+    { id: 1, name: 'Nguyen Van A', role: 'Project Manager' },
+    { id: 2, name: 'Tran Thi B', role: 'Frontend Developer' },
+    { id: 3, name: 'Le Minh C', role: 'Backend Developer' },
+    { id: 4, name: 'Pham Duc D', role: 'UI/UX Designer' },
+    { id: 5, name: 'Hoang Gia E', role: 'QA Engineer' },
+    { id: 6, name: 'Vo Thanh F', role: 'DevOps Engineer' }
+  ])
+
+  function openDelete(member) {
+    memberToDelete.value = member
+    showDeleteModal.value = true
+  }
+
+
+  const selected = ref('a')
   
   const email = ref('')
   const password = ref('')
@@ -27,6 +57,7 @@
   const form = ref({
     birthDate: '',
     role: '',
+    enabled: true,
   })
   const rememberMe = ref(false)
 
@@ -129,22 +160,26 @@
               { label: 'User', value: 'user' }
             ]"
           />
+          
+          <BaseRadio v-model="selected" value="a" name="test">Option A</BaseRadio>
+          <BaseRadio v-model="selected" value="b" name="test">Option B</BaseRadio>
 
+          <BaseSwitch v-model="form.enabled" />
 
+          <BaseMemberTable
+            :members="members"
+            @delete="openDelete"
+          />
 
-
-
-
-
-
+          <BaseDeleteModal
+            v-model="showDeleteModal"
+            @confirm="deleteMember"
+          />
         </div>
         <router-view />
       </main>
     </div>
   </div>
-  
-
-  
 </template>
 
 <style scoped></style>

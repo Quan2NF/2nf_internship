@@ -13,29 +13,25 @@ const props = defineProps({
   required: Boolean,
 })
 
-const emit = defineEmits(['update:modelValue'])
+const modelValue = defineModel({ type: Boolean })
 
 const internalId = `checkbox-${Math.random().toString(36).slice(2, 9)}`
 const computedId = computed(() => props.id || internalId)
 
-const toggle = () => {
-  if (props.disabled) return
-  emit('update:modelValue', !props.modelValue)
-}
 </script>
 
 <template>
   <div class="base-checkbox">
-    <label :for="computedId" class="base-checkbox__wrapper">
+    <label :for="computedId" class="base-checkbox__wrapper" :aria-disabled="disabled">
       <!-- Accessible native checkbox -->
       <input
         :id="computedId"
         type="checkbox"
         class="base-checkbox__input"
-        :checked="modelValue"
+        v-model="modelValue"
         :disabled="disabled"
-        :aria-invalid="!!error"
-        @change="toggle"
+        :aria-invalid="error ? 'true' : undefined"
+        :aria-describedby="hint || error ? computedId + '-desc' : undefined"
       />
 
       <!-- ICON CONTROL -->
@@ -58,13 +54,27 @@ const toggle = () => {
       </span>
     </label>
 
-    <p v-if="hint && !error" class="base-checkbox__hint">{{ hint }}</p>
-    <p v-if="error" class="base-checkbox__error">{{ error }}</p>
+    <p
+      v-if="hint && !error"
+      :id="computedId + '-desc'"
+      class="base-checkbox__hint"
+    >
+      {{ hint }}
+    </p>
+
+    <p
+      v-if="error"
+      :id="computedId + '-desc'"
+      class="base-checkbox__error"
+    >
+      {{ error }}
+    </p>
   </div>
 </template>
 
 <style scoped>
   .base-checkbox {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -72,6 +82,7 @@ const toggle = () => {
   }
 
   .base-checkbox__wrapper {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -82,8 +93,8 @@ const toggle = () => {
   .base-checkbox__input {
     position: absolute;
     opacity: 0;
-    width: 0;
-    height: 0;
+    inset: 0;
+    cursor: inherit;
   }
 
   /* Icon container */
