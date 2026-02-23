@@ -1,15 +1,15 @@
 <script setup>
-import BaseButton from '../base/BaseButton.vue'
+import BaseButton from '@/components/base/BaseButton.vue'
 
 const props = defineProps({
-  modelValue: Boolean, // controls open/close
   loading: Boolean
 })
 
-const emit = defineEmits(['update:modelValue', 'confirm'])
+const isOpen = defineModel({ type: Boolean })
+const emit = defineEmits(['confirm'])
 
 function close() {
-  emit('update:modelValue', false)
+  isOpen.value = false
 }
 
 function confirmDelete() {
@@ -19,7 +19,7 @@ function confirmDelete() {
 
 <template>
   <teleport to="body">
-    <div v-if="modelValue" class="overlay" @click.self="close">
+    <div v-if="isOpen" class="overlay" @click.self="close">
       <div class="modal">
         <!-- Message -->
         <span class="modal__text">Are you sure you want to delete it?</span>
@@ -101,7 +101,7 @@ function confirmDelete() {
   color: #FFFFFF;
 
   font-size: 16px;
-  font-weight: 500px;
+  font-weight: 500;
 }
 
 /* Delete button style override */
@@ -114,6 +114,6 @@ function confirmDelete() {
   color: #FFFFFF;
 
   font-size: 16px;
-  font-weight: 500px;
+  font-weight: 500;
 }
 </style>

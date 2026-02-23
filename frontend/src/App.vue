@@ -19,7 +19,26 @@
   import BaseRadio from '@/components/base/BaseRadio.vue'
   import BaseSwitch from './components/base/BaseSwitch.vue'
   import BaseMemberTable from './components/common/BaseMemberTable.vue'
-  import BaseDeleteModal from './components/common/BaseDeleteModal.vue'
+  import DeleteModal from './components/modal/DeleteModal.vue'
+  import AddMembersModal from '@/components/modal/AddMembersModal.vue'
+
+  const showAddMembersModal = ref(false)
+
+  const users = [
+    { id: 1, name: 'Alice' },
+    { id: 2, name: 'Bob' },
+    { id: 3, name: 'Charlie' }
+  ]
+
+  const roles = [
+    { label: 'Viewer', value: 'viewer' },
+    { label: 'Editor', value: 'editor' },
+    { label: 'Admin', value: 'admin' }
+  ]
+
+  function handleAdd(data) {
+    console.log('ADD', data)
+  }
 
   const showDeleteModal = ref(false)
 
@@ -171,9 +190,23 @@
             @delete="openDelete"
           />
 
-          <BaseDeleteModal
+          <DeleteModal
             v-model="showDeleteModal"
             @confirm="deleteMember"
+          />
+
+          <button
+            class="btn-add-member"
+            @click="showAddMembersModal = true"
+          >
+            + Add member
+          </button>
+
+          <AddMembersModal
+            :users="users"
+            :roles="roles"
+            @add="handleAdd"
+            v-model="showAddMembersModal"
           />
         </div>
         <router-view />
@@ -182,4 +215,22 @@
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.btn-add-member {
+  background: none;
+  border: none;
+  padding: 0;
+
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #FF383C;
+  line-height: 1.5;
+
+  cursor: pointer;
+}
+
+.btn-add-member:hover {
+  opacity: 0.8;
+}
+</style>

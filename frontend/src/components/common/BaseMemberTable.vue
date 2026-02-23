@@ -1,100 +1,47 @@
 <script setup>
-import IconTrash from '@/components/icons/IconTrash.vue'
+import BaseTable from '@/components/base/BaseTable.vue'
 
-defineProps({
-  members: {
-    type: Array,
-    required: true,
-    // [{ id, name, role }]
-  }
+import IconTrash from '@/components/icons/IconTrash.vue'
+import IconPencil from '../icons/IconPencil.vue'
+
+const props = defineProps({
+  members: Array
 })
 
-const emit = defineEmits(['delete'])
+const columns = [
+  { label: 'Name', key: 'name', width: '2fr' },
+  { label: 'Role', key: 'role', width: '1fr' },
+  { label: 'Action', key: 'action', width: '120px', align: 'center' }
+]
 </script>
 
 <template>
-  <div class="table">
-    <!-- Header -->
-    <div class="table__head table__row">
-      <div class="cell cell--no">No</div>
-      <div class="cell">Name</div>
-      <div class="cell">Role</div>
-      <div class="cell cell--action">Action</div>
-    </div>
+  <BaseTable
+    :items="members"
+    :columns="columns"
+    showIndex
+    style="--table-head-weight: 400; --table-row-gap: 10px; --table-radius: 1px" 
+  >
 
-    <!-- Body -->
-    <template v-if="members.length">
-      <div
-        v-for="(member, index) in members"
-        :key="member.id"
-        class="table__row"
+    <template #action="{ item }">
+      <button
+        class="icon-btn icon-btn--edit"
+        @click="$emit('edit', item)"
       >
-        <div class="cell cell--no">{{ index + 1 }}</div>
-        <div class="cell">{{ member.name }}</div>
-        <div class="cell">{{ member.role }}</div>
-
-        <div class="cell cell--action">
-          <button
-            class="icon-btn"
-            @click="$emit('delete', member)"
-            aria-label="Delete member"
-          >
-            <IconTrash />
-          </button>
-        </div>
-      </div>
+        <IconPencil />
+      </button>
+      <button
+        class="icon-btn icon-btn--delete"
+        @click="$emit('delete', item)"
+      >
+        <IconTrash />
+      </button>
     </template>
 
-    <!-- Empty state -->
-    <div v-else class="table__empty">
-      No members found
-    </div>
-  </div>
+  </BaseTable>
 </template>
 
 <style scoped>
-.table {
-  width: 800px;
-  border: 1px solid #F2F2F7;
-  border-radius: 12px;
-  overflow: hidden;
-  background: white;
-  font-size: 14px;
-}
-
-.table__row {
-  display: grid;
-  grid-template-columns: 80px 1fr 1fr 80px;
-  align-items: center;
-  height: 44px;
-}
-
-.table__head {
-  font-weight: 600;
-}
-
-.table__row:not(:last-child) {
-  border-bottom: 1px solid #F2F2F7;
-}
-
-.cell {
-  padding: 0 16px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.cell--action {
-  display: flex;
-  justify-content: center;
-}
-
-/* Hover row */
-.table__row:hover:not(.table__head) {
-  background: #f9fafb;
-}
-
-/* Icon button */
 .icon-btn {
   width: 28px;
   height: 28px;
@@ -105,25 +52,33 @@ const emit = defineEmits(['delete'])
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #FF383C;
+  color: var(--icon-color, black);
   transition: all .15s ease;
 }
 
 .icon-btn:hover {
   background: #f3f4f6;
-  color: #dc3545;
+  color: color-mix(
+    in srgb,
+    var(--icon-color, black) 80%,
+    black
+  );
 }
 
 .icon-btn:active {
   transform: scale(0.95);
 }
 
-/* Empty */
-.table__empty {
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #9ca3af;
+.icon-btn--delete {
+  --icon-color: #FF383C;
 }
+
+.icon-btn--delete:hover {
+  color: #dc3545;
+}
+
+.icon-btn--edit {
+  color: #212529;
+}
+
 </style>

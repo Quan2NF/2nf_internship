@@ -4,7 +4,11 @@ defineProps({
   disabled: Boolean,
   size: {
     type: String,
-    default: 'md' // sm | md | lg
+    default: 'md'
+  },
+  color: {
+    type: String,
+    default: 'default'
   },
 })
 </script>
@@ -14,6 +18,7 @@ defineProps({
     class="base-btn"
     :class="[
       `base-btn--${size}`,
+      `base-btn--${color}`,
       { 'base-btn--block': block }
     ]"
     :disabled="disabled"
@@ -27,8 +32,6 @@ defineProps({
   font-family: inherit;
   padding: 0 24px;
   border-radius: 999px;
-  border: 1px solid #FF383C;
-  background-color: #FF383C;
   color: white;
   font-weight: 500;
   cursor: pointer;
@@ -45,6 +48,22 @@ defineProps({
 .base-btn--md {
   font-size: 22px;
   height: 64px;
+}
+
+.base-btn--modal-size {
+  font-size: 16px;
+  width: 123px;
+  height: 56px;
+}
+
+.base-btn--cancel {
+  background: #CCCCCC;
+  border: 1px solid #F2F2F7;
+}
+
+.base-btn--default {
+  background: #FF383C;
+  border: 1px solid #FF383C;
 }
 
 /* Full width option */
