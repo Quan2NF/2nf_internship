@@ -68,6 +68,7 @@ function close() {
         <!-- Search -->
         <div class="search">
           <BaseInput
+            style="--input-border-color:#F2F2F7; width:492px;"
             v-model="keyword"
           />
           <BaseButton size="modal-size">
@@ -80,7 +81,7 @@ function close() {
           <!-- Header -->
           <div class="table__head table__row">
             <div class="cell cell--checkbox"></div>
-            <div class="cell">User Name</div>
+            <div class="cell">User</div>
             <div class="cell">Role</div>
           </div>
 
@@ -92,17 +93,24 @@ function close() {
           >
             <div class="cell cell--checkbox">
               <BaseCheckbox
+                variant="red"
                 :model-value="selected[user.id]?.checked || false"
                 @update:model-value="val => toggleUser(user.id, val)"
               />
             </div>
 
-            <div class="cell">
-              {{ user.name }}
+            <div class="cell cell--user">
+              <div class="user-name">
+                {{ user.name }}
+              </div>
+              <div class="user-sub">
+                {{ user.email }}
+              </div>
             </div>
 
             <div class="cell">
               <BaseSelectInput
+                class="role-select"
                 :model-value="selected[user.id]?.role || null"
                 :options="roles"
                 placeholder="Select role"
@@ -157,27 +165,32 @@ function close() {
   font-size: 30px;
   color: #0E2040;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 6px;
 }
 
 .modal__footer {
+  position: absolute;
+  bottom: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 22px;
-  margin-top: 20px;
 }
 
 /* Search */
 .search {
   width: 637px;
   display: flex;
+  justify-content: center;
   gap: 22px;
   margin-bottom: 16px;
 }
 
 /* Table */
 .table {
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
   width: 645px;
   border: 1px solid #F2F2F7;
   border-radius: 10px;
@@ -187,15 +200,14 @@ function close() {
 
 .table__row {
   display: grid;
-  grid-template-columns: 60px 1fr 1fr;
+  grid-template-columns: 80px 1fr 1fr;
   align-items: center;
-  min-height: 44px;
+  height: 60px;
 }
 
 .table__head {
   background: #F2F2F7;
   border-bottom: 1px solid #F2F2F7;
-  font-weight: 600;
   height: 44px;
 }
 
@@ -211,5 +223,30 @@ function close() {
 
 .cell--checkbox {
   justify-content: center;
+}
+
+.role-select {
+  --select-input-height: 42px;
+}
+
+.cell--user {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0px;
+}
+
+.user-name {
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.user-sub {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #8E8E93;
+  font-weight: 400;
+  margin-top: -4px;
 }
 </style>

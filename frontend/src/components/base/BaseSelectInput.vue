@@ -7,7 +7,7 @@ const modelValue = defineModel()
 const props = defineProps({
   label: String,
   options: { type: Array, required: true }, // [{ label, value }]
-  placeholder: { type: String, default: 'Select an option' },
+  placeholder: { type: String, default: '' },
   error: String,
   hint: String,
   required: Boolean,
@@ -182,9 +182,9 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 }
 
 .select {
-  height: 56px;
+  height: var(--select-input-height, 56px);
   border-radius: 12px;
-  border: 1px solid rgba(102,102,102,.35);
+  border: 1px solid var(--select-input-color, rgba(102,102,102,.35));
   padding: 0 12px;
   padding-right: 44px;
   display: flex;

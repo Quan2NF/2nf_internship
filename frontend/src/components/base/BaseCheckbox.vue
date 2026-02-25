@@ -2,6 +2,8 @@
 import { computed } from 'vue'
 import IconCheckboxChecked from '@/components/icons/IconCheckboxChecked.vue'
 import IconCheckboxUnchecked from '@/components/icons/IconCheckboxUnchecked.vue'
+import IconCheckbox2Checked from '@/components/icons/IconCheckbox2Checked.vue'
+import IconCheckbox2Unchecked from '@/components/icons/IconCheckbox2Unchecked.vue'
 
 const props = defineProps({
   modelValue: Boolean,
@@ -11,9 +13,25 @@ const props = defineProps({
   disabled: Boolean,
   id: String,
   required: Boolean,
+  variant: {
+    type: String,
+    default: 'default'
+  },
 })
 
 const modelValue = defineModel({ type: Boolean })
+
+const checkedIcon = computed(() =>
+  props.variant === 'red'
+    ? IconCheckbox2Checked
+    : IconCheckboxChecked
+)
+
+const uncheckedIcon = computed(() =>
+  props.variant === 'red'
+    ? IconCheckbox2Unchecked
+    : IconCheckboxUnchecked
+)
 
 const internalId = `checkbox-${Math.random().toString(36).slice(2, 9)}`
 const computedId = computed(() => props.id || internalId)
@@ -43,8 +61,7 @@ const computedId = computed(() => props.id || internalId)
           'is-error': error
         }"
       >
-        <IconCheckboxChecked v-if="modelValue" />
-        <IconCheckboxUnchecked v-else />
+        <component :is="modelValue ? checkedIcon : uncheckedIcon" />
       </span>
 
       <!-- Label -->
@@ -104,12 +121,6 @@ const computedId = computed(() => props.id || internalId)
     justify-content: center;
     transition: transform 0.15s ease, opacity 0.2s;
     color: rgba(102, 102, 102, 0.35);
-  }
-
-  /* Ensure all icons are 24×24 */
-  .base-checkbox__icon svg {
-    width: 24px;
-    height: 24px;
   }
 
   /* Focus ring (keyboard users) */

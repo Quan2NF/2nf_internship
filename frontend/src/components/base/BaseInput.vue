@@ -119,7 +119,7 @@ const toggleVisibility = () => {
   padding: 0 12px;
   padding-right: 44px; /* space for eye icon */
   border-radius: 12px;
-  border: 1px solid rgba(102, 102, 102, 0.35);
+  border: 1px solid var(--input-border-color, rgba(102, 102, 102, 0.35));
   font-size: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }

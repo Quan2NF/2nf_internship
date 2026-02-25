@@ -13,21 +13,25 @@
   
   import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
   import PageTitle from '@/components/common/PageTitle.vue'
-  import AppSidebar from './components/layout/AppSidebar.vue'
-  import PageTitleForEmployee from './components/common/PageTitleForEmployee.vue'
-  import BaseSelectInput from './components/base/BaseSelectInput.vue'
+  import AppSidebar from '@/components/layout/AppSidebar.vue'
+  import PageTitleForEmployee from '@/components/common/PageTitleForEmployee.vue'
+  import BaseSelectInput from '@/components/base/BaseSelectInput.vue'
   import BaseRadio from '@/components/base/BaseRadio.vue'
-  import BaseSwitch from './components/base/BaseSwitch.vue'
-  import BaseMemberTable from './components/common/BaseMemberTable.vue'
-  import DeleteModal from './components/modal/DeleteModal.vue'
+  import BaseSwitch from '@/components/base/BaseSwitch.vue'
+  import BaseMemberTable from '@/components/common/BaseMemberTable.vue'
+  import DeleteModal from '@/components/modal/DeleteModal.vue'
   import AddMembersModal from '@/components/modal/AddMembersModal.vue'
+  import DatabaseUserTable from '@/components/common/DatabaseUserTable.vue'
+import DatabaseFilterBar from './components/common/DatabaseFilterBar.vue'
 
   const showAddMembersModal = ref(false)
 
   const users = [
-    { id: 1, name: 'Alice' },
-    { id: 2, name: 'Bob' },
-    { id: 3, name: 'Charlie' }
+    { id: 1, name: 'Alice', email: 'alice@example.com' },
+    { id: 2, name: 'Bob', email: 'bob@example.com' },
+    { id: 3, name: 'Charlie', email: 'charlie@example.com' },
+    { id: 4, name: 'D', email: 'd@example.com' },
+    { id: 5, name: 'E', email: 'e@example.com' },
   ]
 
   const roles = [
@@ -50,12 +54,12 @@
   const memberToDelete = ref(null)
 
   const members = ref([
-    { id: 1, name: 'Nguyen Van A', role: 'Project Manager' },
-    { id: 2, name: 'Tran Thi B', role: 'Frontend Developer' },
-    { id: 3, name: 'Le Minh C', role: 'Backend Developer' },
-    { id: 4, name: 'Pham Duc D', role: 'UI/UX Designer' },
-    { id: 5, name: 'Hoang Gia E', role: 'QA Engineer' },
-    { id: 6, name: 'Vo Thanh F', role: 'DevOps Engineer' }
+    { id: 1, name: 'Nguyen Van A', role: 'Project Manager', status: true },
+    { id: 2, name: 'Tran Thi B', role: 'Frontend Developer', status: true },
+    { id: 3, name: 'Le Minh C', role: 'Backend Developer', status: true },
+    { id: 4, name: 'Pham Duc D', role: 'UI/UX Designer', status: true },
+    { id: 5, name: 'Hoang Gia E', role: 'QA Engineer', status: false },
+    { id: 6, name: 'Vo Thanh F', role: 'DevOps Engineer', status: false }
   ])
 
   function openDelete(member) {
@@ -209,6 +213,14 @@
             v-model="showAddMembersModal"
           />
         </div>
+        <div class="database-table">
+          <DatabaseFilterBar/>
+
+          <DatabaseUserTable
+            :members="members"
+            @delete="openDelete"
+          />
+        </div>
         <router-view />
       </main>
     </div>
@@ -232,5 +244,16 @@
 
 .btn-add-member:hover {
   opacity: 0.8;
+}
+
+.database-table {
+  font-family: 'Roboto', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  padding: 0 43px 0 37px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
 }
 </style>

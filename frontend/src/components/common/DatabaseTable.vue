@@ -88,27 +88,29 @@ function gridTemplate() {
 
 <style scoped>
 .table {
-  width: 800px;
-  border: 1px solid #F2F2F7;
-  border-radius: var(--table-radius, 10px);
+  width: auto;
+  display: grid;
   overflow: hidden;
   background: white;
-  font-size: 16px;
+  font-size: 20px;
+  line-height: 1.5;
+  gap: 5px;
 }
 
 .table__row {
   display: grid;
   grid-template-columns: 80px 1fr 1fr 80px;
   align-items: center;
-  height: 44px;
+  height: 62px;
 }
 
 .table__head {
-  font-weight: var(--table-head-weight, 600);
+  border: 1px solid #F2F2F7;
+  font-weight: 700;
 }
 
 .table__row:not(:last-child) {
-  border-bottom: 1px solid #F2F2F7;
+  border: 1px solid #F2F2F7;
 }
 
 .cell {

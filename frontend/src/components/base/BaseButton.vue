@@ -54,6 +54,7 @@ defineProps({
   font-size: 16px;
   width: 123px;
   height: 56px;
+  padding: 11px 30px;
 }
 
 .base-btn--cancel {

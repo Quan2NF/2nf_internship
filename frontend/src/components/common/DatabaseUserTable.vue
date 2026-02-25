@@ -1,5 +1,5 @@
 <script setup>
-import BaseTable from '@/components/base/BaseTable.vue'
+import DatabaseTable from '@/components/common/DatabaseTable.vue'
 
 import IconTrash from '@/components/icons/IconTrash.vue'
 import IconPencil from '../icons/IconPencil.vue'
@@ -11,18 +11,26 @@ const props = defineProps({
 const columns = [
   { label: 'Name', key: 'name', width: '2fr' },
   { label: 'Role', key: 'role', width: '1fr' },
+  { label: 'Status', key: 'status', width: '120px' },
   { label: 'Action', key: 'action', width: '120px', align: 'center' }
 ]
 </script>
 
 <template>
-  <BaseTable
-    class="table"
+  <DatabaseTable
     :items="members"
     :columns="columns"
     showIndex
-    style="--table-head-weight: 400;" 
+    style="--table-row-gap: 10px;" 
   >
+    <template #status="{ item }">
+      <span
+        class="status"
+        :class="item.status ? 'is-active' : 'is-inactive'"
+      >
+        {{ item.status ? 'Active' : 'Inactive' }}
+      </span>
+    </template>
 
     <template #action="{ item }">
       <button
@@ -39,7 +47,7 @@ const columns = [
       </button>
     </template>
 
-  </BaseTable>
+  </DatabaseTable>
 </template>
 
 <style scoped>
@@ -82,9 +90,12 @@ const columns = [
   color: #212529;
 }
 
-.table {
-  font-family: 'Roboto', sans-serif;
-  line-height: 1.5;
+.is-active {
+  color: #34C759;
+}
+
+.is-inactive {
+  color: #FF383C;
 }
 
 </style>
