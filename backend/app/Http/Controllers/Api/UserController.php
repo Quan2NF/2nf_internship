@@ -3,11 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
-use App\Enums\ResponseCode;
-use App\Http\Responses\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Data\User\UserListFilterData;
-use App\Data\User\DetailUserResponseData;
 use App\Http\Requests\User\ViewUserRequest;
 use App\Data\User\AssignPositionsToUserData;
 use App\Http\Requests\User\CreateUserRequest;

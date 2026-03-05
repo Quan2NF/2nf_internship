@@ -31,6 +31,8 @@ return new class extends Migration
 
             $table->unsignedTinyInteger('is_active')->default(1);
 
+            $table->rememberToken();
+
             $table->timestamps();   // created_at, updated_at
             $table->softDeletes();  // deleted_at
             

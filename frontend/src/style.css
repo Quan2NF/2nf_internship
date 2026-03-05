@@ -6,6 +6,11 @@ body {
   background-color: #F0F6FF;
 }
 
+#app {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
 *,
 *::before,
 *::after {

@@ -19,7 +19,6 @@
   background-color: #ffffff;
 
   border-bottom: 1px solid rgba(102, 102, 102, 0.25);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16);
 }
 
 .app-header-guest__content {

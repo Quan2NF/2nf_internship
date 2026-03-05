@@ -1,11 +1,12 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\PositionController;
+use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\TaskController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ProjectController;
-use App\Http\Controllers\Api\PositionController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -16,6 +17,17 @@ Route::prefix('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+});
+
+Route::get('/me', function () {
+    return response()->json([
+        'response_code' => 'R_CMN_200_01',
+        'data' => Auth::user()
+    ]);
+});
+
+Route::get('/ping', function () {
+    return 'pong';
 });
 
 Route::prefix('users')->middleware('auth:sanctum')->group(function () {

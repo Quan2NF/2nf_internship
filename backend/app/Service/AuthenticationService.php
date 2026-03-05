@@ -2,18 +2,20 @@
 
 namespace App\Service;
 
-use App\Models\User;
-use App\Enums\ResponseCode;
-use App\Http\Responses\ApiResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Data\Response\ApiResponseData;
-use Illuminate\Support\Facades\Password;
+use App\Contracts\Service\AuthenticationServiceInterface;
+use App\Data\Authentication\ForgotPasswordRequestData;
 use App\Data\Authentication\LoginRequestData;
 use App\Data\Authentication\LoginResponseData;
 use App\Data\Authentication\ResetPasswordRequestData;
-use App\Data\Authentication\ForgotPasswordRequestData;
-use App\Contracts\Service\AuthenticationServiceInterface;
+use App\Data\Response\ApiResponseData;
+use App\Enums\ResponseCode;
+use App\Http\Responses\ApiResponse;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Str;
+use Illuminate\Auth\Events\PasswordReset;
 
 class AuthenticationService implements AuthenticationServiceInterface
 {
@@ -28,7 +30,7 @@ class AuthenticationService implements AuthenticationServiceInterface
             return ApiResponse::from(ResponseCode::INVALID_CREDENTIALS);
         }
 
-        Auth::login($user);
+        Auth::login($user, $data->remember);
         request()->session()->regenerate();
 
         return ApiResponse::from(ResponseCode::SUCCESS, new LoginResponseData(
@@ -56,12 +58,16 @@ class AuthenticationService implements AuthenticationServiceInterface
             [
                 'email' => $data->email,
                 'password' => $data->password,
-                'password_confirmation' => $data->passwordConfirmation,
+                'password_confirmation' => $data->password,
                 'token' => $data->token,
             ],
             function ($user) use ($data) {
-                $user->password = Hash::make($data->password);
-                $user->save();
+                $user->forceFill([
+                    'password' => Hash::make($data->password),
+                    'remember_token' => Str::random(60),
+                ])->save();
+
+                event(new PasswordReset($user));
             }
         );
 

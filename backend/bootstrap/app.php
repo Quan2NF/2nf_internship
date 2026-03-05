@@ -3,7 +3,6 @@
 use App\Enums\ResponseCode;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Log;
-use App\Data\Response\ApiResponseData;
 use Illuminate\Foundation\Application;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (AuthenticationException $e) { // thrown by auth middleware
