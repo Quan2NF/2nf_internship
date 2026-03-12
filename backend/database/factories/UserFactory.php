@@ -4,9 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Position;
-use Illuminate\Support\Str;
 use App\Enums\User\UserGender;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,24 +17,24 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'employee_code' => 'EMP-' . fake()->unique()->numberBetween(1000, 9999),
+            'employee_code' => 'EMP-' . $this->faker->unique()->numberBetween(1000, 9999),
 
-            'name'  => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
+            'name'  => $this->faker->name(),
+            'email' => $this->faker->unique()->safeEmail(),
 
             // password is auto-hashed by cast
             'password' => '123456',
 
-            'phone_number' => fake()->optional()->numerify('##########'),
+            'phone_number' => $this->faker->optional()->numerify('##########'),
 
-            'birthday' => fake()->optional()->date(),
+            'birthday' => $this->faker->optional()->date(),
 
-            'gender' => fake()->optional()->randomElement([
+            'gender' => $this->faker->optional()->randomElement([
                 UserGender::Male,
                 UserGender::Female,
             ]),
 
-            'join_date'   => fake()->date(),
+            'join_date'   => $this->faker->date(),
             'resign_date' => null,
 
             'avatar' => null,
@@ -89,7 +87,7 @@ class UserFactory extends Factory
                 'HR',
             ])->pluck('id');
 
-            $count = fake()->numberBetween(1, min(3, $positionIds->count()));
+            $count = $this->faker->numberBetween(1, min(3, $positionIds->count()));
 
             $selectedIds = $positionIds->random($count);
 

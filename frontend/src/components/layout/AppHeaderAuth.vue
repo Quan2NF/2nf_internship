@@ -4,6 +4,11 @@
   import IconNotificationDot from '@/components/icons/IconNotificationDot.vue';
   import HeaderUserInfo from '@/components/common/HeaderUserInfo.vue';
   import HeaderAvatar from '@/components/common/HeaderAvatar.vue';
+  import { storeToRefs } from 'pinia'
+  import { useAuthStore } from '@/stores/auth'
+
+  const authStore = useAuthStore()
+  const { user } = storeToRefs(authStore)
 </script>
 
 <template>
@@ -18,8 +23,8 @@
         </div>
 
         <HeaderUserInfo>
-          <template #name>Nguyễn Mạnh Quân</template>
-          <template #position>PHP Developer</template>
+          <template #name>{{ user?.name }}</template>
+          <template #position>{{ user?.positions?.[0]?.name }}</template>
         </HeaderUserInfo>
 
         <HeaderAvatar />

@@ -3,9 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Task;
-use App\Models\User;
-use App\Models\Project;
-use App\Models\TaskType;
+// use App\Models\TaskType;
 use App\Models\TaskStatus;
 use App\Models\TaskPriority;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -27,8 +25,13 @@ class TaskFactory extends Factory
         $startDate = $this->faker->dateTimeBetween('-1 month', '+1 month');
         $dueDate   = (clone $startDate)->modify('+' . rand(1, 14) . ' days');
 
+        $isClosed = $this->faker->boolean(35);
+        $closedAt = $isClosed
+            ? $this->faker->dateTimeBetween($startDate, (clone $dueDate)->modify('+5 days'))
+            : null;
+
         return [
-            'project_id' => Project::factory(),
+            'project_id' => null,
             'parent_id'  => null,
 
             'subject'     => $this->faker->sentence(6),
@@ -36,11 +39,12 @@ class TaskFactory extends Factory
 
             // Reference tables (must exist)
             'status_id' => TaskStatus::query()->inRandomOrder()->value('id'),
-            'type_id'   => TaskType::query()->inRandomOrder()->value('id'),
+            // 'type_id'   => TaskType::query()->inRandomOrder()->value('id'),
+            'type_id' => random_int(1, 2),
             'priority_id' => TaskPriority::query()->inRandomOrder()->value('id'),
 
-            'assigned_to' => User::factory(),
-            'created_by'  => User::factory(),
+            'assigned_to' => null,
+            'created_by'  => null,
 
             'start_date' => $startDate->format('Y-m-d'),
             'due_date'   => $dueDate->format('Y-m-d'),
@@ -51,7 +55,7 @@ class TaskFactory extends Factory
             'progress_rate' => $this->faker->numberBetween(0, 100),
             'is_private'    => false,
 
-            'closed_at' => null,
+            'closed_at' => $closedAt,
         ];
     }
 

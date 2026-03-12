@@ -4,13 +4,9 @@ namespace App\Service;
 
 use App\Models\Role;
 use App\Models\User;
-use App\Models\Wiki;
 use App\Models\Project;
-use App\Models\Document;
 use App\Enums\ResponseCode;
-use App\Models\WikiContent;
 use App\Models\ProjectMember;
-use App\Data\Common\KeyOnlyData;
 use App\Data\Project\AssignPMData;
 use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
@@ -31,6 +27,11 @@ class ProjectService implements ProjectServiceInterface
     public function getFilteredList(User $user, ProjectListFilterData $data): ApiResponseData
     {
         $query = Project::query()
+            ->with([
+                'projectMembers.user',
+                'projectMembers.roles',
+                'tasks.type'
+            ])
 
             ->when(
                 ! $user->hasAnyPosition(['ADMIN', 'PMO']),
@@ -75,7 +76,7 @@ class ProjectService implements ProjectServiceInterface
             page: $data->page
         );
 
-        return ApiResponse::from(ResponseCode::SUCCESS, $projects);
+        return ApiResponse::from(ResponseCode::SUCCESS, ProjectResponseData::collect($projects));
     }
 
     public function create(ProjectRequestData $data): ApiResponseData

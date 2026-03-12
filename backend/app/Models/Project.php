@@ -38,8 +38,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property-read User $creator
  * @property-read User $updater
  *
- * @property-read Collection<int, User> $users
- * @property-read Collection<int, ProjectMember> $projectMembers
  * @property-read Wiki|null $wiki
  * @property-read Document|null $document
  */
@@ -88,6 +86,64 @@ class Project extends Model
         'is_public' => false,
         'is_active' => true,
     ];
+
+    protected $appends = [
+        'status_label',
+    ];
+
+    public function getStatusLabelAttribute(): string
+    {
+        return $this->status->name;
+    }
+
+    public function getPmAttribute(): ?ProjectMember
+    {
+        if (! $this->relationLoaded('projectMembers')) {
+            throw new \LogicException('Relation [projectMembers] must be eager loaded.');
+        }
+
+        return $this->projectMembers->first(function ($member) {
+
+            if (! $member->relationLoaded('roles')) {
+                throw new \LogicException('Relation [roles] must be eager loaded on ProjectMember.');
+            }
+
+            return $member->roles->contains('code', 'PM');
+        });
+    }
+
+    public function getTaskProgressAttribute(): array
+    {
+        if (! $this->relationLoaded('tasks')) {
+            throw new \LogicException('Relation [tasks] must be eager loaded.');
+        }
+
+        $stats = [
+            'Bug' => ['closed' => 0, 'total' => 0],
+            'Task' => ['closed' => 0, 'total' => 0],
+        ];
+
+        foreach ($this->tasks as $task) {
+
+            if (! $task->relationLoaded('type')) {
+                throw new \LogicException('Relation [type] must be eager loaded on Task.');
+            }
+
+            $type = $task->type->name;
+
+            if (! isset($stats[$type])) {
+                continue;
+            }
+
+            $stats[$type]['total']++;
+
+            if ($task->closed_at) {
+                $stats[$type]['closed']++;
+            }
+        }
+
+        return $stats;
+    }
 
     public function creator()
     {

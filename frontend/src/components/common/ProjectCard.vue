@@ -11,7 +11,8 @@ defineProps<{
   progress: number
   tasksDone: number
   tasksTotal: number
-  bugs: number
+  bugsDone: number
+  bugsTotal: number
   members: { initials: string; color: string }[]
 }>()
 </script>
@@ -49,20 +50,20 @@ defineProps<{
       <div class="project-card__bars">
         <ProjectCardProgressBar
           title="Progress"
-          :current-progress=25
-          :max-progress=100
+          :current-progress="progress"
+          :max-progress="100"
         />
 
         <ProjectCardProgressBar
           title="Tasks"
-          :current-progress=50
-          :max-progress=600
+          :current-progress="tasksDone"
+          :max-progress="tasksTotal"
         />
 
         <ProjectCardProgressBar
           title="Bugs"
-          :current-progress=25
-          :max-progress=100
+          :current-progress="bugsDone"
+          :max-progress="bugsTotal"
         />
       </div>
     </div>

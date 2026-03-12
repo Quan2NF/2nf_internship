@@ -2,8 +2,11 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
 use App\Enums\Project\ProjectStatus;
+use App\Models\ProjectMember;
+use App\Models\Role;
+use App\Models\Task;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,6 +14,44 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ProjectFactory extends Factory
 {
+    public function configure(): static
+    {
+        return $this->afterCreating(function ($project) {
+
+            $users = User::factory()
+                ->count(random_int(2, 5))
+                ->create();
+
+            $pmUser = $users->random();
+
+            $roles = Role::pluck('id', 'code');
+
+            foreach ($users as $user) {
+
+                $member = ProjectMember::create([
+                    'project_id' => $project->id,
+                    'user_id' => $user->id,
+                ]);
+
+                if ($user->id === $pmUser->id) {
+                    $member->roles()->attach($roles['PM']);
+                } else {
+                    $member->roles()->attach(
+                        collect([$roles['DEV'], $roles['TESTER']])->random()
+                    );
+                }
+            }
+
+            Task::factory()
+                ->count(random_int(8, 12))
+                ->create([
+                    'project_id' => $project->id,
+                    'assigned_to' => $users->random()->id,
+                    'created_by'  => $pmUser->id,
+                ]);
+        });
+    }
+    
     /**
      * Define the model's default state.
      *
@@ -18,30 +59,30 @@ class ProjectFactory extends Factory
      */
     public function definition(): array
     {
-        $plannedStart = fake()->dateTimeBetween('-1 month', '+1 month');
-        $plannedEnd   = fake()->dateTimeBetween($plannedStart, '+6 months');
+        $plannedStart = $this->faker->dateTimeBetween('-1 month', '+1 month');
+        $plannedEnd   = $this->faker->dateTimeBetween($plannedStart, '+6 months');
 
         return [
-            'code' => 'PRJ-' . fake()->unique()->numberBetween(1000, 9999),
+            'code' => 'PRJ-' . $this->faker->unique()->numberBetween(1000, 9999),
 
-            'name'        => fake()->sentence(3),
-            'description' => fake()->optional()->paragraph(),
+            'name'        => $this->faker->sentence(3),
+            'description' => $this->faker->optional()->paragraph(),
 
-            'status' => fake()->randomElement(ProjectStatus::cases()),
+            'status' => $this->faker->randomElement(ProjectStatus::cases()),
 
             'planned_start_date' => $plannedStart,
             'planned_end_date'   => $plannedEnd,
 
-            'start_date' => fake()->optional()->dateTimeBetween(
+            'start_date' => $this->faker->optional()->dateTimeBetween(
                 $plannedStart,
                 $plannedEnd
             ),
 
             'end_date' => null,
 
-            'progress_rate' => fake()->numberBetween(0, 100),
+            'progress_rate' => $this->faker->numberBetween(0, 100),
 
-            'is_public' => fake()->boolean(),
+            'is_public' => $this->faker->boolean(),
             'is_active' => true,
 
             // creator / updater
@@ -71,7 +112,7 @@ class ProjectFactory extends Factory
     {
         return $this->state(fn () => [
             'status' => ProjectStatus::ACTIVE,
-            'progress_rate' => fake()->numberBetween(1, 99),
+            'progress_rate' => $this->faker->numberBetween(1, 99),
         ]);
     }
 

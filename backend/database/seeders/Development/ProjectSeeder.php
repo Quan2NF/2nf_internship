@@ -4,7 +4,6 @@ namespace Database\Seeders\Development;
 
 use App\Models\Project;
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class ProjectSeeder extends Seeder
 {
@@ -14,7 +13,7 @@ class ProjectSeeder extends Seeder
     public function run(): void
     {
         Project::factory()
-            ->count(5)
+            ->count(20)
             ->create();
     }
 }

@@ -20,9 +20,14 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::get('/me', function () {
+    /** @var \App\Models\User|null $user */
+    $user = Auth::user();
+    
+    $user?->load('positions');
+
     return response()->json([
         'response_code' => 'R_CMN_200_01',
-        'data' => Auth::user()
+        'data' => $user
     ]);
 });
 
