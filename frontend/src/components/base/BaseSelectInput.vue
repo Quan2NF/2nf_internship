@@ -169,7 +169,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
 
 .base-input__label {
   font-size: 16px;
-  color: #666;
+  color: var(--select-input-label-color, #666);
 }
 
 .base-input__required {

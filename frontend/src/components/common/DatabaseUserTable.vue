@@ -2,33 +2,40 @@
 import DatabaseTable from '@/components/common/DatabaseTable.vue'
 
 import IconTrash from '@/components/icons/IconTrash.vue'
-import IconPencil from '../icons/IconPencil.vue'
+import IconPencil from '@/components/icons/IconPencil.vue'
 
-const props = defineProps({
-  members: Array
+defineProps({
+  users: {
+    type: Array,
+    default: () => []
+  }
 })
 
 const columns = [
-  { label: 'Name', key: 'name', width: '2fr' },
-  { label: 'Role', key: 'role', width: '1fr' },
-  { label: 'Status', key: 'status', width: '120px' },
+  { label: 'No', key: 'no', width: '70px', align: 'center' },
+  { label: 'Code', key: 'code', width: '150px' },
+  { label: 'Name', key: 'name', width: '1fr' },
+  { label: 'Email', key: 'email', width: '1fr' },
+  { label: 'Phone number', key: 'phone', width: '1fr' },
+  { label: 'Join date', key: 'joinDate', width: '140px' },
+  { label: 'Status', key: 'status', width: '120px', align: 'center' },
   { label: 'Action', key: 'action', width: '120px', align: 'center' }
 ]
 </script>
 
 <template>
   <DatabaseTable
-    :items="members"
+    :items="users"
     :columns="columns"
-    showIndex
-    style="--table-row-gap: 10px;" 
+    style="--table-row-gap: 10px;"
   >
+
     <template #status="{ item }">
       <span
         class="status"
-        :class="item.status ? 'is-active' : 'is-inactive'"
+        :class="item.status === 'Active' ? 'is-active' : 'is-inactive'"
       >
-        {{ item.status ? 'Active' : 'Inactive' }}
+        {{ item.status }}
       </span>
     </template>
 
@@ -39,6 +46,7 @@ const columns = [
       >
         <IconPencil />
       </button>
+
       <button
         class="icon-btn icon-btn--delete"
         @click="$emit('delete', item)"
@@ -74,6 +82,14 @@ const columns = [
   );
 }
 
+.email {
+  display: block;
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .icon-btn:active {
   transform: scale(0.95);
 }
@@ -97,5 +113,4 @@ const columns = [
 .is-inactive {
   color: #FF383C;
 }
-
 </style>

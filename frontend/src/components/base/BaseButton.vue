@@ -57,6 +57,13 @@ defineProps({
   padding: 11px 30px;
 }
 
+.base-btn--form-size {
+  font-size: 16px;
+  width: 230px;
+  height: 56px;
+  padding: 11px 30px;
+}
+
 .base-btn--cancel {
   background: #CCCCCC;
   border: 1px solid #F2F2F7;

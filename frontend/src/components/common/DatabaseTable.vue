@@ -29,7 +29,13 @@ function gridTemplate() {
   if (props.showIndex) cols.push('80px')
 
   props.columns.forEach(col => {
-    cols.push(col.width || '1fr')
+    const width = col.width || '1fr'
+
+    if (width.includes('fr')) {
+      cols.push(`minmax(0, ${width})`)
+    } else {
+      cols.push(width)
+    }
   })
 
   return cols.join(' ')
@@ -88,7 +94,7 @@ function gridTemplate() {
 
 <style scoped>
 .table {
-  width: auto;
+  width: 100%;
   display: grid;
   overflow: hidden;
   background: white;
@@ -99,7 +105,6 @@ function gridTemplate() {
 
 .table__row {
   display: grid;
-  grid-template-columns: 80px 1fr 1fr 80px;
   align-items: center;
   height: 62px;
 }
@@ -126,7 +131,6 @@ function gridTemplate() {
 }
 
 .cell--left {
-  justify-self: start;
   text-align: left;
 }
 

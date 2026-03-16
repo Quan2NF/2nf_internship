@@ -97,7 +97,7 @@ const internalValue = computed({
 .base-input__label {
   font-size: 16px;
   font-weight: 400;
-  color: #666;
+  color: var(--date-input-label-color, #666);
 }
 
 .base-input__required { color: red; }

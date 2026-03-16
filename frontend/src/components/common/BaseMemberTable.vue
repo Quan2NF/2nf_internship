@@ -25,12 +25,12 @@ const columns = [
   >
 
     <template #action="{ item }">
-      <button
+      <!-- <button
         class="icon-btn icon-btn--edit"
         @click="$emit('edit', item)"
       >
         <IconPencil />
-      </button>
+      </button> -->
       <button
         class="icon-btn icon-btn--delete"
         @click="$emit('delete', item)"

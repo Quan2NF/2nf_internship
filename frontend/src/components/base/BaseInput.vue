@@ -101,7 +101,7 @@ const toggleVisibility = () => {
 .base-input__label {
   font-size: 16px;
   font-weight: 400;
-  color: #666;
+  color: var(--input-label-color, #666);
 }
 
 .base-input__required {

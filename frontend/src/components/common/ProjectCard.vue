@@ -1,20 +1,50 @@
-<script setup lang="ts">
-import IconProjectCardQuickAction from '../icons/IconProjectCardQuickAction.vue';
-import ProjectCardProgressBar from './ProjectCardProgressBar.vue';
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import IconProjectCardQuickAction from '../icons/IconProjectCardQuickAction.vue'
+import ProjectCardProgressBar from './ProjectCardProgressBar.vue'
 
-defineProps<{
-  title: string
-  code: string
-  pmCode: string
-  status: string
-  timeline: string
-  progress: number
-  tasksDone: number
-  tasksTotal: number
-  bugsDone: number
-  bugsTotal: number
-  members: { initials: string; color: string }[]
-}>()
+defineProps({
+  title: String,
+  code: String,
+  pmCode: String,
+  status: String,
+  timeline: String,
+  progress: Number,
+  tasksDone: Number,
+  tasksTotal: Number,
+  bugsDone: Number,
+  bugsTotal: Number,
+  members: Array
+})
+
+const menuOpen = ref(false)
+const dropdownRef = ref(null)
+const buttonRef = ref(null)
+
+function toggleMenu() {
+  setTimeout(() => {
+    menuOpen.value = !menuOpen.value
+  })
+}
+
+function handleClickOutside(e) {
+  if (
+    dropdownRef.value?.contains(e.target) ||
+    buttonRef.value?.contains(e.target)
+  ) {
+    return
+  }
+
+  menuOpen.value = false
+}
+
+onMounted(() => {
+  window.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <template>
@@ -22,17 +52,31 @@ defineProps<{
     <!-- Header -->
     <div class="project-card__header">
       <h3 class="project-card__title">{{ title }}</h3>
-      <button class="project-card__menu"><IconProjectCardQuickAction/></button>
+
+      <div class="menu-wrapper">
+        <button class="project-card__menu" @click="toggleMenu">
+          <IconProjectCardQuickAction/>
+        </button>
+
+        <div v-if="menuOpen" ref="dropdownRef" class="project-card__dropdown">
+          <button class="dropdown-item">Edit</button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item delete">Delete</button>
+        </div>
+      </div>
     </div>
 
     <div class="project-card__info">
       <!-- Meta -->
       <div class="project-card__meta">
         <span class="project-card__code">{{ code }}</span>
+
         <div class="project-card__people">
           <span><b>PM</b>: {{ pmCode }}</span>
+
           <div class="project-card__members">
             <span><b>Members</b>:</span>
+
             <div class="avatars">
               <div
                 v-for="(m, i) in members"
@@ -94,6 +138,7 @@ defineProps<{
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
 .project-card__info {
@@ -115,6 +160,11 @@ defineProps<{
   font-weight: 600;
   color: #0D062D;
   margin: 0;
+
+  max-width: 28ch;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .project-card__menu {
@@ -123,12 +173,65 @@ defineProps<{
   cursor: pointer;
 
   padding: 0;
-  width: auto;
-  height: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
+
+/* Dropdown */
+
+.menu-wrapper {
+  position: relative;
+}
+
+.project-card__dropdown {
+  position: absolute;
+  top: 28px;
+  right: 10px;
+
+  width: 120px;
+  height: auto;
+
+  background: #FFFFFF;
+  border: 1px solid rgba(120, 120, 120, 0.2);
+  border-radius: 5px;
+  
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  height: 37px;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #333333;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #F2F2F7;
+}
+
+.dropdown-item.delete {
+  color: #FF383C;
+}
+
+.dropdown-item:hover {
+  background: #F7F7FA;
+}
+
+/* Other styles */
 
 .project-card__code {
   margin-bottom: 20px;
@@ -146,7 +249,6 @@ defineProps<{
   gap: 15px;
 }
 
-/* Badge + timeline */
 .project-card__meta {
   display: flex;
   flex-direction: column;
@@ -162,9 +264,8 @@ defineProps<{
   background: #198754;
   color: white;
   padding: 5px 12px;
-  
   border-radius: 999px;
-  
+
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
   font-size: 15px;
@@ -175,37 +276,10 @@ defineProps<{
   color: #787486;
 }
 
-/* Stats */
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.stat__row {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: #787486;
-}
-
-/* Members */
-.members {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.members__label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #787486;
-}
-
 .avatars {
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
 }
 
 .avatar {

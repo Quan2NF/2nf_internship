@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
@@ -24,6 +24,18 @@ const isOpen = defineModel({ type: Boolean })
 const emit = defineEmits(['close', 'add'])
 
 const keyword = ref('')
+
+const filteredUsers = computed(() => {
+  if (!keyword.value.trim()) return props.users
+
+  const k = keyword.value.toLowerCase()
+
+  return props.users.filter(user =>
+    user.name.toLowerCase().includes(k) ||
+    user.email.toLowerCase().includes(k)
+  )
+})
+
 const selected = ref({}) // { userId: { checked: true, role: '...' } }
 
 function toggleUser(userId, checked) {
@@ -54,6 +66,10 @@ function submit() {
 function close() {
   isOpen.value = false
 }
+
+function search() {
+  keyword.value = keyword.value.trim()
+}
 </script>
 
 <template>
@@ -70,8 +86,9 @@ function close() {
           <BaseInput
             style="--input-border-color:#F2F2F7; width:492px;"
             v-model="keyword"
+            @keyup.enter="search"
           />
-          <BaseButton size="modal-size">
+          <BaseButton size="modal-size" @click="search">
             Search
           </BaseButton>
         </div>
@@ -85,37 +102,39 @@ function close() {
             <div class="cell">Role</div>
           </div>
 
-          <!-- Body -->
-          <div
-            v-for="user in users"
-            :key="user.id"
-            class="table__row"
-          >
-            <div class="cell cell--checkbox">
-              <BaseCheckbox
-                variant="red"
-                :model-value="selected[user.id]?.checked || false"
-                @update:model-value="val => toggleUser(user.id, val)"
-              />
-            </div>
-
-            <div class="cell cell--user">
-              <div class="user-name">
-                {{ user.name }}
+          <!-- Scroll Body -->
+          <div class="table__body">
+            <div
+              v-for="user in filteredUsers"
+              :key="user.id"
+              class="table__row"
+            >
+              <div class="cell cell--checkbox">
+                <BaseCheckbox
+                  variant="red"
+                  :model-value="selected[user.id]?.checked || false"
+                  @update:model-value="val => toggleUser(user.id, val)"
+                />
               </div>
-              <div class="user-sub">
-                {{ user.email }}
-              </div>
-            </div>
 
-            <div class="cell">
-              <BaseSelectInput
-                class="role-select"
-                :model-value="selected[user.id]?.role || null"
-                :options="roles"
-                placeholder="Select role"
-                @update:model-value="val => changeRole(user.id, val)"
-              />
+              <div class="cell cell--user">
+                <div class="user-name">
+                  {{ user.name }}
+                </div>
+                <div class="user-sub">
+                  {{ user.email }}
+                </div>
+              </div>
+
+              <div class="cell">
+                <BaseSelectInput
+                  class="role-select"
+                  :model-value="selected[user.id]?.role || null"
+                  :options="roles"
+                  placeholder="Select role"
+                  @update:model-value="val => changeRole(user.id, val)"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -196,6 +215,11 @@ function close() {
   border-radius: 10px;
   overflow: hidden;
   background: white;
+}
+
+.table__body {
+  height: 300px;        /* 5 rows */
+  overflow-y: auto;
 }
 
 .table__row {

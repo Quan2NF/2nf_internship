@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import api from '@/axios'
 
 import BaseTextSearch from '@/components/base/BaseTextSearch.vue'
@@ -10,7 +11,11 @@ import ProjectCard from '@/components/common/ProjectCard.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 
 const projects = ref([])
-const page = ref(1)
+const route = useRoute()
+const router = useRouter()
+
+const page = ref(Number(route.query.page) || 1)
+const keyword = ref(route.query.keyword || '')
 const total = ref(0)
 const perPage = 6
 
@@ -38,10 +43,19 @@ async function fetchProjects(newPage = page.value) {
   try {
     page.value = newPage
 
+    router.push({
+      query: {
+        ...route.query,
+        page: newPage,
+        keyword: keyword.value || undefined
+      }
+    })
+
     const { data } = await api.get('/projects', {
       params: {
         per_page: perPage,
-        page: newPage
+        page: newPage,
+        keyword: keyword.value || undefined
       }
     })
 
@@ -54,7 +68,7 @@ async function fetchProjects(newPage = page.value) {
 
       title: p.name,
       code: p.code,
-      pmCode: p.pm.employee_code,
+      pmCode: p.pm?.employee_code,
       status: formatStatus(p.status_label),
 
       timeline: `${formatDate(p.planned_start_date)} - ${formatDate(p.planned_end_date)}`,
@@ -77,7 +91,28 @@ async function fetchProjects(newPage = page.value) {
   }
 }
 
-onMounted(fetchProjects)
+watch(
+  () => route.query.page,
+  (p) => {
+    const newPage = Number(p) || 1
+    if (newPage !== page.value) {
+      fetchProjects(newPage)
+    }
+  }
+)
+
+watch(
+  () => route.query.keyword,
+  (k) => {
+    const newKeyword = k || ''
+    if (newKeyword !== keyword.value) {
+      keyword.value = newKeyword
+      fetchProjects(1)
+    }
+  }
+)
+
+onMounted(() => fetchProjects(page.value))
 </script>
 
 <template>
@@ -90,7 +125,11 @@ onMounted(fetchProjects)
       <div class="main-content">
         <div class="main-content__top">
           <PageTitleForEmployee>Projects</PageTitleForEmployee>
-          <BaseTextSearch/>
+          <BaseTextSearch
+            v-model="keyword"
+            placeholder="Search projects"
+            @enter="fetchProjects(1)"
+          />
         </div>
 
         <div class="project-grid">
@@ -113,7 +152,7 @@ onMounted(fetchProjects)
   </div>
 </template>
 
-<style>
+<style scoped>
   .main-layout {
     min-height: 100vh;
     display: flex;
@@ -125,7 +164,7 @@ onMounted(fetchProjects)
     flex: 1;
     display: flex;
     overflow: hidden;
-    padding-bottom: 40px;
+    padding-bottom: 7px;
   }
 
   .main-content {

@@ -88,7 +88,7 @@ function gridTemplate() {
 
 <style scoped>
 .table {
-  width: 800px;
+  width: auto;
   border: 1px solid #F2F2F7;
   border-radius: var(--table-radius, 10px);
   overflow: hidden;
