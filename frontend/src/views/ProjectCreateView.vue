@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/axios'
 
@@ -29,7 +29,7 @@ const form = reactive({
   planned_start_date: '',
   planned_end_date: '',
   manager: null,
-  status: 1,
+  status: null,
   is_public: false,
   is_active: true
 })
@@ -40,13 +40,34 @@ const members = ref([])
 const showDeleteModal = ref(false)
 const memberToDelete = ref(null)
 
-const roles = ref([
-  { label: 'Developer', value: 'DEV' },
-  { label: 'Tester', value: 'TEST' },
-  { label: 'BA', value: 'BA' }
-])
+const statuses = ref([])
 
-const manager_options = ref([])
+async function fetchStatuses() {
+  const { data } = await api.get('/enums/project-statuses')
+  statuses.value = data
+
+  if (!form.status && data.length) {
+    form.status = data[0].value
+  }
+}
+
+const roles = ref([])
+
+async function fetchRoles() {
+  const { data } = await api.get('/roles')
+  roles.value = data.map(r => ({
+    label: r.label,
+    value: r.code,
+    id: r.value
+  }))
+}
+
+const manager_options = computed(() =>
+  members.value.map(m => ({
+    label: m.name,
+    value: m.id
+  }))
+)
 
 const showAddMembersModal = ref(false)
 
@@ -62,11 +83,6 @@ async function fetchUsers() {
     name: u.name,
     email: u.email
   }))
-
-  manager_options.value = list.map(u => ({
-    label: u.name,
-    value: u.id
-  }))
 }
 
 function handleAdd(data) {
@@ -74,17 +90,25 @@ function handleAdd(data) {
 
   data.forEach(item => {
     const user = users.value.find(u => u.id == item.userId)
-
     if (!user) return
 
     const exists = members.value.find(m => m.id == user.id)
 
-    if (!exists) {
+    const newRoles = Array.isArray(item.roles) ? item.roles : []
+
+    if (!newRoles.length) {
+      members.value = members.value.filter(m => m.id !== user.id)
+      return
+    }
+
+    if (exists) {
+      exists.roles = newRoles
+    } else {
       members.value.push({
         id: user.id,
         name: user.name,
         email: user.email,
-        role: item.role
+        roles: newRoles
       })
     }
   })
@@ -108,9 +132,9 @@ function deleteMember() {
 function mapMembersForApi() {
   return members.value.map(member => ({
     user_id: member.id,
-    roles: Array.isArray(member.role)
-      ? member.role
-      : [member.role].filter(Boolean)
+    roles: Array.isArray(member.roles)
+      ? member.roles
+      : [member.roles].filter(Boolean)
   }))
 }
 
@@ -164,7 +188,18 @@ function cancel() {
   router.push('/projects')
 }
 
-onMounted(fetchUsers)
+watch(members, (newMembers) => {
+  const exists = newMembers.find(m => m.id === form.manager)
+  if (!exists) {
+    form.manager = null
+  }
+})
+
+onMounted(() => {
+  fetchUsers()
+  fetchStatuses()
+  fetchRoles()
+})
 </script>
 
 <template>
@@ -225,6 +260,8 @@ onMounted(fetchUsers)
           v-model="form.manager"
           label="Manager"
           :options="manager_options"
+          :placeholder="manager_options.length ? '' : 'Select a member first'"
+          :disabled="!manager_options.length"
           style="--select-input-label-color:#000;"
         />
 
@@ -243,12 +280,14 @@ onMounted(fetchUsers)
 
           <BaseMemberTable
             :members="members"
+            :roles="roles"
             @delete="openDelete"
           />
 
           <AddMembersModal
             :users="users"
             :roles="roles"
+            :existing-members="members"
             v-model="showAddMembersModal"
             @add="handleAdd"
           />
@@ -267,9 +306,15 @@ onMounted(fetchUsers)
           </div>
 
           <div class="main-content__form__status-row">
-            <BaseRadio v-model="form.status" :value="1" name="status">Active</BaseRadio>
-            <BaseRadio v-model="form.status" :value="2" name="status">On-hold</BaseRadio>
-            <BaseRadio v-model="form.status" :value="3" name="status">Closed</BaseRadio>
+            <BaseRadio
+              v-for="s in statuses"
+              :key="s.value"
+              v-model="form.status"
+              :value="s.value"
+              name="status"
+            >
+              {{ s.label }}
+            </BaseRadio>
           </div>
 
         </div>

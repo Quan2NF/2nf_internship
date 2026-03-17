@@ -68,6 +68,15 @@ Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
     Route::put('{project}/schedule', [ProjectController::class, 'updateSchedule']);
 });
 
+Route::middleware('auth:sanctum')->get('/enums/project-statuses', function () {
+    return \App\Enums\Project\ProjectStatus::options();
+});
+
+Route::middleware('auth:sanctum')->get('/roles', function () {
+    return \App\Models\Role::select('id as value', 'name as label', 'code')
+        ->get();
+});
+
 Route::prefix('projects/{project}/tasks')->middleware('auth:sanctum')->scopeBindings()->group(function () {
     Route::get('/', [TaskController::class, 'getFilteredList']);
     Route::post('/', [TaskController::class, 'create']);

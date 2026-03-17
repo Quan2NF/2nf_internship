@@ -3,7 +3,8 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import IconProjectCardQuickAction from '../icons/IconProjectCardQuickAction.vue'
 import ProjectCardProgressBar from './ProjectCardProgressBar.vue'
 
-defineProps({
+const { id } = defineProps({
+  id: [String, Number],
   title: String,
   code: String,
   pmCode: String,
@@ -16,6 +17,16 @@ defineProps({
   bugsTotal: Number,
   members: Array
 })
+
+const emit = defineEmits(['delete', 'edit'])
+
+function handleDelete() {
+  emit('delete', id)
+}
+
+function handleEdit() {
+  emit('edit', id)
+}
 
 const menuOpen = ref(false)
 const dropdownRef = ref(null)
@@ -59,9 +70,21 @@ onBeforeUnmount(() => {
         </button>
 
         <div v-if="menuOpen" ref="dropdownRef" class="project-card__dropdown">
-          <button class="dropdown-item">Edit</button>
+          <button
+            class="dropdown-item"
+            @click="handleEdit"
+          >
+            Edit
+          </button>
+
           <div class="dropdown-divider"></div>
-          <button class="dropdown-item delete">Delete</button>
+
+          <button
+            class="dropdown-item delete"
+            @click="handleDelete"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>

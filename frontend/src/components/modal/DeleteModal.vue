@@ -63,7 +63,7 @@ function confirmDelete() {
   width: 450px;
   height: 200px;
   background: #FFFFFF;
-  border: 1px solid #404040;
+  /* border: 1px solid #404040; */
   border-radius: 10px;
 
   display: flex;

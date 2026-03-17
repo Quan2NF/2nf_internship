@@ -245,7 +245,10 @@ onBeforeUnmount(() => document.removeEventListener('click', onClickOutside))
   background: white;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0,0,0,.12);
-  padding: 6px 0;
+  overflow: hidden;
+
+  max-height: 240px;
+  overflow-y: auto;
 }
 
 .dropdown__item {

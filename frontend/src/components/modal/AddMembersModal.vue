@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
@@ -7,17 +7,18 @@ import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
 import BaseSelectInput from '@/components/base/BaseSelectInput.vue'
 
 const props = defineProps({
-  users: {
+  users: Array,
+  roles: Array,
+  existingMembers: {
     type: Array,
     default: () => []
-    // [{ id, name }]
-  },
-  roles: {
-    type: Array,
-    default: () => []
-    // [{ label, value }]
+    // [{ user_id, roles: [] }]
   }
 })
+
+const existingIds = computed(() =>
+  new Set(props.existingMembers.map(m => m.id))
+)
 
 const isOpen = defineModel({ type: Boolean })
 
@@ -26,38 +27,68 @@ const emit = defineEmits(['close', 'add'])
 const keyword = ref('')
 
 const filteredUsers = computed(() => {
-  if (!keyword.value.trim()) return props.users
+  const k = keyword.value.trim().toLowerCase()
 
-  const k = keyword.value.toLowerCase()
-
-  return props.users.filter(user =>
-    user.name.toLowerCase().includes(k) ||
-    user.email.toLowerCase().includes(k)
-  )
+  return props.users
+    .filter(user => !existingIds.value.has(user.id)) // 🔥 remove added members
+    .filter(user => {
+      if (!k) return true
+      return (
+        user.name.toLowerCase().includes(k) ||
+        user.email.toLowerCase().includes(k)
+      )
+    })
 })
 
-const selected = ref({}) // { userId: { checked: true, role: '...' } }
+const selected = ref({}) // { userId: { checked: true, roles: [] } }
 
 function toggleUser(userId, checked) {
   if (!selected.value[userId]) {
-    selected.value[userId] = { checked: false, role: null }
+    selected.value[userId] = { checked: false, roles: [] }
   }
+
   selected.value[userId].checked = checked
+
+  if (checked) {
+    // only assign default if no role yet
+    if (!selected.value[userId].roles.length) {
+      const devRole = props.roles.find(r => r.value === 'DEV')
+      if (devRole) {
+        selected.value[userId].roles = [devRole.value]
+      }
+    }
+  } else {
+    // uncheck → clear roles
+    selected.value[userId].roles = []
+  }
 }
 
-function changeRole(userId, role) {
+function changeRole(userId, roles) {
   if (!selected.value[userId]) {
-    selected.value[userId] = { checked: false, role: null }
+    selected.value[userId] = { checked: false, roles: [] }
   }
-  selected.value[userId].role = role
+
+  const normalized = Array.isArray(roles)
+    ? roles
+    : roles
+      ? [roles]
+      : []
+
+  selected.value[userId].roles = normalized
+
+  if (normalized.length) {
+    selected.value[userId].checked = true
+  } else {
+    selected.value[userId].checked = false
+  }
 }
 
 function submit() {
   const result = Object.entries(selected.value)
     .filter(([_, v]) => v.checked)
     .map(([userId, v]) => ({
-      userId,
-      role: v.role
+      userId: Number(userId),
+      roles: v.roles ?? []
     }))
 
   emit('add', result)
@@ -70,6 +101,13 @@ function close() {
 function search() {
   keyword.value = keyword.value.trim()
 }
+
+watch(isOpen, (val) => {
+  if (!val) {
+    selected.value = {}
+    keyword.value = ''
+  }
+})
 </script>
 
 <template>
@@ -129,9 +167,10 @@ function search() {
               <div class="cell">
                 <BaseSelectInput
                   class="role-select"
-                  :model-value="selected[user.id]?.role || null"
+                  :model-value="selected[user.id]?.roles?.[0] || null"
                   :options="roles"
-                  placeholder="Select role"
+                  placeholder=""
+                  :disabled="!selected[user.id]?.checked"
                   @update:model-value="val => changeRole(user.id, val)"
                 />
               </div>

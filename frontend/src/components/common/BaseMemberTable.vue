@@ -2,17 +2,37 @@
 import BaseTable from '@/components/base/BaseTable.vue'
 
 import IconTrash from '@/components/icons/IconTrash.vue'
-import IconPencil from '../icons/IconPencil.vue'
+// import IconPencil from '../icons/IconPencil.vue'
 
 const props = defineProps({
-  members: Array
+  members: {
+    type: Array,
+    default: () => []
+  },
+  roles: {
+    type: Array,
+    default: () => []
+    // [{ label, value }]
+  }
 })
 
 const columns = [
   { label: 'Name', key: 'name', width: '2fr' },
-  { label: 'Role', key: 'role', width: '1fr' },
+  { label: 'Role', key: 'roles', width: '1fr' },
   { label: 'Action', key: 'action', width: '120px', align: 'center' }
 ]
+
+// ✅ map role codes → labels
+function formatRoles(roleCodes) {
+  if (!Array.isArray(roleCodes) || !roleCodes.length) return ''
+
+  return roleCodes
+    .map(code => {
+      const found = props.roles.find(r => r.value === code)
+      return found?.label || code
+    })
+    .join(', ')
+}
 </script>
 
 <template>
@@ -21,9 +41,14 @@ const columns = [
     :items="members"
     :columns="columns"
     showIndex
-    style="--table-head-weight: 400;" 
+    style="--table-head-weight: 400;"
   >
 
+    <template #roles="{ item }">
+      {{ formatRoles(item.roles) }}
+    </template>
+
+    <!-- actions -->
     <template #action="{ item }">
       <!-- <button
         class="icon-btn icon-btn--edit"
@@ -86,5 +111,4 @@ const columns = [
   font-family: 'Roboto', sans-serif;
   line-height: 1.5;
 }
-
 </style>

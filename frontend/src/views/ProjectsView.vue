@@ -9,6 +9,7 @@ import AppHeaderAuth from '@/components/layout/AppHeaderAuth.vue'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import ProjectCard from '@/components/common/ProjectCard.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
+import DeleteModal from '@/components/modal/DeleteModal.vue'
 
 const projects = ref([])
 const route = useRoute()
@@ -18,6 +19,8 @@ const page = ref(Number(route.query.page) || 1)
 const keyword = ref(route.query.keyword || '')
 const total = ref(0)
 const perPage = 6
+const showDeleteModal = ref(false)
+const projectToDelete = ref(null)
 
 function getInitials(name) {
   return name
@@ -32,11 +35,6 @@ function formatDate(date) {
 
   const [year, month, day] = date.split('-')
   return `${day}/${month}/${year}`
-}
-
-function formatStatus(status) {
-  if (!status) return ''
-  return status.charAt(0) + status.slice(1).toLowerCase()
 }
 
 async function fetchProjects(newPage = page.value) {
@@ -64,12 +62,12 @@ async function fetchProjects(newPage = page.value) {
     total.value = response.total
 
     projects.value = response.data.map(p => ({
-      id: p.code,
+      id: p.id,
 
       title: p.name,
       code: p.code,
       pmCode: p.pm?.employee_code,
-      status: formatStatus(p.status_label),
+      status: p.status_label,
 
       timeline: `${formatDate(p.planned_start_date)} - ${formatDate(p.planned_end_date)}`,
 
@@ -88,6 +86,25 @@ async function fetchProjects(newPage = page.value) {
     }))
   } catch (err) {
     console.error('Failed to load projects', err)
+  }
+}
+
+function openDelete(id) {
+  projectToDelete.value = id
+  showDeleteModal.value = true
+}
+
+async function deleteProject() {
+  try {
+    console.log('DELETE ID:', projectToDelete.value)
+
+    await api.delete(`/projects/${projectToDelete.value}`)
+
+    showDeleteModal.value = false
+    fetchProjects(page.value)
+
+  } catch (err) {
+    console.error('Delete failed', err)
   }
 }
 
@@ -116,6 +133,11 @@ onMounted(() => fetchProjects(page.value))
 </script>
 
 <template>
+  <DeleteModal
+    v-model="showDeleteModal"
+    @confirm="deleteProject"
+  />
+
   <div class="main-layout">
     <AppHeaderAuth/>
 
@@ -137,6 +159,7 @@ onMounted(() => fetchProjects(page.value))
             v-for="project in projects"
             :key="project.id"
             v-bind="project"
+            @delete="openDelete"
           />
         </div>
 

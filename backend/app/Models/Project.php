@@ -93,7 +93,7 @@ class Project extends Model
 
     public function getStatusLabelAttribute(): string
     {
-        return $this->status->name;
+        return $this->status->label();
     }
 
     public function getPmAttribute(): ?ProjectMember
