@@ -53,8 +53,8 @@ const options = [
 }
 
 .filter-bar__search-button {
-  width: 110px;
   height: 56px;
+  padding: 13px 24px;
 
   font-size: 20px;
   line-height: 1.5;

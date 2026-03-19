@@ -39,6 +39,15 @@ class ProjectService implements ProjectServiceInterface
             )
 
             ->when(
+                ! $user->hasAnyPosition(['ADMIN', 'PMO']),
+                fn ($q) => $q->where(
+                    fn ($q2) => $q2
+                        ->whereHas('users', fn ($q3) => $q3->whereKey($user->id))
+                        ->orWhere('is_public', true)
+                )
+            )
+
+            ->when(
                 $data->keyword !== null && $data->keyword !== '',
                 fn ($q) => $q->where(fn ($q2) =>
                     $q2->where('code', 'like', "%{$data->keyword}%")
@@ -92,7 +101,13 @@ class ProjectService implements ProjectServiceInterface
 
     public function view(Project $project): ApiResponseData
     {
-        return ApiResponse::from(ResponseCode::SUCCESS, ProjectResponseData::from($project));
+        return ApiResponse::from(ResponseCode::SUCCESS, ProjectResponseData::from(
+                $project->load([
+                    'projectMembers.user',
+                    'projectMembers.roles',
+                    'tasks.type'
+                ])
+            ));
     }
 
     public function update(Project $project, ProjectRequestData $data): ApiResponseData
@@ -102,7 +117,13 @@ class ProjectService implements ProjectServiceInterface
             'updated_by' => Auth::id()
         ]);
 
-        return ApiResponse::from(ResponseCode::SUCCESS, ProjectResponseData::from($project));
+        return ApiResponse::from(ResponseCode::SUCCESS, ProjectResponseData::from(
+                $project->load([
+                    'projectMembers.user',
+                    'projectMembers.roles',
+                    'tasks.type'
+                ])
+            ));
     }
 
     public function delete(Project $project): ApiResponseData

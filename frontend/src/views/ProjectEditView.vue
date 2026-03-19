@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import api from '@/axios'
 
 import BaseInput from '@/components/base/BaseInput.vue'
@@ -19,8 +19,9 @@ import BaseMemberTable from '@/components/common/BaseMemberTable.vue'
 import AddMembersModal from '@/components/modal/AddMembersModal.vue'
 import DeleteModal from '@/components/modal/DeleteModal.vue'
 
-
 const router = useRouter()
+const route = useRoute()
+const projectId = route.params.id
 
 const form = reactive({
   code: '',
@@ -34,36 +35,15 @@ const form = reactive({
   is_active: true
 })
 
+const loading = ref(true)
 const users = ref([])
 const members = ref([])
+const roles = ref([])
+const statuses = ref([])
 
 const showDeleteModal = ref(false)
 const memberToDelete = ref(null)
-
-const statuses = ref([])
-
-async function fetchStatuses() {
-  const { data } = await api.get('/enums/project-statuses')
-  statuses.value = data
-
-  if (!form.status && data.length) {
-    form.status = data[0].value
-  }
-}
-
-const roles = ref([])
-
-async function fetchRoles() {
-  const { data } = await api.get('/roles')
-
-  roles.value = data
-    .filter(r => r.code !== 'PM') // 👈 remove PM here
-    .map(r => ({
-      label: r.label,
-      value: r.code,
-      id: r.value
-    }))
-}
+const showAddMembersModal = ref(false)
 
 const manager_options = computed(() =>
   members.value.map(m => ({
@@ -72,31 +52,67 @@ const manager_options = computed(() =>
   }))
 )
 
-const showAddMembersModal = ref(false)
+async function fetchProject() {
+  try {
+    const { data } = await api.get(`/projects/${route.params.id}`)
+    const p = data.data
+
+    form.code = p.code
+    form.name = p.name
+    form.description = p.description
+    form.planned_start_date = p.planned_start_date
+    form.planned_end_date = p.planned_end_date
+    form.status = p.status
+    form.is_public = p.is_public
+    form.is_active = p.is_active
+
+    members.value = p.projectMembers.map(m => ({
+      id: m.id,
+      name: m.name,
+      email: m.email,
+      roles: m.roles
+        .map(r => r.code)
+        .filter(code => code !== 'PM') // 🔥 remove PM
+    }))
+
+    form.manager = p.pm?.id ?? null
+
+  } finally {
+    loading.value = false
+  }
+}
 
 async function fetchUsers() {
-  const { data } = await api.get('/users', {
-    params: { per_page: 100 }
-  })
-
-  const list = data.data.data
-
-  users.value = list.map(u => ({
+  const { data } = await api.get('/users', { params: { per_page: 100 } })
+  users.value = data.data.data.map(u => ({
     id: u.id,
     name: u.name,
     email: u.email
   }))
 }
 
-function handleAdd(data) {
-  console.log('ADD', data)
+async function fetchStatuses() {
+  const { data } = await api.get('/enums/project-statuses')
+  statuses.value = data
+}
 
+async function fetchRoles() {
+  const { data } = await api.get('/roles')
+  roles.value = data
+    .filter(r => r.code !== 'PM')
+    .map(r => ({
+      label: r.label,
+      value: r.code,
+      id: r.value
+    }))
+}
+
+function handleAdd(data) {
   data.forEach(item => {
     const user = users.value.find(u => u.id == item.userId)
     if (!user) return
 
     const exists = members.value.find(m => m.id == user.id)
-
     const newRoles = Array.isArray(item.roles) ? item.roles : []
 
     if (!newRoles.length) {
@@ -128,7 +144,6 @@ function deleteMember() {
   members.value = members.value.filter(
     m => m.id !== memberToDelete.value.id
   )
-
   showDeleteModal.value = false
 }
 
@@ -141,49 +156,31 @@ function mapMembersForApi() {
   }))
 }
 
-async function createProject() {
+async function updateProject() {
   try {
-    const { data } = await api.post('/projects', {
+    await api.put(`/projects/${projectId}`, {
       code: form.code,
       name: form.name,
       description: form.description,
       status: form.status,
       planned_start_date: form.planned_start_date || null,
       planned_end_date: form.planned_end_date || null,
-      progress_rate: 0,
       is_public: form.is_public,
       is_active: form.is_active
     })
 
-    const projectId = data.data.id
+    await api.put(`/projects/${projectId}/pm`, {
+      pm_id: form.manager
+    })
 
-    if (form.manager) {
-      await api.put(`/projects/${projectId}/pm`, {
-        pm_id: form.manager
-      })
-    }
+    await api.put(`/projects/${projectId}/members`, {
+      members: mapMembersForApi()
+    })
 
-    if (members.value.length) {
-      await api.put(`/projects/${projectId}/members`, {
-        members: mapMembersForApi()
-      })
-    }
-
-    router.push('/projects')
+    await fetchProject()
 
   } catch (err) {
-    console.error('Create project failed')
-
-    if (err.response) {
-      console.error('STATUS:', err.response.status)
-      console.error('RESPONSE:', err.response.data)
-
-      if (err.response.data?.errors) {
-        console.error('VALIDATION ERRORS:', err.response.data.errors)
-      }
-    } else {
-      console.error(err)
-    }
+    console.error('Update failed', err)
   }
 }
 
@@ -198,34 +195,34 @@ watch(members, (newMembers) => {
   }
 })
 
-onMounted(() => {
-  fetchUsers()
-  fetchStatuses()
-  fetchRoles()
+onMounted(async () => {
+  await Promise.all([
+    fetchUsers(),
+    fetchStatuses(),
+    fetchRoles(),
+    fetchProject()
+  ])
 })
 </script>
 
 <template>
 <div class="main-layout">
-
   <AppHeaderAuth/>
 
   <div class="main-body">
-
     <AppSidebar/>
 
     <div class="main-content">
-
       <div class="main-content__top">
-        <PageTitleForEmployee>Create Project</PageTitleForEmployee>
+        <PageTitleForEmployee>Edit Project</PageTitleForEmployee>
       </div>
 
-      <div class="main-content__form">
+      <div v-if="!loading" class="main-content__form">
 
         <BaseInput
           v-model="form.code"
           label="ID"
-          required
+          disabled
           style="--input-label-color:#000;"
         />
 
@@ -263,13 +260,11 @@ onMounted(() => {
           v-model="form.manager"
           label="Manager"
           :options="manager_options"
-          :placeholder="manager_options.length ? '' : 'Select a member first'"
           :disabled="!manager_options.length"
           style="--select-input-label-color:#000;"
         />
 
         <div class="main-content__form__member-table">
-
           <div class="main-content__form__top">
             <div>Members</div>
 
@@ -299,15 +294,10 @@ onMounted(() => {
             v-model="showDeleteModal"
             @confirm="deleteMember"
           />
-
         </div>
 
         <div class="main-content__form__status">
-
-          <div class="main-content__form__top">
-            Status
-          </div>
-
+          <div class="main-content__form__top">Status</div>
           <div class="main-content__form__status-row">
             <BaseRadio
               v-for="s in statuses"
@@ -319,7 +309,6 @@ onMounted(() => {
               {{ s.label }}
             </BaseRadio>
           </div>
-
         </div>
 
         <div class="main-content__form__public-and-active">
@@ -354,7 +343,7 @@ onMounted(() => {
 
           <BaseButton
             size="form-size"
-            @click="createProject"
+            @click="updateProject"
           >
             Apply
           </BaseButton>
@@ -363,10 +352,11 @@ onMounted(() => {
 
       </div>
 
+      <div v-else>
+        Loading...
+      </div>
     </div>
-
   </div>
-
 </div>
 </template>
 

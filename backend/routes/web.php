@@ -28,6 +28,15 @@ Route::get('/me', function () {
     return response()->json([
         'response_code' => 'R_CMN_200_01',
         'data' => $user
+            ? array_merge(
+                $user->toArray(),
+                [
+                    'permissions' => [
+                        'project.create' => $user->can('create', \App\Models\Project::class),
+                    ],
+                ]
+            )
+            : null,
     ]);
 });
 
@@ -56,7 +65,7 @@ Route::prefix('projects')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [ProjectController::class, 'getFilteredList']);
     Route::post('/', [ProjectController::class, 'create']);
     Route::get('{project}', [ProjectController::class, 'view']);
-    Route::patch('{project}', [ProjectController::class, 'update']);
+    Route::put('{project}', [ProjectController::class, 'update']);
     Route::delete('{project}', [ProjectController::class, 'delete']);
     Route::get('{project}/pm', [ProjectController::class, 'getPM']);
     Route::put('{project}/pm', [ProjectController::class, 'assignPM']);

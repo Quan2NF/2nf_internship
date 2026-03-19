@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ProjectsView from '@/views/ProjectsView.vue'
 import ProjectCreateView from '@/views/ProjectCreateView.vue'
+import ProjectEditView from '@/views/ProjectEditView.vue'
 import { useAuthStore } from '@/stores/auth'
 import UsersView from '@/views/UsersView.vue'
 
@@ -24,6 +25,12 @@ const router = createRouter({
       path: '/projects/new',
       name: 'projects.create',
       component: ProjectCreateView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/projects/:id/edit',
+      name: 'projects.edit',
+      component: ProjectEditView,
       meta: { requiresAuth: true },
     },
     {

@@ -9,6 +9,10 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isAuthenticated: (state) => !!state.user,
+
+    can: (state) => (permission) => {
+      return !!state.user?.permissions?.[permission]
+    }
   },
 
   actions: {

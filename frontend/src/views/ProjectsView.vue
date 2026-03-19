@@ -10,6 +10,10 @@ import AppSidebar from '@/components/layout/AppSidebar.vue'
 import ProjectCard from '@/components/common/ProjectCard.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
 import DeleteModal from '@/components/modal/DeleteModal.vue'
+import BaseButton from '@/components/base/BaseButton.vue'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
 
 const projects = ref([])
 const route = useRoute()
@@ -94,6 +98,10 @@ function openDelete(id) {
   showDeleteModal.value = true
 }
 
+function openEdit(id) {
+  router.push({ name: 'projects.edit', params: { id: id } })
+}
+
 async function deleteProject() {
   try {
     console.log('DELETE ID:', projectToDelete.value)
@@ -129,7 +137,13 @@ watch(
   }
 )
 
-onMounted(() => fetchProjects(page.value))
+onMounted(async () => {
+  if (!auth.initialized) {
+    await auth.fetchUser()
+  }
+
+  fetchProjects(page.value)
+})
 </script>
 
 <template>
@@ -147,11 +161,22 @@ onMounted(() => fetchProjects(page.value))
       <div class="main-content">
         <div class="main-content__top">
           <PageTitleForEmployee>Projects</PageTitleForEmployee>
-          <BaseTextSearch
-            v-model="keyword"
-            placeholder="Search projects"
-            @enter="fetchProjects(1)"
-          />
+          <div class="main-content__top__right">
+            <BaseTextSearch
+              v-model="keyword"
+              placeholder="Search projects"
+              @enter="fetchProjects(1)"
+            />
+
+            <BaseButton
+              v-if="auth.can('project.create')"
+              class="main-content__button"
+              @click="router.push({ name: 'projects.create' })"
+            >
+              + Create Project
+            </BaseButton>
+          </div>
+          
         </div>
 
         <div class="project-grid">
@@ -160,6 +185,7 @@ onMounted(() => fetchProjects(page.value))
             :key="project.id"
             v-bind="project"
             @delete="openDelete"
+            @edit="openEdit"
           />
         </div>
 
@@ -203,6 +229,7 @@ onMounted(() => fetchProjects(page.value))
     padding-left: 6px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 
   .project-grid {
@@ -214,5 +241,20 @@ onMounted(() => fetchProjects(page.value))
   .pagination {
     display: flex;
     justify-content: center;
+  }
+
+  .main-content__top__right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .main-content__button {
+    height: 56px;
+    font-size: 20px;
+    padding: 13px 24px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
   }
 </style>
