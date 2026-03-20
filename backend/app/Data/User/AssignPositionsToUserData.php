@@ -10,11 +10,9 @@ use Spatie\LaravelData\Data;
 class AssignPositionsToUserData extends Data
 {
     /**
-     * @param int $user_id
      * @param int[] $position_ids
      */
     public function __construct(
-        public int $user_id,
         public array $position_ids,
     ) {}
 }

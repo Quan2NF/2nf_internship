@@ -4,14 +4,12 @@ namespace App\Service;
 
 use App\Models\User;
 use App\Enums\ResponseCode;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Support\Facades\Hash;
 use App\Data\User\UserListFilterData;
 use App\Data\Response\ApiResponseData;
-use App\Data\User\CreateUserResponseData;
 use App\Data\User\DetailUserResponseData;
 use App\Data\User\AssignPositionsToUserData;
 use App\Contracts\Service\UserServiceInterface;

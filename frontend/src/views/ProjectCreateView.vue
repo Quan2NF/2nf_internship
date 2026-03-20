@@ -89,8 +89,6 @@ async function fetchUsers() {
 }
 
 function handleAdd(data) {
-  console.log('ADD', data)
-
   data.forEach(item => {
     const user = users.value.find(u => u.id == item.userId)
     if (!user) return
@@ -224,7 +222,7 @@ onMounted(() => {
 
         <BaseInput
           v-model="form.code"
-          label="ID"
+          label="Code"
           required
           style="--input-label-color:#000;"
         />
@@ -356,7 +354,7 @@ onMounted(() => {
             size="form-size"
             @click="createProject"
           >
-            Apply
+            Save
           </BaseButton>
 
         </div>

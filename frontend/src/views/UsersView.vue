@@ -10,6 +10,7 @@ import DatabaseFilterBar from '@/components/common/DatabaseFilterBar.vue'
 import DatabaseUserTable from '@/components/common/DatabaseUserTable.vue'
 import DeleteModal from '@/components/modal/DeleteModal.vue'
 import BasePagination from '@/components/common/BasePagination.vue'
+import BaseButton from '@/components/base/BaseButton.vue'
 
 const users = ref([])
 
@@ -85,6 +86,10 @@ function openDelete(user) {
   showDeleteModal.value = true
 }
 
+function openEdit(user) {
+  router.push({ name: 'users.edit', params: { id: user.id } })
+}
+
 async function deleteUser() {
   try {
     await api.delete(`/users/${userToDelete.value.id}`)
@@ -118,6 +123,13 @@ onMounted(() => fetchUsers(page.value))
 
         <div class="main-content__top">
           <PageTitleForEmployee>Users</PageTitleForEmployee>
+
+          <BaseButton
+            class="main-content__button"
+            @click="router.push({ name: 'users.create' })"
+          >
+            + Create User
+          </BaseButton>
         </div>
 
         <div class="database-table">
@@ -130,6 +142,7 @@ onMounted(() => fetchUsers(page.value))
           <DatabaseUserTable
             :users="users"
             @delete="openDelete"
+            @edit="openEdit"
           />
 
           <BasePagination
@@ -181,6 +194,15 @@ onMounted(() => fetchUsers(page.value))
 .main-content__top {
   display: flex;
   justify-content: space-between;
+}
+
+.main-content__button {
+  height: 56px;
+  font-size: 20px;
+  padding: 13px 24px;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400;
+  line-height: 1.5;
 }
 
 .database-table {

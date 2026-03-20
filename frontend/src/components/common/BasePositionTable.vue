@@ -1,60 +1,30 @@
 <script setup>
 import BaseTable from '@/components/base/BaseTable.vue'
-
 import IconTrash from '@/components/icons/IconTrash.vue'
-// import IconPencil from '../icons/IconPencil.vue'
 
 const props = defineProps({
-  members: {
+  positions: {
     type: Array,
     default: () => []
-  },
-  roles: {
-    type: Array,
-    default: () => []
-    // [{ label, value }]
   }
 })
 
 const columns = [
-  { label: 'Name', key: 'name', width: '2fr' },
-  { label: 'Role', key: 'roles', width: '1fr' },
+  { label: 'Name', key: 'name', width: '1fr' },
   { label: 'Action', key: 'action', width: '120px', align: 'center' }
 ]
-
-function formatRoles(roleCodes) {
-  if (!Array.isArray(roleCodes) || !roleCodes.length) return ''
-
-  return roleCodes
-    .map(code => {
-      const found = props.roles.find(r => r.value === code)
-      return found?.label || code
-    })
-    .join(', ')
-}
 </script>
 
 <template>
   <BaseTable
     class="table"
-    :items="members"
+    :items="positions"
     :columns="columns"
     showIndex
     style="--table-head-weight: 400;"
   >
-
-    <template #roles="{ item }">
-      {{ formatRoles(item.roles) }}
-    </template>
-
     <!-- actions -->
     <template #action="{ item }">
-      <!-- <button
-        class="icon-btn icon-btn--edit"
-        @click="$emit('edit', item)"
-      >
-        <IconPencil />
-      </button> -->
       <button
         class="icon-btn icon-btn--delete"
         @click="$emit('delete', item)"
@@ -62,7 +32,6 @@ function formatRoles(roleCodes) {
         <IconTrash />
       </button>
     </template>
-
   </BaseTable>
 </template>
 
@@ -100,10 +69,6 @@ function formatRoles(roleCodes) {
 
 .icon-btn--delete:hover {
   color: #dc3545;
-}
-
-.icon-btn--edit {
-  color: #212529;
 }
 
 .table {

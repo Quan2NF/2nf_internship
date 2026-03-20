@@ -1,9 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ProjectsView from '@/views/ProjectsView.vue'
 import ProjectCreateView from '@/views/ProjectCreateView.vue'
+import UserCreateView from '@/views/UserCreateView.vue'
 import ProjectEditView from '@/views/ProjectEditView.vue'
 import { useAuthStore } from '@/stores/auth'
 import UsersView from '@/views/UsersView.vue'
+import UserEditView from '@/views/UserEditView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -38,6 +40,18 @@ const router = createRouter({
       name: 'users.index',
       component: UsersView,
       meta: {requiresAuth: true},
+    },
+    {
+      path: '/users/new',
+      name: 'users.create',
+      component: UserCreateView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/users/:id/edit',
+      name: 'users.edit',
+      component: UserEditView,
+      meta: { requiresAuth: true },
     },
     {
       path: '/login',

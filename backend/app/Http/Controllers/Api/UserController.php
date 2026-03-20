@@ -34,7 +34,14 @@ class UserController extends Controller
 
     public function update(User $user, UpdateUserRequest $request)
     {
-        return $this->userService->update($user, UserData::from($request->validated()));
+        return $this->userService->update(
+            $user,
+            UserData::from([
+                ...$request->validated(),
+                'employee_code' => $user->employee_code,
+                'email' => $user->email,
+            ])
+        );
     }
 
     public function delete(User $user, DeleteUserRequest $request)

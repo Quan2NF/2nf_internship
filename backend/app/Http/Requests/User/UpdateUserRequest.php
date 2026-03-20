@@ -37,7 +37,12 @@ class UpdateUserRequest extends FormRequest
                 Rule::enum(UserGender::class),
             ],
 
+            'join_date' => ['sometimes', 'nullable', 'date'],
+            'resign_date' => ['sometimes', 'nullable', 'date'],
+
             'avatar' => ['sometimes', 'nullable', 'string', 'max:255'],
+
+            'is_active' => ['sometimes', 'boolean'],
         ];
     }
 }

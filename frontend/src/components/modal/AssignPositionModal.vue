@@ -4,20 +4,20 @@ import { ref, computed, watch } from 'vue'
 import BaseInput from '@/components/base/BaseInput.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
 import BaseCheckbox from '@/components/base/BaseCheckbox.vue'
-import BaseSelectInput from '@/components/base/BaseSelectInput.vue'
 
 const props = defineProps({
-  users: Array,
-  roles: Array,
-  existingMembers: {
+  positions: {
     type: Array,
     default: () => []
-    // [{ user_id, roles: [] }]
+  },
+  existingPositions: {
+    type: Array,
+    default: () => [] // [{ id }]
   }
 })
 
 const existingIds = computed(() =>
-  new Set(props.existingMembers.map(m => m.id))
+  new Set(props.existingPositions.map(p => p.id))
 )
 
 const isOpen = defineModel({ type: Boolean })
@@ -26,70 +26,27 @@ const emit = defineEmits(['close', 'add'])
 
 const keyword = ref('')
 
-const filteredUsers = computed(() => {
+const filteredPositions = computed(() => {
   const k = keyword.value.trim().toLowerCase()
 
-  return props.users
-    .filter(user => !existingIds.value.has(user.id)) // 🔥 remove added members
-    .filter(user => {
+  return props.positions
+    .filter(pos => !existingIds.value.has(pos.id)) // remove already assigned
+    .filter(pos => {
       if (!k) return true
-      return (
-        user.name.toLowerCase().includes(k) ||
-        user.email.toLowerCase().includes(k)
-      )
+      return pos.name.toLowerCase().includes(k)
     })
 })
 
-const selected = ref({}) // { userId: { checked: true, roles: [] } }
+const selected = ref({}) // { positionId: true }
 
-function toggleUser(userId, checked) {
-  if (!selected.value[userId]) {
-    selected.value[userId] = { checked: false, roles: [] }
-  }
-
-  selected.value[userId].checked = checked
-
-  if (checked) {
-    // only assign default if no role yet
-    if (!selected.value[userId].roles.length) {
-      const devRole = props.roles.find(r => r.value === 'DEV')
-      if (devRole) {
-        selected.value[userId].roles = [devRole.value]
-      }
-    }
-  } else {
-    // uncheck → clear roles
-    selected.value[userId].roles = []
-  }
-}
-
-function changeRole(userId, roles) {
-  if (!selected.value[userId]) {
-    selected.value[userId] = { checked: false, roles: [] }
-  }
-
-  const normalized = Array.isArray(roles)
-    ? roles
-    : roles
-      ? [roles]
-      : []
-
-  selected.value[userId].roles = normalized
-
-  if (normalized.length) {
-    selected.value[userId].checked = true
-  } else {
-    selected.value[userId].checked = false
-  }
+function togglePosition(positionId, checked) {
+  selected.value[positionId] = checked
 }
 
 function submit() {
   const result = Object.entries(selected.value)
-    .filter(([_, v]) => v.checked)
-    .map(([userId, v]) => ({
-      userId: Number(userId),
-      roles: v.roles ?? []
-    }))
+    .filter(([_, checked]) => checked)
+    .map(([id]) => Number(id))
 
   emit('add', result)
 }
@@ -116,7 +73,7 @@ watch(isOpen, (val) => {
       <div class="modal">
         <!-- Header -->
         <div class="modal__header">
-          Add member
+          Assign Position
         </div>
 
         <!-- Search -->
@@ -136,43 +93,26 @@ watch(isOpen, (val) => {
           <!-- Header -->
           <div class="table__head table__row">
             <div class="cell cell--checkbox"></div>
-            <div class="cell">User</div>
-            <div class="cell">Role</div>
+            <div class="cell">Name</div>
           </div>
 
-          <!-- Scroll Body -->
+          <!-- Body -->
           <div class="table__body">
             <div
-              v-for="user in filteredUsers"
-              :key="user.id"
+              v-for="pos in filteredPositions"
+              :key="pos.id"
               class="table__row"
             >
               <div class="cell cell--checkbox">
                 <BaseCheckbox
                   variant="red"
-                  :model-value="selected[user.id]?.checked || false"
-                  @update:model-value="val => toggleUser(user.id, val)"
+                  :model-value="selected[pos.id] || false"
+                  @update:model-value="val => togglePosition(pos.id, val)"
                 />
-              </div>
-
-              <div class="cell cell--user">
-                <div class="user-name">
-                  {{ user.name }}
-                </div>
-                <div class="user-sub">
-                  {{ user.email }}
-                </div>
               </div>
 
               <div class="cell">
-                <BaseSelectInput
-                  class="role-select"
-                  :model-value="selected[user.id]?.roles?.[0] || null"
-                  :options="roles"
-                  placeholder=""
-                  :disabled="!selected[user.id]?.checked"
-                  @update:model-value="val => changeRole(user.id, val)"
-                />
+                {{ pos.name }}
               </div>
             </div>
           </div>
@@ -230,8 +170,6 @@ watch(isOpen, (val) => {
   position: absolute;
   bottom: 32px;
   display: flex;
-  justify-content: center;
-  align-items: center;
   gap: 22px;
 }
 
@@ -257,20 +195,19 @@ watch(isOpen, (val) => {
 }
 
 .table__body {
-  height: 300px;        /* 5 rows */
+  height: 294px;
   overflow-y: auto;
 }
 
 .table__row {
   display: grid;
-  grid-template-columns: 80px 1fr 1fr;
+  grid-template-columns: 80px 1fr;
   align-items: center;
-  height: 60px;
+  height: 42px;
 }
 
 .table__head {
   background: #F2F2F7;
-  border-bottom: 1px solid #F2F2F7;
   height: 44px;
 }
 
@@ -286,30 +223,5 @@ watch(isOpen, (val) => {
 
 .cell--checkbox {
   justify-content: center;
-}
-
-.role-select {
-  --select-input-height: 42px;
-}
-
-.cell--user {
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 0px;
-}
-
-.user-name {
-  font-size: 16px;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-.user-sub {
-  font-size: 13px;
-  line-height: 1.5;
-  color: #8E8E93;
-  font-weight: 400;
-  margin-top: -4px;
 }
 </style>

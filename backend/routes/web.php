@@ -48,10 +48,10 @@ Route::prefix('users')->middleware('auth:sanctum')->group(function () {
     Route::get('/', [UserController::class, 'getFilteredList']);
     Route::get('{user}', [UserController::class, 'view']);
     Route::post('/', [UserController::class, 'create']);
-    Route::patch('{user}', [UserController::class, 'update']);
+    Route::put('{user}', [UserController::class, 'update']);
     Route::delete('{user}', [UserController::class, 'delete']);
     Route::get('{user}/positions', [UserController::class, 'getPositions']);
-    Route::post('{user}/positions', [UserController::class, 'assignPositions']);
+    Route::put('{user}/positions', [UserController::class, 'assignPositions']);
 });
 
 Route::prefix('positions')->middleware('auth:sanctum')->group(function () {
